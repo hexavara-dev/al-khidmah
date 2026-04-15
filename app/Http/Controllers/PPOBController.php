@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\PPOB\PriceListRequest;
 use App\Services\IAKService;
 
 class PPOBController extends Controller
@@ -18,8 +18,8 @@ class PPOBController extends Controller
         return response()->json($result);
     }
 
-    public function priceList(Request $request) {
-        $type   = $request->query('type', $request->input('type', 'pulsa'));
+    public function priceList(PriceListRequest $request) {
+        $type = (string) $request->validated('type');
         $result = $this->iakService->priceList($type);
 
         return response()->json($result);

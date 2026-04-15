@@ -13,7 +13,7 @@ class IAKService {
     public function __construct() {
         $this->userHp = config('services.iak.user_hp');
         $this->apiKey = config('services.iak.api_key');
-        $this->baseUrl  = 'https://prepaid.iak.id/api';
+        $this->baseUrl  = 'https://prepaid.iak.dev/api';
     }
 
     private function sign(string $suffix): string {
@@ -32,7 +32,7 @@ class IAKService {
         ])->json();
     }
 
-    public function priceList(string $type = 'pulsa'): array {
+    public function priceList(string $type): array {
         return $this->post('/pricelist', [
             'commands' => 'pricelist',
             'username' => $this->userHp,

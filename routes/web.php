@@ -16,8 +16,8 @@ Route::get('/', function () {
 });
 
 Route::prefix('ppob')->group(function () {
-    Route::get('/saldo',     [PPOBController::class, 'checkBalance']);
-    Route::get('/pricelist', [PPOBController::class, 'priceList']);
+    Route::get('/saldo', [PPOBController::class, 'checkBalance']);
+    Route::get('/pricelist/{type?}', [PPOBController::class, 'priceList']);
     // Route::post('/topup',    [PPOBController::class, 'topUp']);
 });
 
