@@ -2,18 +2,11 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PPOBController;
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\HomepageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+Route::get('/', [HomepageController::class, 'index'])->name('home');
 
 Route::prefix('ppob')->group(function () {
     Route::get('/saldo', [PPOBController::class, 'checkBalance']);
