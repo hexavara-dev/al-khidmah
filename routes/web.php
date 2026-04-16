@@ -16,10 +16,32 @@ Route::get('/', function () {
 });
 
 Route::prefix('ppob')->group(function () {
-    Route::get('/saldo', [PPOBController::class, 'checkBalance']);
-    Route::get('/pricelist/{type?}', [PPOBController::class, 'priceList']);
-    // Route::post('/topup',    [PPOBController::class, 'topUp']);
+
+    Route::get(
+        '/pricelist',
+        fn() =>
+        Inertia::render('PPOB/PriceList')
+    );
+
+    Route::get(
+        '/transaksi',
+        fn() =>
+        Inertia::render('PPOB/Transaksi')
+    );
+
+    Route::get(
+        '/history',
+        fn() =>
+        Inertia::render('PPOB/History')
+    );
 });
+
+// Route::prefix('ppob')->group(function () {
+//     Route::get('/saldo', [PPOBController::class, 'checkBalance']);
+//     Route::get('/pricelist/{type?}', [PPOBController::class, 'priceList']);
+//     Route::post('/pln/inquiry', [PPOBController::class, 'inquiryPln']);
+//     // Route::post('/topup',    [PPOBController::class, 'topUp']);
+// });
 
 
 

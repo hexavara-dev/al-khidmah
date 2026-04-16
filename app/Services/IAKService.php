@@ -41,4 +41,28 @@ class IAKService {
             'type'     => $type,
         ])->json();
     }
+
+
+    public function inquiryPln(string $customerId, string $productCode): array
+    {
+        return $this->post('/transaction', [
+            'commands'   => 'inq-pra',
+            'username'   => $this->userHp,
+            'customer_id' => $customerId,
+            'code'       => $productCode,
+            'sign'       => $this->sign($customerId),
+        ])->json();
+    }
+
+    public function topUpPln(string $customerId, string $productCode, string $refId): array
+    {
+        return $this->post('/transaction', [
+            'commands'    => 'topup',
+            'username'    => $this->userHp,
+            'customer_id' => $customerId,
+            'product_code' => $productCode,
+            'ref_id'      => $refId,
+            'sign'        => $this->sign($refId),
+        ])->json();
+    }
 }
