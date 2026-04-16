@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PPOBController;
 use App\Http\Controllers\HomepageController;
 use Illuminate\Support\Facades\Route;
@@ -10,8 +9,10 @@ Route::get('/', [HomepageController::class, 'index'])->name('home');
 
 Route::prefix('ppob')->group(function () {
     Route::get('/saldo', [PPOBController::class, 'checkBalance']);
-    Route::get('/pricelist/{type?}', [PPOBController::class, 'priceList']);
-    // Route::post('/topup',    [PPOBController::class, 'topUp']);
+    Route::get('/pricelist/{type}', [PPOBController::class, 'priceList']);
+    Route::get('/pricelist-pasca/{type}', [PPOBController::class, 'priceListPasca']);
+    Route::post('/topup', [PPOBController::class, 'topUp']);
+    Route::post('/callback', [PPOBController::class, 'callback']);
 });
 
 
