@@ -18,7 +18,7 @@ jobs:
     - name: Set up PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: 8.2
+        php-version: 8.3
         extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, dom, filter, gd, json
         coverage: none
 
@@ -105,5 +105,5 @@ jobs:
           php artisan event:cache # Cache events juga
 
           # Restart services
-          sudo systemctl reload php8.2-fpm || true
+          sudo systemctl reload php8.3-fpm || true
           sudo systemctl reload nginx || sudo systemctl reload apache2 || true
