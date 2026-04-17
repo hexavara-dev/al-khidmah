@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\PPOBController;
 use App\Http\Controllers\HomepageController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PPOBController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', [HomepageController::class, 'index'])->name('home');
 
@@ -11,9 +11,17 @@ Route::prefix('ppob')->group(function () {
     Route::get('/saldo', [PPOBController::class, 'checkBalance']);
     Route::get('/pricelist/{type}', [PPOBController::class, 'priceList']);
     Route::get('/pricelist-pasca/{type}', [PPOBController::class, 'priceListPasca']);
-    Route::post('/topup', [PPOBController::class, 'topUp']);
-    Route::post('/callback', [PPOBController::class, 'callback']);
+    Route::post('/checkout', [PPOBController::class, 'checkout'])->name('ppob.checkout');
+    Route::post('/callback', [PPOBController::class, 'callback'])->name('ppob.callback');
 });
+
+// Midtrans payment notification webhook — must be exempt from CSRF
+Route::post('/payment/notification', [PaymentController::class, 'notification'])
+    ->name('payment.notification');
+
+// Halaman finish setelah redirect kembali dari Midtrans
+Route::get('/payment/finish', [PaymentController::class, 'finish'])
+    ->name('payment.finish');
 
 
 

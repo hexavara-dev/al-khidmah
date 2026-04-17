@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->validateCsrfTokens(except: [
             'ppob/callback',
+            'payment/notification',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

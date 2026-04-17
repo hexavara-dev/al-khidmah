@@ -19,6 +19,7 @@ class TopUpRequest extends FormRequest
             'customer_id'  => 'required|string|max:50',
             'product_code' => 'required|string|max:50',
             'type'         => 'required|in:pulsa,data,pln,game,etoll,voucher,esim,esiminternational,international',
+            'price'        => 'required|integer|min:1',
         ];
     }
 
@@ -29,6 +30,9 @@ class TopUpRequest extends FormRequest
             'product_code.required' => 'product_code wajib diisi.',
             'type.required'         => 'type wajib diisi.',
             'type.in'               => 'Tipe produk tidak valid.',
+            'price.required'        => 'price wajib diisi.',
+            'price.integer'         => 'price harus berupa angka.',
+            'price.min'             => 'price minimal 1.',
         ];
     }
 

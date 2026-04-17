@@ -12,6 +12,8 @@ class Transaction extends Model
         'customer_id',
         'type',
         'price',
+        'snap_token',
+        'payment_status',
         'status',
         'message',
         'sn',

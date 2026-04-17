@@ -35,7 +35,7 @@ export default function ConfirmModal({ show, item, phoneNumber, operator, servic
 			const csrfMeta = document.querySelector('meta[name="csrf-token"]');
 			const csrfToken = csrfMeta ? (csrfMeta as HTMLMetaElement).content : '';
 
-			const res = await fetch('/ppob/topup', {
+			const res = await fetch('/ppob/checkout', {
 				method: 'POST',
 				credentials: 'same-origin',
 				headers: {
@@ -48,25 +48,28 @@ export default function ConfirmModal({ show, item, phoneNumber, operator, servic
 					customer_id: phoneNumber,
 					product_code: item.product_code,
 					type: service?.type ?? '',
+					price: item.product_price,
 				}),
 			});
 
 			const contentType = res.headers.get('content-type') ?? '';
 			const data = contentType.includes('application/json') ? await res.json() : null;
 
-			if (!res.ok || data?.data?.status === 2) {
+			if (!res.ok) {
 				if (res.status === 419) {
 					setErrorMessage('Sesi keamanan berakhir. Silakan refresh halaman lalu coba lagi.');
 					setStatus('error');
 					return;
 				}
-				setErrorMessage(data?.data?.message ?? data?.message ?? 'Transaksi gagal. Silakan coba lagi.');
+				setErrorMessage(data?.message ?? 'Transaksi gagal. Silakan coba lagi.');
 				setStatus('error');
-			} else {
-				setStatus('success');
+				return;
 			}
-		} catch {
-			setErrorMessage('Terjadi kesalahan jaringan. Silakan coba lagi.');
+
+			// Redirect ke halaman pembayaran Midtrans
+			window.location.href = data.redirect_url;
+		} catch (err) {
+			setErrorMessage(err instanceof Error ? err.message : 'Terjadi kesalahan jaringan. Silakan coba lagi.');
 			setStatus('error');
 		}
 	};

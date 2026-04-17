@@ -23,16 +23,19 @@ class IAKService {
 
     public function checkBalance(): array {
         return Http::post($this->prepaidUrl . '/check-balance', [
+            'commands' => 'checkBalance',
             'username' => $this->userHp,
             'sign'     => $this->sign('bl'),
         ])->json();
     }
 
     public function priceList(string $type): array {
-        return Http::post($this->prepaidUrl . '/pricelist/' . $type, [
+        return Http::post($this->prepaidUrl . '/pricelist', [
+            'commands' => 'pricelist',
             'username' => $this->userHp,
             'sign'     => $this->sign('pl'),
             'status'   => 'active',
+            'type'     => $type,
         ])->json();
     }
 
@@ -46,16 +49,12 @@ class IAKService {
     }
 
     public function topUp(string $refId, string $customerId, string $productCode): array {
-        $payload = [
+        return Http::post($this->prepaidUrl . '/top-up', [
             'username'     => $this->userHp,
             'ref_id'       => $refId,
             'customer_id'  => $customerId,
             'product_code' => $productCode,
             'sign'         => $this->sign($refId),
-        ];
-
-        $response = Http::post($this->prepaidUrl . '/top-up', $payload)->json();
-
-        return $response;
+        ])->json();
     }
 }
