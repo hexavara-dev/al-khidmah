@@ -271,6 +271,7 @@ export default function Homepage({ balance }: HomepageProps) {
                         bill={billData}
                         customerNumber={phoneNumber}
                         serviceType={selected?.type}
+                        serviceLabel={selected?.type === 'tv' ? (selectedProvider?.name ?? selected?.label) : selected?.label}
                         onPay={(bill) => setConfirmBill(bill)}
                     />
                 )}
@@ -292,6 +293,7 @@ export default function Homepage({ balance }: HomepageProps) {
                     show={confirmBill !== null}
                     bill={confirmBill}
                     serviceType={selected?.type}
+                    serviceLabel={selected?.type === 'tv' ? (selectedProvider?.name ?? selected?.label) : selected?.label}
                     onClose={() => setConfirmBill(null)}
                 />
 

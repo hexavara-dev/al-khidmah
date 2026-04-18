@@ -6,13 +6,14 @@ type Props = {
     bill: PostpaidBill;
     customerNumber: string;
     serviceType?: string;
+    serviceLabel?: string;
     onPay: (bill: PostpaidBill) => void;
 };
 
-export default function BillInquiryCard({ bill, customerNumber, serviceType = 'pln_pasca', onPay }: Props) {
-    const isTv = serviceType === 'tv_pasca';
+export default function BillInquiryCard({ bill, customerNumber, serviceType = 'pln_pasca', serviceLabel, onPay }: Props) {
+    const isTv = serviceType === 'tv' || serviceType === 'tv_pasca' || serviceType === 'internet_pasca';
     const Icon = isTv ? Tv2 : Zap;
-    const title = isTv ? 'Detail Tagihan TV / Internet' : 'Detail Tagihan PLN';
+    const title = `Detail Tagihan ${serviceLabel ?? (isTv ? 'TV / Internet' : 'PLN')}`;
     const customerLabel = isTv ? 'Nomor Pelanggan' : 'Nomor Meter';
 
     return (

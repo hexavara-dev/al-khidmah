@@ -14,10 +14,11 @@ type Props = {
 	service?: Service | null;
 	bill?: PostpaidBill | null;
 	serviceType?: string;
+	serviceLabel?: string;
 	onClose: () => void;
 };
 
-export default function ConfirmModal({ show, item, phoneNumber, operator, service, bill, serviceType, onClose }: Props) {
+export default function ConfirmModal({ show, item, phoneNumber, operator, service, bill, serviceType, serviceLabel, onClose }: Props) {
 	const [status, setStatus] = useState<Status>('idle');
 	const [errorMessage, setErrorMessage] = useState('');
 
@@ -97,7 +98,7 @@ export default function ConfirmModal({ show, item, phoneNumber, operator, servic
 						<CheckCircle2 className="size-14 text-green-500" />
 						<p className="text-sm font-medium text-gray-700">
 							{isPostpaid
-								? <>Tagihan PLN atas nama <span className="font-semibold text-green-700">{bill!.customer_name ?? phoneNumber}</span> sedang diproses.</>
+								? <>Tagihan {serviceLabel ?? 'postpaid'} atas nama <span className="font-semibold text-green-700">{bill!.customer_name ?? phoneNumber}</span> sedang diproses.</>
 								: <>Pembelian <span className="font-semibold text-green-700">{item ? getItemTitle(item, service?.type ?? '') : ''}</span> untuk nomor <span className="font-semibold">{phoneNumber}</span> sedang diproses.</>
 							}
 						</p>
@@ -139,7 +140,7 @@ export default function ConfirmModal({ show, item, phoneNumber, operator, servic
 									<div className="flex items-center justify-between px-4 py-3">
 										<span className="text-gray-500">Layanan</span>
 										<span className="font-medium text-gray-800">
-											{serviceType === 'tv_pasca' ? 'TV Kabel / Internet' : 'PLN Pascabayar'}
+											{serviceLabel ?? (serviceType === 'tv' || serviceType === 'tv_pasca' || serviceType === 'internet_pasca' ? 'TV / Internet' : 'PLN Pascabayar')}
 										</span>
 									</div>
 									{bill!.customer_name && (
