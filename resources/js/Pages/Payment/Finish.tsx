@@ -9,6 +9,8 @@ interface Props {
     transaction: {
         product_code: string;
         customer_id: string;
+        customer_name: string | null;
+        segment_power: string | null;
         price: number;
         type: string;
     } | null;
@@ -74,9 +76,23 @@ export default function Finish({ orderId, transactionStatus, statusCode, transac
                                 <span className="font-mono text-xs font-medium text-gray-700">{orderId}</span>
                             </div>
                             <div className="flex justify-between px-4 py-3">
-                                <span className="text-gray-500">Nomor Tujuan</span>
+                                <span className="text-gray-500">
+                                    {transaction.type === 'pln' || transaction.type === 'pln_pasca' ? 'Nomor Meter' : transaction.type === 'tv_pasca' ? 'Nomor Pelanggan' : 'Nomor Tujuan'}
+                                </span>
                                 <span className="font-semibold text-gray-900">{transaction.customer_id}</span>
                             </div>
+                            {transaction.customer_name && (
+                                <div className="flex justify-between px-4 py-3">
+                                    <span className="text-gray-500">Atas Nama</span>
+                                    <span className="font-semibold text-gray-900">{transaction.customer_name}</span>
+                                </div>
+                            )}
+                            {transaction.segment_power && (
+                                <div className="flex justify-between px-4 py-3">
+                                    <span className="text-gray-500">Daya</span>
+                                    <span className="font-medium text-gray-800">{transaction.segment_power}</span>
+                                </div>
+                            )}
                             <div className="flex justify-between px-4 py-3">
                                 <span className="text-gray-500">Produk</span>
                                 <span className="font-medium text-gray-800">{transaction.product_code}</span>

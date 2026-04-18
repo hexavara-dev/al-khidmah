@@ -16,12 +16,13 @@ type Props = {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onCheck: () => void;
     operator?: Operator | null;
+    buttonLabel?: string;
     type?: string;
     emoneyProvider?: string;
     onEmoneyChange?: (value: string) => void;
 };
 
-export default function NumberInputBar({ value, placeholder, isValid, onChange, onCheck, operator, type, emoneyProvider, onEmoneyChange }: Props) {
+export default function NumberInputBar({ value, placeholder, isValid, onChange, onCheck, operator, buttonLabel, type, emoneyProvider, onEmoneyChange }: Props) {
     const isEmoney = type === 'etoll';
 
     return (
@@ -72,7 +73,7 @@ export default function NumberInputBar({ value, placeholder, isValid, onChange, 
                     onClick={onCheck}
                     className="rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700"
                 >
-                    Cek Layanan
+                    {buttonLabel ?? 'Cek Layanan'}
                 </button>
             </div>
         </div>

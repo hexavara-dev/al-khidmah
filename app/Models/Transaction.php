@@ -10,6 +10,8 @@ class Transaction extends Model
         'ref_id',
         'product_code',
         'customer_id',
+        'customer_name',
+        'segment_power',
         'type',
         'price',
         'snap_token',

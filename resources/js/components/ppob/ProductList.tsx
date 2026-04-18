@@ -1,6 +1,6 @@
+import type { PricelistItem, Operator, Service, PlnCustomer } from '@/types/ppob';
 import { useState } from 'react';
 import { Info, X } from 'lucide-react';
-import type { PricelistItem, Operator, Service } from '@/types/ppob';
 import { idr, getItemTitle, getItemSubtitle } from '@/lib/ppob';
 
 type Props = {
@@ -8,6 +8,8 @@ type Props = {
     selected: Service | null;
     operator: Operator | null;
     onBuy: (item: PricelistItem) => void;
+    customerNumber?: string;
+    plnCustomer?: PlnCustomer | null;
 };
 
 function RawJsonDialog({ item, onClose }: { item: PricelistItem; onClose: () => void }) {
@@ -37,7 +39,7 @@ function RawJsonDialog({ item, onClose }: { item: PricelistItem; onClose: () => 
     );
 }
 
-export default function ProductList({ items, selected, operator, onBuy }: Props) {
+export default function ProductList({ items, selected, operator, onBuy, customerNumber, plnCustomer }: Props) {
     const [inspecting, setInspecting] = useState<PricelistItem | null>(null);
 
     return (
@@ -48,6 +50,18 @@ export default function ProductList({ items, selected, operator, onBuy }: Props)
                         {selected?.label}{operator?.name && <span className="capitalize"> &mdash; {operator.name}</span>}
                     </h2>
                     <p className="mt-1 text-xs text-gray-400">{items.length} produk tersedia</p>
+                    {selected?.type === 'pln' && plnCustomer && (
+                        <div className="mt-2 rounded-xl border border-green-100 bg-green-50 px-4 py-3 text-xs text-gray-700 space-y-1">
+                            {plnCustomer.name && <p><span className="text-gray-400">Nama:</span> <span className="font-semibold">{plnCustomer.name}</span></p>}
+                            {plnCustomer.meter_no && <p><span className="text-gray-400">No. Meter:</span> <span className="font-semibold">{plnCustomer.meter_no}</span></p>}
+                            {plnCustomer.segment_power && <p><span className="text-gray-400">Daya:</span> <span className="font-semibold">{plnCustomer.segment_power}</span></p>}
+                        </div>
+                    )}
+                    {selected?.type === 'pln' && customerNumber && !plnCustomer && (
+                        <p className="mt-1.5 text-xs text-gray-500">
+                            ID Pelanggan: <span className="font-semibold text-gray-700">{customerNumber}</span>
+                        </p>
+                    )}
                 </div>
                 <div className="flex flex-col divide-y divide-green-50 rounded-2xl border border-green-100 bg-white shadow-sm overflow-hidden">
                     {items.length > 0 ? items.map((item) => (
