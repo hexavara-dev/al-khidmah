@@ -13,6 +13,7 @@ export type PricelistItem = {
     product_code: string;
     product_description: string;
     product_nominal: string;
+    product_details: string;
     product_price: number;
 };
 

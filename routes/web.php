@@ -11,6 +11,7 @@ Route::prefix('ppob')->group(function () {
     Route::get('/saldo', [PPOBController::class, 'checkBalance']);
     Route::get('/pricelist/{type}', [PPOBController::class, 'priceList']);
     Route::get('/pricelist-pasca/{type}', [PPOBController::class, 'priceListPasca']);
+    Route::post('/inquiry-ovo', [PPOBController::class, 'inquiryOvo'])->name('ppob.inquiry-ovo');
     Route::post('/checkout', [PPOBController::class, 'checkout'])->name('ppob.checkout');
     Route::post('/callback', [PPOBController::class, 'callback'])->name('ppob.callback');
 });

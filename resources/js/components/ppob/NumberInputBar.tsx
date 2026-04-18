@@ -1,6 +1,14 @@
 import { CheckCircle2, XCircle } from 'lucide-react';
 import type { Operator } from '@/types/ppob';
 
+const emoneyOptions = [
+    { label: 'OVO',       value: 'ovo'      },
+    { label: 'GoPay',     value: 'gopay'    },
+    { label: 'DANA',      value: 'dana'     },
+    { label: 'ShopeePay', value: 'shopee'   },
+    { label: 'LinkAja',   value: 'linkaja'  },
+];
+
 type Props = {
     value: string;
     placeholder: string;
@@ -8,9 +16,14 @@ type Props = {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onCheck: () => void;
     operator?: Operator | null;
+    type?: string;
+    emoneyProvider?: string;
+    onEmoneyChange?: (value: string) => void;
 };
 
-export default function NumberInputBar({ value, placeholder, isValid, onChange, onCheck, operator }: Props) {
+export default function NumberInputBar({ value, placeholder, isValid, onChange, onCheck, operator, type, emoneyProvider, onEmoneyChange }: Props) {
+    const isEmoney = type === 'etoll';
+
     return (
         <div className="mt-8 flex justify-center">
             <div className="flex items-center gap-3 rounded-2xl border border-green-200 bg-white px-5 py-3 shadow-sm">
@@ -30,7 +43,22 @@ export default function NumberInputBar({ value, placeholder, isValid, onChange, 
                         }
                     </>
                 )}
-                {operator && (
+                {isEmoney && (
+                    <>
+                        <div className="h-5 w-px bg-green-200" />
+                        <select
+                            value={emoneyProvider ?? ''}
+                            onChange={e => onEmoneyChange?.(e.target.value)}
+                            className="border-none bg-transparent text-sm text-gray-700 outline-none"
+                        >
+                            <option value="">Pilih e-money</option>
+                            {emoneyOptions.map(opt => (
+                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                        </select>
+                    </>
+                )}
+                {!isEmoney && operator && (
                     <>
                         <div className="h-5 w-px bg-green-200" />
                         <div className="flex items-center gap-2">

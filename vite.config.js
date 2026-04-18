@@ -16,7 +16,13 @@ export default defineConfig({
         strictPort: true,
         origin: 'http://127.0.0.1:5173',
         cors: {
-            origin: [/^https?:\/\/localhost:8000$/, /^https?:\/\/127\.0\.0\.1:8000$/],
+            origin: [
+                /^https?:\/\/localhost(:\d+)?$/,
+                /^https?:\/\/127\.0\.0\.1(:\d+)?$/,
+                /\.ngrok-free\.app$/,
+                /\.ngrok\.io$/,
+                /\.ngrok\.app$/,
+            ],
         },
         hmr: {
             host: '127.0.0.1',

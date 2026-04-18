@@ -17,6 +17,7 @@ export default function Homepage({ balance }: HomepageProps) {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isValid, setIsValid] = useState<boolean | null>(null);
     const [operator, setOperator] = useState<Operator | null>(null);
+    const [emoneyProvider, setEmoneyProvider] = useState<string>('');
     const [prepaidService, setPrepaidService] = useState<PricelistItem[] | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [confirmItem, setConfirmItem] = useState<PricelistItem | null>(null);
@@ -31,6 +32,7 @@ export default function Homepage({ balance }: HomepageProps) {
         }
         setPhoneNumber('');
         setOperator(null);
+        setEmoneyProvider('');
         setIsValid(null);
     };
 
@@ -43,12 +45,23 @@ export default function Homepage({ balance }: HomepageProps) {
             const res = await fetch(url);
             const data = await res.json();
             const allItems: PricelistItem[] = data?.data?.pricelist ?? [];
-            if (operator) {
-                const opName = operator.apiName.toLowerCase();
+            const isEmoney = selected?.type === 'etoll';
+            const filterKey = isEmoney
+                ? emoneyProvider
+                : operator?.apiName ?? '';
+            if (filterKey) {
+                const keyLower = filterKey.toLowerCase();
+                const isPulsa = selected?.type === 'pulsa';
                 const filtered = allItems
                     .filter(item => {
                         const desc = item.product_description.toLowerCase();
-                        return desc.includes(opName) || opName.includes(desc);
+                        const code = item.product_code.toLowerCase();
+                        if (!desc.includes(keyLower) && !code.includes(keyLower)) return false;
+                        if (isPulsa) {
+                            const nom = parseInt(item.product_nominal?.replace(/\D/g, '') ?? '');
+                            if (isNaN(nom) || nom < 1000) return false;
+                        }
+                        return true;
                     })
                     .sort((a, b) => a.product_price - b.product_price);
                 setPrepaidService(filtered);
@@ -150,7 +163,10 @@ export default function Homepage({ balance }: HomepageProps) {
                             isValid={isValid}
                             onChange={handlePhoneNumberChange}
                             onCheck={handleServiceCheck}
-                            operator={(selected.type === 'pulsa' || selected.type === 'data') ? operator : undefined}
+                            operator={(selected.type === 'pulsa' || selected.type === 'data') ? operator : null}
+                            type={selected.type}
+                            emoneyProvider={emoneyProvider}
+                            onEmoneyChange={setEmoneyProvider}
                         />
                     )}
                 </section>
