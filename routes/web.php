@@ -25,11 +25,29 @@ Route::get('/payment/finish', [PaymentController::class, 'finish'])
     ->name('payment.finish');
 
 
+// Donasi SPA — semua route dari AppRouter.jsx dilayani oleh donasi.blade.php
+// Public routes
+Route::get('/donasi', fn() => view('donasi'));
+Route::get('/campaigns/{id}', fn() => view('donasi'));
 
+// Guest routes
+Route::get('/login', fn() => view('donasi'));
+Route::get('/register', fn() => view('donasi'));
 
+// Authenticated user routes
+Route::get('/my-donations', fn() => view('donasi'));
+Route::get('/campaigns', fn() => view('donasi'));
 
+// Admin routes
+Route::get('/dashboard', fn() => view('donasi'));
+Route::get('/dashboard/campaigns', fn() => view('donasi'));
+Route::get('/dashboard/categories', fn() => view('donasi'));
+Route::get('/dashboard/donations', fn() => view('donasi'));
+Route::get('/dashboard/users', fn() => view('donasi'));
 
-
+// Catch-all untuk sub-route SPA lainnya
+Route::get('/donasi/{any}', fn() => view('donasi'))->where('any', '.*');
+Route::get('/{any}', fn() => view('donasi'))->where('any', '^(?!api).*');
 
 // Route::get('/dashboard', function () {
 //     return Inertia::render('Dashboard');
@@ -40,5 +58,3 @@ Route::get('/payment/finish', [PaymentController::class, 'finish'])
 //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
-
-require __DIR__.'/auth.php';

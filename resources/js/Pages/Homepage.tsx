@@ -106,21 +106,40 @@ export default function Homepage({ balance }: HomepageProps) {
 
             <div className="min-h-screen bg-green-50 font-sans">
                 {/* Navbar */}
-                <header className="border-b border-green-100 bg-white/80 backdrop-blur-sm">
-                    <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-                        <div className="flex items-center gap-2.5">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-600">
-                                <CircleDollarSign className="size-4 text-white" />
-                            </div>
-                            <span className="text-base font-semibold text-green-900">Al-Khidmah</span>
-                        </div>
-                        <div className="flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-1.5">
-                            <div className="h-2 w-2 rounded-full bg-green-500" />
-                            <span className="text-xs font-medium text-green-700">Saldo</span>
-                            <span className="text-sm font-semibold text-green-900">{idr.format(balance ?? 0)}</span>
-                        </div>
-                    </div>
-                </header>
+               <header className="border-b border-green-100 bg-white/80 backdrop-blur-sm">
+    <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        
+        {/* Kiri (Logo) */}
+        <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-600">
+                <CircleDollarSign className="size-4 text-white" />
+            </div>
+            <span className="text-base font-semibold text-green-900">Al-Khidmah</span>
+        </div>
+
+        {/* Kanan (Saldo + Donasi) */}
+        <div className="flex items-center gap-3">
+            
+            {/* Saldo */}
+            <div className="flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-1.5">
+                <div className="h-2 w-2 rounded-full bg-green-500" />
+                <span className="text-xs font-medium text-green-700">Saldo</span>
+                <span className="text-sm font-semibold text-green-900">
+                    {idr.format(balance ?? 0)}
+                </span>
+            </div>
+
+            {/* Button Donasi */}
+            <a
+                href="/donasi"
+                className="bg-green-600 text-white text-xs font-semibold px-4 py-1.5 rounded-full hover:bg-green-700 transition"
+            >
+                Donasi
+            </a>
+
+        </div>
+    </div>
+</header>
 
                 {/* Hero */}
                 <section className="mx-auto max-w-6xl px-6 pb-8 pt-12">
