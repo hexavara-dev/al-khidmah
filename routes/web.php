@@ -9,9 +9,12 @@ Route::get('/', [HomepageController::class, 'index'])->name('home');
 
 Route::prefix('ppob')->group(function () {
     Route::get('/saldo', [PPOBController::class, 'checkBalance']);
+    Route::get('/inquiry-pln/{hp}', [PPOBController::class, 'inquiryPln']);
     Route::get('/pricelist/{type}', [PPOBController::class, 'priceList']);
     Route::get('/pricelist-pasca/{type}', [PPOBController::class, 'priceListPasca']);
     Route::post('/checkout', [PPOBController::class, 'checkout'])->name('ppob.checkout');
+    Route::post('/checkout-pasca', [PPOBController::class, 'checkoutPasca'])->name('ppob.checkout.pasca');
+    Route::post('/inquiry', [PPOBController::class, 'inquiry'])->name('ppob.inquiry');
     Route::post('/callback', [PPOBController::class, 'callback'])->name('ppob.callback');
 });
 

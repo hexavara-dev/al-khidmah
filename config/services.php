@@ -36,8 +36,11 @@ return [
     ],
 
     'iak' => [
-        'user_hp' => env('IAK_USER_HP'),
-        'api_key' => env('IAK_API_KEY'),
+        'user_hp'              => env('IAK_USER_HP'),
+        'api_key'              => env('IAK_API_KEY'),
+        'prepaid_url'          => env('IAK_PREPAID_URL',          'https://prepaid.iak.dev/api'),
+        'postpaid_url'         => env('IAK_POSTPAID_URL',         'https://testpostpaid.mobilepulsa.net/api/v1/bill/check'),
+        'postpaid_payment_url' => env('IAK_POSTPAID_PAYMENT_URL', 'https://testpostpaid.mobilepulsa.net/api/v1/bill/payment'),
     ],
 
     'midtrans' => [

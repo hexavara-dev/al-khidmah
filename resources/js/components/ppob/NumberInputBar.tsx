@@ -8,9 +8,10 @@ type Props = {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onCheck: () => void;
     operator?: Operator | null;
+    buttonLabel?: string;
 };
 
-export default function NumberInputBar({ value, placeholder, isValid, onChange, onCheck, operator }: Props) {
+export default function NumberInputBar({ value, placeholder, isValid, onChange, onCheck, operator, buttonLabel }: Props) {
     return (
         <div className="mt-8 flex justify-center">
             <div className="flex items-center gap-3 rounded-2xl border border-green-200 bg-white px-5 py-3 shadow-sm">
@@ -44,7 +45,7 @@ export default function NumberInputBar({ value, placeholder, isValid, onChange, 
                     onClick={onCheck}
                     className="rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700"
                 >
-                    Cek Layanan
+                    {buttonLabel ?? 'Cek Layanan'}
                 </button>
             </div>
         </div>

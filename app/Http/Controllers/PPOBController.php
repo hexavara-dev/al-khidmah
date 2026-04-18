@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PPOB\PriceListRequest;
+use App\Http\Requests\PPOB\InquiryRequest;
+use App\Http\Requests\PPOB\PostpaidCheckoutRequest;
 use App\Http\Requests\PPOB\PostpaidPriceListRequest;
+use App\Http\Requests\PPOB\PriceListRequest;
 use App\Http\Requests\PPOB\TopUpRequest;
 use App\Services\IAKService;
 use App\Services\TransactionService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
@@ -17,6 +20,23 @@ class PPOBController extends Controller
         private IAKService $iakService,
         private TransactionService $transactionService,
     ) {}
+
+    public function inquiryPln(string $hp): JsonResponse
+    {
+        $result = $this->iakService->inquiryPln($hp);
+        $data   = $result['data'] ?? $result;
+        $status = (int) ($data['status'] ?? 0);
+
+        if ($status !== 1) {
+            return response()->json(['message' => $data['message'] ?? 'Nomor meter tidak ditemukan.'], 422);
+        }
+
+        return response()->json([
+            'name'          => $data['name']          ?? null,
+            'meter_no'      => $data['meter_no']       ?? null,
+            'segment_power' => $data['segment_power'] ?? null,
+        ]);
+    }
 
     public function checkBalance() {
         $result = $this->iakService->checkBalance();
@@ -43,6 +63,28 @@ class PPOBController extends Controller
             price:       (int)    $request->validated('price'),
         );
 
+        return response()->json($data);
+    }
+
+    public function inquiry(InquiryRequest $request): JsonResponse
+    {
+        try {
+            $data = $this->transactionService->createPostpaidInquiry(
+                customerId:  (string) $request->validated('customer_id'),
+                productCode: (string) $request->validated('product_code'),
+                type:        (string) $request->validated('type'),
+            );
+            return response()->json($data);
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    public function checkoutPasca(PostpaidCheckoutRequest $request): JsonResponse
+    {
+        $data = $this->transactionService->createPostpaidCheckout(
+            refId: (string) $request->validated('ref_id'),
+        );
         return response()->json($data);
     }
 

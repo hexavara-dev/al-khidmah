@@ -1,14 +1,16 @@
-﻿import { useState } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import { CircleDollarSign } from 'lucide-react';
 import type { PageProps } from '@/types';
-import type { Service, PricelistItem, Operator } from '@/types/ppob';
+import type { Service, PricelistItem, Operator, PostpaidBill, PostpaidProvider, PlnCustomer } from '@/types/ppob';
 import { idr, services } from '@/lib/ppob';
 import phonePrefix from '@/lib/phonePrefix';
 import ServiceCard from '@/components/ppob/ServiceCard';
 import NumberInputBar from '@/components/ppob/NumberInputBar';
 import ProductList from '@/components/ppob/ProductList';
+import BillInquiryCard from '@/components/ppob/BillInquiryCard';
 import ConfirmModal from '@/components/ppob/ConfirmModal';
+import ProviderSelector from '@/components/ppob/ProviderSelector';
 
 type HomepageProps = PageProps<{ balance: number }>;
 
@@ -18,8 +20,46 @@ export default function Homepage({ balance }: HomepageProps) {
     const [isValid, setIsValid] = useState<boolean | null>(null);
     const [operator, setOperator] = useState<Operator | null>(null);
     const [prepaidService, setPrepaidService] = useState<PricelistItem[] | null>(null);
+    const [billData, setBillData] = useState<PostpaidBill | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [confirmItem, setConfirmItem] = useState<PricelistItem | null>(null);
+    const [confirmBill, setConfirmBill] = useState<PostpaidBill | null>(null);
+    const [tvProviders, setTvProviders] = useState<PostpaidProvider[] | null>(null);
+    const [tvProvidersLoading, setTvProvidersLoading] = useState(false);
+    const [selectedProvider, setSelectedProvider] = useState<PostpaidProvider | null>(null);
+    const [plnCustomer, setPlnCustomer] = useState<PlnCustomer | null>(null);
+
+    useEffect(() => {
+        if (selected?.type !== 'tv') {
+            setTvProviders(null);
+            setTvProvidersLoading(false);
+            setSelectedProvider(null);
+            return;
+        }
+        let cancelled = false;
+        setTvProvidersLoading(true);
+        Promise.all([
+            fetch('/ppob/pricelist-pasca/tv').then(r => r.json()),
+            fetch('/ppob/pricelist-pasca/internet').then(r => r.json()),
+        ])
+            .then(([tv, internet]) => {
+                if (!cancelled) {
+                    const combined: PostpaidProvider[] = [
+                        ...(tv?.data?.pasca ?? []),
+                        ...(internet?.data?.pasca ?? []),
+                    ];
+                    setTvProviders(combined);
+                    setTvProvidersLoading(false);
+                }
+            })
+            .catch(() => {
+                if (!cancelled) {
+                    setTvProviders([]);
+                    setTvProvidersLoading(false);
+                }
+            });
+        return () => { cancelled = true; };
+    }, [selected?.type]);
 
     const handleSelect = (service: Service) => {
         if (selected?.label === service.label) {
@@ -32,28 +72,71 @@ export default function Homepage({ balance }: HomepageProps) {
         setPhoneNumber('');
         setOperator(null);
         setIsValid(null);
+        setBillData(null);
+        setSelectedProvider(null);
+        setPlnCustomer(null);
     };
 
     const handleServiceCheck = async () => {
         if (!selected) return;
         setIsLoading(true);
         setPrepaidService(null);
+        setBillData(null);
+
         try {
-            const url = `/ppob/pricelist/${selected.type}`;
-            const res = await fetch(url);
-            const data = await res.json();
-            const allItems: PricelistItem[] = data?.data?.pricelist ?? [];
-            if (operator) {
-                const opName = operator.apiName.toLowerCase();
-                const filtered = allItems
-                    .filter(item => {
-                        const desc = item.product_description.toLowerCase();
-                        return desc.includes(opName) || opName.includes(desc);
-                    })
-                    .sort((a, b) => a.product_price - b.product_price);
-                setPrepaidService(filtered);
+            if (selected.type === 'pln_pasca' || selected.type === 'tv') {
+                const isTv = selected.type === 'tv';
+                if (isTv && !selectedProvider) return;
+                const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
+                const iakType = isTv
+                    ? (selectedProvider!.type === 'internet' ? 'internet_pasca' : 'tv_pasca')
+                    : 'pln_pasca';
+                const res = await fetch('/ppob/inquiry', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        customer_id: phoneNumber,
+                        product_code: isTv ? selectedProvider!.code : 'PLNPOSTPAID',
+                        type: iakType,
+                    }),
+                });
+                if (!res.ok) return;
+                const data = res.headers.get('content-type')?.includes('application/json') ? await res.json() : null;
+                if (data) setBillData(data);
             } else {
-                setPrepaidService([]);
+                const url = `/ppob/pricelist/${selected.type}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                const allItems: PricelistItem[] = data?.data?.pricelist ?? [];
+                if (selected.type === 'pln' && selected.endpoint === 'prepaid') {
+                    if (!phoneNumber) {
+                        setPrepaidService([]);
+                    } else {
+                        setPrepaidService([...allItems].sort((a, b) => a.product_price - b.product_price));
+                        try {
+                            const plnRes = await fetch(`/ppob/inquiry-pln/${encodeURIComponent(phoneNumber)}`);
+                            if (plnRes.ok) setPlnCustomer(await plnRes.json());
+                        } catch { /* graceful fallback */ }
+                    }
+                } else if (operator) {
+                    const opName = operator.apiName.toLowerCase();
+                    setPrepaidService(
+                        allItems
+                            .filter(item => {
+                                const desc = item.product_description.toLowerCase();
+                                return desc.includes(opName) || opName.includes(desc);
+                            })
+                            .sort((a, b) => a.product_price - b.product_price)
+                    );
+                } else {
+                    setPrepaidService([]);
+                }
             }
         } finally {
             setIsLoading(false);
@@ -63,6 +146,16 @@ export default function Homepage({ balance }: HomepageProps) {
     const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setPhoneNumber(value);
+
+        if ((selected?.type === 'pln' && selected?.endpoint === 'prepaid') || selected?.type === 'pln_pasca') {
+            setIsValid(value.length === 0 ? null : value.length >= 11 && value.length <= 12);
+            return;
+        }
+
+        if (selected?.type === 'tv') {
+            setIsValid(value.length === 0 ? null : value.length >= 4);
+            return;
+        }
 
         const isPhoneService = selected?.type === 'pulsa' || selected?.type === 'data';
         if (!isPhoneService) { setIsValid(null); return; }
@@ -143,7 +236,21 @@ export default function Homepage({ balance }: HomepageProps) {
                             />
                         ))}
                     </div>
-                    {selected && (
+                    {selected?.type === 'tv' && (
+                        tvProvidersLoading ? (
+                            <div className="mt-6 flex items-center gap-3 py-6 text-sm text-green-700">
+                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-green-200 border-t-green-600" />
+                                Memuat penyedia layanan...
+                            </div>
+                        ) : (
+                            <ProviderSelector
+                                providers={tvProviders ?? []}
+                                selected={selectedProvider?.code ?? null}
+                                onSelect={setSelectedProvider}
+                            />
+                        )
+                    )}
+                    {selected && (selected.type !== 'tv' || selectedProvider !== null) && (
                         <NumberInputBar
                             value={phoneNumber}
                             placeholder={selected.placeholder}
@@ -151,12 +258,25 @@ export default function Homepage({ balance }: HomepageProps) {
                             onChange={handlePhoneNumberChange}
                             onCheck={handleServiceCheck}
                             operator={(selected.type === 'pulsa' || selected.type === 'data') ? operator : undefined}
+                            buttonLabel={
+                                selected.type === 'pln' && selected.endpoint === 'prepaid' ? 'Cek Token' :
+                                selected.type === 'pln_pasca' || selected.type === 'tv' ? 'Cek Tagihan' : 'Cek Layanan'
+                            }
                         />
                     )}
                 </section>
 
+                {billData && (
+                    <BillInquiryCard
+                        bill={billData}
+                        customerNumber={phoneNumber}
+                        serviceType={selected?.type}
+                        onPay={(bill) => setConfirmBill(bill)}
+                    />
+                )}
+
                 {prepaidService !== null && (
-                    <ProductList items={prepaidService} selected={selected} operator={operator} onBuy={setConfirmItem} />
+                    <ProductList items={prepaidService} selected={selected} operator={operator} onBuy={setConfirmItem} customerNumber={phoneNumber} plnCustomer={plnCustomer} />
                 )}
 
                 <ConfirmModal
@@ -166,6 +286,13 @@ export default function Homepage({ balance }: HomepageProps) {
                     operator={operator}
                     service={selected}
                     onClose={() => setConfirmItem(null)}
+                />
+
+                <ConfirmModal
+                    show={confirmBill !== null}
+                    bill={confirmBill}
+                    serviceType={selected?.type}
+                    onClose={() => setConfirmBill(null)}
                 />
 
                 {/* Footer */}

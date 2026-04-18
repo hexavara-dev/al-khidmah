@@ -3,18 +3,21 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class IAKService {
     private string $userHp;
     private string $apiKey;
     private string $prepaidUrl;
     private string $postpaidUrl;
+    private string $postpaidPaymentUrl;
 
     public function __construct() {
-        $this->userHp      = config('services.iak.user_hp');
-        $this->apiKey      = config('services.iak.api_key');
-        $this->prepaidUrl  = 'https://prepaid.iak.dev/api';
-        $this->postpaidUrl = 'https://postpaid.iak.dev/api/v1/bill/check';
+        $this->userHp             = config('services.iak.user_hp');
+        $this->apiKey             = config('services.iak.api_key');
+        $this->prepaidUrl         = config('services.iak.prepaid_url');
+        $this->postpaidUrl        = config('services.iak.postpaid_url');
+        $this->postpaidPaymentUrl = config('services.iak.postpaid_payment_url');
     }
 
     private function sign(string $suffix): string {
@@ -46,6 +49,37 @@ class IAKService {
             'sign'     => $this->sign('pl'),
             'status'   => 'active',
         ])->json();
+    }
+
+    public function inquiryPostpaid(string $refId, string $code, string $hp, string $iakType): array {
+        return Http::post($this->postpaidUrl . '/' . $iakType, [
+            'commands' => 'inq-pasca',
+            'username' => $this->userHp,
+            'code'     => $code,
+            'hp'       => $hp,
+            'ref_id'   => $refId,
+            'sign'     => $this->sign($refId),
+        ])->json();
+    }
+
+    public function billPaymentPostpaid(string $refId, string $trId, string $iakType): array {
+        return Http::post($this->postpaidPaymentUrl . '/' . $iakType, [
+            'commands' => 'pay-pasca',
+            'username' => $this->userHp,
+            'tr_id'    => $trId,
+            'ref_id'   => $refId,
+            'sign'     => md5($this->userHp . $this->apiKey . $trId),
+        ])->json();
+    }
+
+    public function inquiryPln(string $hp): array {
+        $response = Http::post($this->prepaidUrl . '/inquiry-pln', [
+            'commands' => 'inquiry_pln',
+            'username' => $this->userHp,
+            'hp'       => $hp,
+            'sign'     => md5($this->userHp . $this->apiKey . $hp),
+        ])->json();
+        return $response ?? [];
     }
 
     public function topUp(string $refId, string $customerId, string $productCode): array {
