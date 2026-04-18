@@ -91,4 +91,12 @@ class IAKService {
             'sign'         => $this->sign($refId),
         ])->json();
     }
+
+    public function inquiryOvo(string $customerId): array {
+        return Http::post($this->prepaidUrl . '/inquiry-ovo', [
+            'username'    => $this->userHp,
+            'customer_id' => $customerId,
+            'sign'        => md5($this->userHp . $this->apiKey . $customerId),
+        ])->json();
+    }
 }

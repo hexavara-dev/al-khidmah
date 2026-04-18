@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { CheckCircle2, XCircle, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { CheckCircle2, XCircle, X, ShieldCheck } from 'lucide-react';
 import Modal from '@/components/Modal';
 import type { PricelistItem, Operator, Service, PostpaidBill } from '@/types/ppob';
 import { idr, getItemTitle } from '@/lib/ppob';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
+type InquiryState = 'idle' | 'loading' | 'verified' | 'failed';
 
 type Props = {
 	show: boolean;
@@ -18,9 +19,65 @@ type Props = {
 	onClose: () => void;
 };
 
+
 export default function ConfirmModal({ show, item, phoneNumber, operator, service, bill, serviceType, serviceLabel, onClose }: Props) {
+
+  function isOvoProduct(item: PricelistItem | null): boolean {
+    if (!item) return false;
+    const code = item.product_code.toLowerCase();
+    const desc = item.product_description.toLowerCase();
+    return code.includes('ovo') || desc.includes('ovo');
+  }
+
 	const [status, setStatus] = useState<Status>('idle');
 	const [errorMessage, setErrorMessage] = useState('');
+	const [inquiryState, setInquiryState] = useState<InquiryState>('idle');
+	const [ovoName, setOvoName] = useState('');
+	const [inquiryError, setInquiryError] = useState('');
+
+	const needsInquiry = isOvoProduct(item);
+
+	useEffect(() => {
+		if (!show) {
+			setInquiryState('idle');
+			setOvoName('');
+			setInquiryError('');
+		}
+	}, [show]);
+
+	const handleInquiry = async () => {
+		setInquiryState('loading');
+		setInquiryError('');
+		try {
+			const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+			const csrfToken = csrfMeta ? (csrfMeta as HTMLMetaElement).content : '';
+
+			const res = await fetch('/ppob/inquiry-ovo', {
+				method: 'POST',
+				credentials: 'same-origin',
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+					'X-Requested-With': 'XMLHttpRequest',
+					'X-CSRF-TOKEN': csrfToken,
+				},
+				body: JSON.stringify({ customer_id: phoneNumber }),
+			});
+
+			const data = await res.json();
+			if (!res.ok || !data.success) {
+				setInquiryError(data.message ?? 'Nomor OVO tidak valid.');
+				setInquiryState('failed');
+				return;
+			}
+
+			setOvoName(data.name ?? '-');
+			setInquiryState('verified');
+		} catch {
+			setInquiryError('Gagal memverifikasi nomor OVO. Cek koneksi internet.');
+			setInquiryState('failed');
+		}
+	};
 
 	const isPostpaid = !!bill;
 
@@ -199,6 +256,34 @@ export default function ConfirmModal({ show, item, phoneNumber, operator, servic
 							)}
 						</div>
 
+						{/* OVO Inquiry Section */}
+						{needsInquiry && inquiryState !== 'verified' && (
+							<div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+								<p className="mb-3 text-xs text-amber-700">
+									Untuk top-up OVO, nomor harus diverifikasi terlebih dahulu.
+								</p>
+								{inquiryState === 'failed' && (
+									<p className="mb-3 text-xs font-medium text-red-600">{inquiryError}</p>
+								)}
+								<button
+									onClick={handleInquiry}
+									disabled={inquiryState === 'loading'}
+									className="w-full rounded-xl bg-amber-500 py-2.5 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-50"
+								>
+									{inquiryState === 'loading' ? 'Memverifikasi...' : inquiryState === 'failed' ? 'Coba Lagi' : 'Verifikasi Nomor OVO'}
+								</button>
+							</div>
+						)}
+
+						{needsInquiry && inquiryState === 'verified' && (
+							<div className="mb-4 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+								<ShieldCheck className="size-4 text-green-600" />
+								<span className="text-sm text-green-700">
+									Terverifikasi: <span className="font-semibold">{ovoName}</span>
+								</span>
+							</div>
+						)}
+
 						<div className="flex gap-3">
 							<button
 								onClick={handleClose}
@@ -209,7 +294,7 @@ export default function ConfirmModal({ show, item, phoneNumber, operator, servic
 							</button>
 							<button
 								onClick={handleBuy}
-								disabled={status === 'loading'}
+								disabled={status === 'loading' || (needsInquiry && inquiryState !== 'verified')}
 								className="flex-1 rounded-xl bg-green-600 py-2.5 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50"
 							>
 								{status === 'loading' ? 'Memproses...' : 'Konfirmasi'}

@@ -19,6 +19,7 @@ export default function Homepage({ balance }: HomepageProps) {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isValid, setIsValid] = useState<boolean | null>(null);
     const [operator, setOperator] = useState<Operator | null>(null);
+    const [emoneyProvider, setEmoneyProvider] = useState<string>('');
     const [prepaidService, setPrepaidService] = useState<PricelistItem[] | null>(null);
     const [billData, setBillData] = useState<PostpaidBill | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -71,6 +72,7 @@ export default function Homepage({ balance }: HomepageProps) {
         }
         setPhoneNumber('');
         setOperator(null);
+        setEmoneyProvider('');
         setIsValid(null);
         setBillData(null);
         setSelectedProvider(null);
@@ -109,6 +111,30 @@ export default function Homepage({ balance }: HomepageProps) {
                 if (!res.ok) return;
                 const data = res.headers.get('content-type')?.includes('application/json') ? await res.json() : null;
                 if (data) setBillData(data);
+            const url = `/ppob/pricelist/${selected.type}`;
+            const res = await fetch(url);
+            const data = await res.json();
+            const allItems: PricelistItem[] = data?.data?.pricelist ?? [];
+            const isEmoney = selected?.type === 'etoll';
+            const filterKey = isEmoney
+                ? emoneyProvider
+                : operator?.apiName ?? '';
+            if (filterKey) {
+                const keyLower = filterKey.toLowerCase();
+                const isPulsa = selected?.type === 'pulsa';
+                const filtered = allItems
+                    .filter(item => {
+                        const desc = item.product_description.toLowerCase();
+                        const code = item.product_code.toLowerCase();
+                        if (!desc.includes(keyLower) && !code.includes(keyLower)) return false;
+                        if (isPulsa) {
+                            const nom = parseInt(item.product_nominal?.replace(/\D/g, '') ?? '');
+                            if (isNaN(nom) || nom < 1000) return false;
+                        }
+                        return true;
+                    })
+                    .sort((a, b) => a.product_price - b.product_price);
+                setPrepaidService(filtered);
             } else {
                 const url = `/ppob/pricelist/${selected.type}`;
                 const res = await fetch(url);
@@ -262,6 +288,9 @@ export default function Homepage({ balance }: HomepageProps) {
                                 selected.type === 'pln' && selected.endpoint === 'prepaid' ? 'Cek Token' :
                                 selected.type === 'pln_pasca' || selected.type === 'tv' ? 'Cek Tagihan' : 'Cek Layanan'
                             }
+                            type={selected.type}
+                            emoneyProvider={emoneyProvider}
+                            onEmoneyChange={setEmoneyProvider}
                         />
                     )}
                 </section>

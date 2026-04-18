@@ -12,6 +12,7 @@ Route::prefix('ppob')->group(function () {
     Route::get('/inquiry-pln/{hp}', [PPOBController::class, 'inquiryPln']);
     Route::get('/pricelist/{type}', [PPOBController::class, 'priceList']);
     Route::get('/pricelist-pasca/{type}', [PPOBController::class, 'priceListPasca']);
+    Route::post('/inquiry-ovo', [PPOBController::class, 'inquiryOvo'])->name('ppob.inquiry-ovo');
     Route::post('/checkout', [PPOBController::class, 'checkout'])->name('ppob.checkout');
     Route::post('/checkout-pasca', [PPOBController::class, 'checkoutPasca'])->name('ppob.checkout.pasca');
     Route::post('/inquiry', [PPOBController::class, 'inquiry'])->name('ppob.inquiry');

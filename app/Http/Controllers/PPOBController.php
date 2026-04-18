@@ -55,6 +55,27 @@ class PPOBController extends Controller
         return response()->json($result);
     }
 
+    public function inquiryOvo(Request $request) {
+        $request->validate([
+            'customer_id' => 'required|string|regex:/^08\d{8,11}$/',
+        ]);
+
+        $result = $this->iakService->inquiryOvo($request->input('customer_id'));
+        $data   = $result['data'] ?? [];
+
+        if (($data['rc'] ?? '') !== '00') {
+            return response()->json([
+                'success' => false,
+                'message' => $data['message'] ?? 'Nomor OVO tidak valid.',
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'name'    => $data['name'] ?? '-',
+        ]);
+    }
+
     public function checkout(TopUpRequest $request) {
         $data = $this->transactionService->createCheckout(
             customerId:  (string) $request->validated('customer_id'),
