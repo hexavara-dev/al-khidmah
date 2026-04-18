@@ -111,57 +111,55 @@ export default function Homepage({ balance }: HomepageProps) {
                 if (!res.ok) return;
                 const data = res.headers.get('content-type')?.includes('application/json') ? await res.json() : null;
                 if (data) setBillData(data);
-            const url = `/ppob/pricelist/${selected.type}`;
-            const res = await fetch(url);
-            const data = await res.json();
-            const allItems: PricelistItem[] = data?.data?.pricelist ?? [];
-            const isEmoney = selected?.type === 'etoll';
-            const filterKey = isEmoney
-                ? emoneyProvider
-                : operator?.apiName ?? '';
-            if (filterKey) {
-                const keyLower = filterKey.toLowerCase();
-                const isPulsa = selected?.type === 'pulsa';
-                const filtered = allItems
-                    .filter(item => {
-                        const desc = item.product_description.toLowerCase();
-                        const code = item.product_code.toLowerCase();
-                        if (!desc.includes(keyLower) && !code.includes(keyLower)) return false;
-                        if (isPulsa) {
-                            const nom = parseInt(item.product_nominal?.replace(/\D/g, '') ?? '');
-                            if (isNaN(nom) || nom < 1000) return false;
-                        }
-                        return true;
-                    })
-                    .sort((a, b) => a.product_price - b.product_price);
-                setPrepaidService(filtered);
             } else {
                 const url = `/ppob/pricelist/${selected.type}`;
                 const res = await fetch(url);
                 const data = await res.json();
                 const allItems: PricelistItem[] = data?.data?.pricelist ?? [];
-                if (selected.type === 'pln' && selected.endpoint === 'prepaid') {
-                    if (!phoneNumber) {
-                        setPrepaidService([]);
-                    } else {
-                        setPrepaidService([...allItems].sort((a, b) => a.product_price - b.product_price));
-                        try {
-                            const plnRes = await fetch(`/ppob/inquiry-pln/${encodeURIComponent(phoneNumber)}`);
-                            if (plnRes.ok) setPlnCustomer(await plnRes.json());
-                        } catch { /* graceful fallback */ }
-                    }
-                } else if (operator) {
-                    const opName = operator.apiName.toLowerCase();
-                    setPrepaidService(
-                        allItems
-                            .filter(item => {
-                                const desc = item.product_description.toLowerCase();
-                                return desc.includes(opName) || opName.includes(desc);
-                            })
-                            .sort((a, b) => a.product_price - b.product_price)
-                    );
+                const isEmoney = selected?.type === 'etoll';
+                const filterKey = isEmoney
+                    ? emoneyProvider
+                    : operator?.apiName ?? '';
+                if (filterKey) {
+                    const keyLower = filterKey.toLowerCase();
+                    const isPulsa = selected?.type === 'pulsa';
+                    const filtered = allItems
+                        .filter(item => {
+                            const desc = item.product_description.toLowerCase();
+                            const code = item.product_code.toLowerCase();
+                            if (!desc.includes(keyLower) && !code.includes(keyLower)) return false;
+                            if (isPulsa) {
+                                const nom = parseInt(item.product_nominal?.replace(/\D/g, '') ?? '');
+                                if (isNaN(nom) || nom < 1000) return false;
+                            }
+                            return true;
+                        })
+                        .sort((a, b) => a.product_price - b.product_price);
+                    setPrepaidService(filtered);
                 } else {
-                    setPrepaidService([]);
+                    if (selected.type === 'pln' && selected.endpoint === 'prepaid') {
+                        if (!phoneNumber) {
+                            setPrepaidService([]);
+                        } else {
+                            setPrepaidService([...allItems].sort((a, b) => a.product_price - b.product_price));
+                            try {
+                                const plnRes = await fetch(`/ppob/inquiry-pln/${encodeURIComponent(phoneNumber)}`);
+                                if (plnRes.ok) setPlnCustomer(await plnRes.json());
+                            } catch { /* graceful fallback */ }
+                        }
+                    } else if (operator) {
+                        const opName = operator.apiName.toLowerCase();
+                        setPrepaidService(
+                            allItems
+                                .filter(item => {
+                                    const desc = item.product_description.toLowerCase();
+                                    return desc.includes(opName) || opName.includes(desc);
+                                })
+                                .sort((a, b) => a.product_price - b.product_price)
+                        );
+                    } else {
+                        setPrepaidService([]);
+                    }
                 }
             }
         } finally {
