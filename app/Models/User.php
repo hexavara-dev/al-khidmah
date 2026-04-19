@@ -22,6 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'google_id',
+        'avatar',
+        'email_verified_at',
         'is_admin',
     ];
 
@@ -40,6 +43,11 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
     protected function casts(): array
     {
         return [

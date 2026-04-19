@@ -1,290 +1,188 @@
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { Eye, EyeOff, Heart, ShoppingBag, Zap } from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
+import { Head } from '@inertiajs/react';
+import { Zap } from 'lucide-react';
 
-const services = [
-    { icon: Zap, label: 'PPOB', desc: 'Pulsa, Token PLN, Air & Internet' },
-    { icon: Heart, label: 'Donasi', desc: 'Zakat, Infaq, Sedekah & Wakaf' },
-    { icon: ShoppingBag, label: 'Toko', desc: 'Produk islami & kebutuhan harian' },
-];
+const GoogleIcon = () => (
+    <svg className="size-5 flex-shrink-0" viewBox="0 0 24 24">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+    </svg>
+);
 
-export default function Login({
-    status,
-    canResetPassword,
-}: {
-    status?: string;
-    canResetPassword: boolean;
-}) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
-        remember: false as boolean,
-    });
+const JemaahIcon = () => (
+    <svg className="size-5 text-secondary flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M12 2L3 7v5c0 5 3.8 9.7 9 11 5.2-1.3 9-6 9-11V7l-9-5z" strokeLinejoin="round" />
+        <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
 
-    const [showPassword, setShowPassword] = useState(false);
-
-    const submit: FormEventHandler = (e) => {
-        e.preventDefault();
-        post(route('login'), { onFinish: () => reset('password') });
-    };
-
+function SsoCard({ status }: { status?: string }) {
     return (
-        <div className="min-h-screen flex bg-white">
-            <Head title="Admin — Masuk" />
+        <div className="flex flex-col">
+            {status && (
+                <div className="mb-5 rounded-2xl border border-secondary-container bg-secondary-container/30 px-4 py-3 text-sm font-medium text-on-surface">
+                    {status}
+                </div>
+            )}
 
-            {/* ── Left: Islamic branding panel ── */}
-            <div
-                className="hidden lg:flex lg:w-[52%] relative flex-col overflow-hidden"
-                style={{ background: 'linear-gradient(155deg, #0c1f5e 0%, #1044b0 55%, #1a6fd4 100%)' }}
-            >
-                {/* Islamic geometric tile pattern */}
-                <svg
-                    className="absolute inset-0 w-full h-full"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
+            {/* Greeting */}
+            <div className="mb-6 flex flex-col items-center text-center lg:items-start lg:text-left">
+                <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary-container/60 px-3 py-1">
+                    <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
+                        Selamat Datang
+                    </span>
+                </div>
+                <h2 className="font-headline text-2xl font-extrabold text-on-surface">
+                    Masuk ke Al-Khidmah
+                </h2>
+                <p className="mt-1.5 max-w-xs text-sm text-on-surface-variant">
+                    Pilih metode masuk yang Anda gunakan.
+                </p>
+            </div>
+
+            {/* SSO Buttons */}
+            <div className="space-y-3">
+                {/* Jemaah Al-Khidmah */}
+                <a
+                    href="/auth/jemaah"
+                    className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-secondary/20 bg-secondary-container/20 px-5 py-4 transition hover:bg-secondary-container/35 hover:shadow-md active:scale-[0.98]"
                 >
-                    <defs>
-                        <pattern id="islamic-geo" width="80" height="80" patternUnits="userSpaceOnUse">
-                            {/* Outer octagon */}
-                            <polygon
-                                points="24,0 56,0 80,24 80,56 56,80 24,80 0,56 0,24"
-                                fill="none"
-                                stroke="rgba(255,255,255,0.08)"
-                                strokeWidth="0.8"
-                            />
-                            {/* 8-pointed star */}
-                            <polygon
-                                points="40,14 44.5,29 58,23 52,36 68,40 52,44 58,57 44.5,51 40,66 35.5,51 22,57 28,44 12,40 28,36 22,23 35.5,29"
-                                fill="none"
-                                stroke="rgba(255,255,255,0.07)"
-                                strokeWidth="0.7"
-                            />
-                            {/* Inner octagon */}
-                            <polygon
-                                points="33,29 47,29 54,36 54,47 47,54 33,54 26,47 26,36"
-                                fill="none"
-                                stroke="rgba(255,255,255,0.05)"
-                                strokeWidth="0.6"
-                            />
-                            {/* Center dot */}
-                            <circle cx="40" cy="40" r="2.5" fill="rgba(255,255,255,0.06)" />
-                        </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#islamic-geo)" />
-                </svg>
-
-                {/* Ambient glows */}
-                <div
-                    className="absolute -top-32 -right-32 w-[600px] h-[600px] rounded-full pointer-events-none"
-                    style={{ background: 'radial-gradient(ellipse, rgba(96,165,250,0.2) 0%, transparent 65%)' }}
-                />
-                <div
-                    className="absolute -bottom-24 -left-24 w-[500px] h-[500px] rounded-full pointer-events-none"
-                    style={{ background: 'radial-gradient(ellipse, rgba(30,64,175,0.4) 0%, transparent 65%)' }}
-                />
-
-                <div className="relative z-10 flex flex-col justify-between h-full p-14">
-                    {/* Logo + Bismillah */}
-                    <div className="space-y-5">
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm shrink-0">
-                                {/* Crescent moon icon */}
-                                <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="currentColor">
-                                    <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.91-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <p className="text-white font-bold text-[15px] leading-none tracking-tight">Al-Khidmah</p>
-                                <p className="text-blue-200/70 text-[11px] mt-0.5 tracking-wide">Platform Layanan Islami</p>
-                            </div>
-                        </div>
-
-                        {/* Bismillah */}
-                        <div className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 backdrop-blur-sm inline-block">
-                            <p
-                                className="text-white/80 text-lg font-light leading-relaxed tracking-wider"
-                                style={{ fontFamily: 'serif', direction: 'rtl' }}
-                            >
-                                بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ
-                            </p>
-                        </div>
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-secondary/15">
+                        <JemaahIcon />
                     </div>
-
-                    {/* Hero copy */}
-                    <div className="space-y-8">
-                        <div className="space-y-4">
-                            <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-300/20 bg-blue-300/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-blue-200">
-                                <span className="h-1.5 w-1.5 rounded-full bg-blue-300 animate-pulse" />
-                                Admin Panel
-                            </span>
-                            <h1 className="text-[2.5rem] font-extrabold leading-[1.15] text-white tracking-tight">
-                                Satu platform<br />untuk semua<br />
-                                <span className="text-blue-200">layanan umat.</span>
-                            </h1>
-                            <p className="text-blue-100/60 text-[14px] leading-relaxed max-w-[300px]">
-                                Kelola PPOB, donasi, dan toko Al-Khidmah dari satu dasbor terintegrasi secara real-time.
-                            </p>
-                        </div>
-
-                        {/* 3 Service cards */}
-                        <div className="space-y-2.5">
-                            {services.map(({ icon: Icon, label, desc }) => (
-                                <div
-                                    key={label}
-                                    className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-5 py-3.5 backdrop-blur-sm"
-                                >
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
-                                        <Icon className="h-5 w-5 text-white" />
-                                    </div>
-                                    <div>
-                                        <p className="text-white font-semibold text-[13px] leading-none">{label}</p>
-                                        <p className="text-blue-200/60 text-[11px] mt-1">{desc}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                    <div className="flex-1">
+                        <p className="text-sm font-bold text-secondary">
+                            Jemaah Al-Khidmah
+                        </p>
+                        <p className="text-xs text-secondary/70">
+                            Masuk sebagai jemaah
+                        </p>
                     </div>
+                    <svg
+                        className="size-4 text-secondary/40 transition group-hover:translate-x-0.5 group-hover:text-secondary"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                    >
+                        <path
+                            d="M6 12l4-4-4-4"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                    </svg>
+                </a>
 
-                    <p className="text-blue-200/30 text-[12px]">
-                        &copy; {new Date().getFullYear()} Al-Khidmah. All rights reserved.
-                    </p>
+                {/* Google */}
+                <a
+                    href="/auth/google"
+                    className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-outline-variant/20 bg-surface-container-lowest px-5 py-4 shadow-sm transition hover:border-primary/30 hover:shadow-md active:scale-[0.98]"
+                >
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-outline-variant/15 bg-white shadow-sm">
+                        <GoogleIcon />
+                    </div>
+                    <div className="flex-1">
+                        <p className="text-sm font-bold text-on-surface">
+                            Masuk dengan Google
+                        </p>
+                        <p className="text-xs text-on-surface-variant">
+                            Gunakan akun Google Anda
+                        </p>
+                    </div>
+                    <svg
+                        className="size-4 text-outline-variant transition group-hover:translate-x-0.5 group-hover:text-primary"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                    >
+                        <path
+                            d="M6 12l4-4-4-4"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    );
+}
+
+export default function Login({ status }: { status?: string; canResetPassword: boolean }) {
+    return (
+        <>
+            <Head title="Masuk" />
+
+            {/* ── MOBILE (< lg) ── */}
+            <div className="flex min-h-screen flex-col items-center justify-start overflow-hidden bg-surface-container-low px-4 pb-10 pt-14 lg:hidden sm:justify-center sm:pt-0">
+                <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                    <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-primary/8" />
+                    <div className="absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-secondary/6" />
+                </div>
+            </div>
+            <div>
+                {/* Mobile logo */}
+                <div className="relative mb-8 flex flex-col items-center text-center">
+                    <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-surface-container-lowest shadow-md">
+                        <Zap className="size-9 text-primary" strokeWidth={2.5} />
+                    </div>
+                    <h1 className="font-headline text-3xl font-extrabold text-primary">Al-Khidmah</h1>
+                    <p className="mt-1 max-w-xs text-sm text-on-surface-variant">Kelola finansial Anda dengan tenang dan berkah.</p>
+                </div>
+
+                <div className="relative w-full max-w-sm rounded-3xl bg-surface-container-lowest px-6 py-7 shadow-lg">
+                    <SsoCard status={status} />
                 </div>
             </div>
 
-            {/* ── Right: Form panel ── */}
-            <div className="flex flex-1 flex-col items-center justify-center px-8 py-16 sm:px-16">
-                {/* Mobile logo */}
-                <div className="mb-10 flex flex-col items-center gap-2 lg:hidden">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600">
-                        <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="currentColor">
-                            <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.91-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z" />
-                        </svg>
+            {/* ── DESKTOP (>= lg) ── */}
+            <div className="hidden min-h-screen lg:flex">
+                {/* Left — branding */}
+                <div className="relative flex w-1/2 flex-col justify-between overflow-hidden bg-primary p-12">
+                    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                        <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-white/5" />
+                        <div className="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-white/5" />
+                        <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/[0.03]" />
                     </div>
-                    <span className="font-bold text-slate-900">Al-Khidmah</span>
-                </div>
 
-                <div className="w-full max-w-[360px]">
-                    {/* Heading */}
-                    <div className="mb-8">
-                        <h2 className="text-[1.75rem] font-bold text-slate-900 tracking-tight leading-none">Masuk</h2>
-                        <p className="mt-2 text-[14px] text-slate-500">
-                            Gunakan akun admin Anda untuk melanjutkan
+                    {/* Logo */}
+                    <div className="relative flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15">
+                            <Zap className="size-5 text-white" />
+                        </div>
+                        <span className="font-headline text-xl font-extrabold tracking-tight text-white">Al-Khidmah</span>
+                    </div>
+
+                    {/* Center copy */}
+                    <div className="relative">
+                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1">
+                            <div className="h-1.5 w-1.5 rounded-full bg-white" />
+                            <span className="text-xs font-medium text-white/80">Payment Point Online Bank</span>
+                        </div>
+                        <h1 className="font-headline text-4xl font-extrabold leading-snug text-white">
+                            Layanan pembayaran<br />
+                            <span className="text-white/70">digital terpercaya.</span>
+                        </h1>
+                        <p className="mt-4 max-w-sm text-sm leading-7 text-white/60">
+                            Bayar tagihan listrik, internet, pulsa, dan berbagai layanan lainnya dengan mudah, cepat, dan aman.
                         </p>
                     </div>
 
-                    {status && (
-                        <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-[13px] text-emerald-700">
-                            {status}
-                        </div>
-                    )}
+                    <p className="relative text-xs text-white/40">
+                        © {new Date().getFullYear()} Al-Khidmah. All rights reserved.
+                    </p>
+                </div>
 
-                    <form onSubmit={submit} className="space-y-4">
-                        {/* Email */}
-                        <div className="space-y-1.5">
-                            <Label htmlFor="email" className="text-[13px] font-medium text-slate-700">
-                                Email
-                            </Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                name="email"
-                                value={data.email}
-                                autoComplete="username"
-                                autoFocus
-                                placeholder="admin@example.com"
-                                onChange={(e) => setData('email', e.target.value)}
-                                className={[
-                                    'h-10 rounded-lg text-[14px] text-slate-900 placeholder:text-slate-400',
-                                    'border bg-slate-50/80 transition-all duration-150',
-                                    errors.email
-                                        ? 'border-red-400 ring-2 ring-red-400/20'
-                                        : 'border-slate-200 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/15',
-                                ].join(' ')}
-                            />
-                            {errors.email && <p className="text-[12px] text-red-500">{errors.email}</p>}
-                        </div>
-
-                        {/* Password */}
-                        <div className="space-y-1.5">
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="password" className="text-[13px] font-medium text-slate-700">
-                                    Password
-                                </Label>
-                                {canResetPassword && (
-                                    <Link
-                                        href={route('password.request')}
-                                        className="text-[12px] font-medium text-blue-600 hover:text-blue-800 transition-colors"
-                                    >
-                                        Lupa password?
-                                    </Link>
-                                )}
-                            </div>
-                            <div className="relative">
-                                <Input
-                                    id="password"
-                                    type={showPassword ? 'text' : 'password'}
-                                    name="password"
-                                    value={data.password}
-                                    autoComplete="current-password"
-                                    placeholder="••••••••"
-                                    onChange={(e) => setData('password', e.target.value)}
-                                    className={[
-                                        'h-10 rounded-lg pr-10 text-[14px] text-slate-900 placeholder:text-slate-400',
-                                        'border bg-slate-50/80 transition-all duration-150',
-                                        errors.password
-                                            ? 'border-red-400 ring-2 ring-red-400/20'
-                                            : 'border-slate-200 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/15',
-                                    ].join(' ')}
-                                />
-                                <button
-                                    type="button"
-                                    tabIndex={-1}
-                                    onClick={() => setShowPassword((v) => !v)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                                >
-                                    {showPassword ? <EyeOff className="h-[15px] w-[15px]" /> : <Eye className="h-[15px] w-[15px]" />}
-                                </button>
-                            </div>
-                            {errors.password && <p className="text-[12px] text-red-500">{errors.password}</p>}
-                        </div>
-
-                        {/* Remember me */}
-                        <div className="flex items-center gap-2.5 pt-0.5">
-                            <input
-                                id="remember"
-                                type="checkbox"
-                                name="remember"
-                                checked={data.remember}
-                                onChange={(e) => setData('remember', e.target.checked as false)}
-                                className="h-[15px] w-[15px] rounded border-slate-300 accent-blue-600 cursor-pointer"
-                            />
-                            <Label htmlFor="remember" className="cursor-pointer select-none text-[13px] font-normal text-slate-600">
-                                Ingat saya selama 30 hari
-                            </Label>
-                        </div>
-
-                        {/* Submit */}
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            className="mt-1 w-full h-10 rounded-lg bg-blue-600 text-[13px] font-semibold text-white tracking-wide shadow-sm shadow-blue-600/30 transition-all hover:bg-blue-700 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
-                        >
-                            {processing ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                    </svg>
-                                    Memproses...
-                                </span>
-                            ) : 'Masuk ke Dashboard'}
-                        </button>
-                    </form>
+                {/* Right — card */}
+                <div className="flex w-1/2 items-center justify-center bg-surface-container-low px-8 py-12">
+                    <div className="w-full max-w-md rounded-3xl bg-surface-container-lowest px-8 py-10 shadow-lg">
+                        <SsoCard status={status} />
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
 

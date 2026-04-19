@@ -19,15 +19,14 @@ type Props = {
 	onClose: () => void;
 };
 
-
 export default function ConfirmModal({ show, item, phoneNumber, operator, service, bill, serviceType, serviceLabel, onClose }: Props) {
 
-  function isOvoProduct(item: PricelistItem | null): boolean {
-    if (!item) return false;
-    const code = item.product_code.toLowerCase();
-    const desc = item.product_description.toLowerCase();
-    return code.includes('ovo') || desc.includes('ovo');
-  }
+	function isOvoProduct(item: PricelistItem | null): boolean {
+		if (!item) return false;
+		const code = item.product_code.toLowerCase();
+		const desc = item.product_description.toLowerCase();
+		return code.includes('ovo') || desc.includes('ovo');
+	}
 
 	const [status, setStatus] = useState<Status>('idle');
 	const [errorMessage, setErrorMessage] = useState('');
@@ -140,11 +139,11 @@ export default function ConfirmModal({ show, item, phoneNumber, operator, servic
 		<Modal show={show} maxWidth="sm" onClose={handleClose}>
 			<div className="p-6">
 				<div className="mb-5 flex items-center justify-between">
-					<h3 className="text-base font-semibold text-gray-900">
+					<h3 className="font-headline text-base font-bold text-on-surface">
 						{status === 'success' ? 'Transaksi Berhasil' : status === 'error' ? 'Transaksi Gagal' : 'Konfirmasi Pembelian'}
 					</h3>
 					{status !== 'loading' && (
-						<button onClick={handleClose} className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+						<button onClick={handleClose} className="rounded-lg p-1 text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface">
 							<X className="size-4" />
 						</button>
 					)}
@@ -152,16 +151,16 @@ export default function ConfirmModal({ show, item, phoneNumber, operator, servic
 
 				{status === 'success' && (
 					<div className="flex flex-col items-center gap-3 py-4 text-center">
-						<CheckCircle2 className="size-14 text-green-500" />
-						<p className="text-sm font-medium text-gray-700">
+						<CheckCircle2 className="size-14 text-secondary" />
+						<p className="text-sm font-medium text-on-surface-variant">
 							{isPostpaid
-								? <>Tagihan {serviceLabel ?? 'postpaid'} atas nama <span className="font-semibold text-green-700">{bill!.customer_name ?? phoneNumber}</span> sedang diproses.</>
-								: <>Pembelian <span className="font-semibold text-green-700">{item ? getItemTitle(item, service?.type ?? '') : ''}</span> untuk nomor <span className="font-semibold">{phoneNumber}</span> sedang diproses.</>
+								? <>Tagihan {serviceLabel ?? 'postpaid'} atas nama <span className="font-semibold text-primary">{bill!.customer_name ?? phoneNumber}</span> sedang diproses.</>
+								: <>Pembelian <span className="font-semibold text-primary">{item ? getItemTitle(item, service?.type ?? '') : ''}</span> untuk nomor <span className="font-semibold">{phoneNumber}</span> sedang diproses.</>
 							}
 						</p>
 						<button
 							onClick={handleClose}
-							className="mt-2 w-full rounded-xl bg-green-600 py-2.5 text-sm font-semibold text-white hover:bg-green-700"
+							className="mt-2 w-full rounded-xl bg-primary py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-dim"
 						>
 							Selesai
 						</button>
@@ -170,18 +169,18 @@ export default function ConfirmModal({ show, item, phoneNumber, operator, servic
 
 				{status === 'error' && (
 					<div className="flex flex-col items-center gap-3 py-4 text-center">
-						<XCircle className="size-14 text-red-500" />
-						<p className="text-sm text-gray-600">{errorMessage}</p>
+						<XCircle className="size-14 text-error" />
+						<p className="text-sm text-on-surface-variant">{errorMessage}</p>
 						<div className="mt-2 flex w-full gap-3">
 							<button
 								onClick={handleClose}
-								className="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50"
+								className="flex-1 rounded-xl border border-outline-variant/30 py-2.5 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low"
 							>
 								Tutup
 							</button>
 							<button
 								onClick={() => setStatus('idle')}
-								className="flex-1 rounded-xl bg-green-600 py-2.5 text-sm font-semibold text-white hover:bg-green-700"
+								className="flex-1 rounded-xl bg-primary py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-dim"
 							>
 								Coba Lagi
 							</button>
@@ -191,66 +190,66 @@ export default function ConfirmModal({ show, item, phoneNumber, operator, servic
 
 				{(status === 'idle' || status === 'loading') && (
 					<>
-						<div className="mb-5 divide-y divide-gray-100 rounded-xl border border-gray-100 bg-gray-50 text-sm">
+						<div className="mb-5 divide-y divide-outline-variant/10 rounded-xl border border-outline-variant/15 bg-surface-container-low text-sm">
 							{isPostpaid ? (
 								<>
 									<div className="flex items-center justify-between px-4 py-3">
-										<span className="text-gray-500">Layanan</span>
-										<span className="font-medium text-gray-800">
+										<span className="text-on-surface-variant">Layanan</span>
+										<span className="font-medium text-on-surface">
 											{serviceLabel ?? (serviceType === 'tv' || serviceType === 'tv_pasca' || serviceType === 'internet_pasca' ? 'TV / Internet' : 'PLN Pascabayar')}
 										</span>
 									</div>
 									{bill!.customer_name && (
 										<div className="flex items-center justify-between px-4 py-3">
-											<span className="text-gray-500">Nama Pelanggan</span>
-											<span className="font-semibold text-gray-900">{bill!.customer_name}</span>
+											<span className="text-on-surface-variant">Nama Pelanggan</span>
+											<span className="font-semibold text-on-surface">{bill!.customer_name}</span>
 										</div>
 									)}
 									{bill!.period && (
 										<div className="flex items-center justify-between px-4 py-3">
-											<span className="text-gray-500">Periode</span>
-											<span className="font-medium text-gray-800">{bill!.period}</span>
+											<span className="text-on-surface-variant">Periode</span>
+											<span className="font-medium text-on-surface">{bill!.period}</span>
 										</div>
 									)}
 									<div className="flex items-center justify-between px-4 py-3">
-										<span className="text-gray-500">Tagihan</span>
-										<span className="font-medium text-gray-800">{idr.format(bill!.nominal)}</span>
+										<span className="text-on-surface-variant">Tagihan</span>
+										<span className="font-medium text-on-surface">{idr.format(bill!.nominal)}</span>
 									</div>
 									<div className="flex items-center justify-between px-4 py-3">
-										<span className="text-gray-500">Admin</span>
-										<span className="font-medium text-gray-800">{idr.format(bill!.admin)}</span>
+										<span className="text-on-surface-variant">Admin</span>
+										<span className="font-medium text-on-surface">{idr.format(bill!.admin)}</span>
 									</div>
 									<div className="flex items-center justify-between px-4 py-3">
-										<span className="text-gray-500">Total Bayar</span>
-										<span className="text-base font-bold text-green-600">{idr.format(bill!.price)}</span>
+										<span className="text-on-surface-variant">Total Bayar</span>
+										<span className="text-base font-bold text-primary">{idr.format(bill!.price)}</span>
 									</div>
 								</>
 							) : (
 								<>
 									<div className="flex items-center justify-between px-4 py-3">
-										<span className="text-gray-500">Layanan</span>
-										<span className="font-medium text-gray-800">{service?.label}</span>
+										<span className="text-on-surface-variant">Layanan</span>
+										<span className="font-medium text-on-surface">{service?.label}</span>
 									</div>
 									{operator && (
 										<div className="flex items-center justify-between px-4 py-3">
-											<span className="text-gray-500">Operator</span>
+											<span className="text-on-surface-variant">Operator</span>
 											<div className="flex items-center gap-2">
 												<img src={operator.image} alt={operator.name} className="h-5 w-auto object-contain" />
-												<span className="font-medium capitalize text-gray-800">{operator.name}</span>
+												<span className="font-medium capitalize text-on-surface">{operator.name}</span>
 											</div>
 										</div>
 									)}
 									<div className="flex items-center justify-between px-4 py-3">
-										<span className="text-gray-500">{service?.type === 'pln' ? 'Nomor Meter' : 'Nomor Tujuan'}</span>
-										<span className="font-semibold text-gray-900">{phoneNumber}</span>
+										<span className="text-on-surface-variant">{service?.type === 'pln' ? 'Nomor Meter' : 'Nomor Tujuan'}</span>
+										<span className="font-semibold text-on-surface">{phoneNumber}</span>
 									</div>
 									<div className="flex items-center justify-between px-4 py-3">
-										<span className="text-gray-500">Produk</span>
-										<span className="font-medium text-gray-800">{item ? getItemTitle(item, service?.type ?? '') : ''}</span>
+										<span className="text-on-surface-variant">Produk</span>
+										<span className="font-medium text-on-surface">{item ? getItemTitle(item, service?.type ?? '') : ''}</span>
 									</div>
 									<div className="flex items-center justify-between px-4 py-3">
-										<span className="text-gray-500">Total Bayar</span>
-										<span className="text-base font-bold text-green-600">{idr.format(item?.product_price ?? 0)}</span>
+										<span className="text-on-surface-variant">Total Bayar</span>
+										<span className="text-base font-bold text-primary">{idr.format(item?.product_price ?? 0)}</span>
 									</div>
 								</>
 							)}
@@ -258,17 +257,17 @@ export default function ConfirmModal({ show, item, phoneNumber, operator, servic
 
 						{/* OVO Inquiry Section */}
 						{needsInquiry && inquiryState !== 'verified' && (
-							<div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
-								<p className="mb-3 text-xs text-amber-700">
+							<div className="mb-4 rounded-xl border border-tertiary-container bg-tertiary-container/30 p-4">
+								<p className="mb-3 text-xs text-on-tertiary-container">
 									Untuk top-up OVO, nomor harus diverifikasi terlebih dahulu.
 								</p>
 								{inquiryState === 'failed' && (
-									<p className="mb-3 text-xs font-medium text-red-600">{inquiryError}</p>
+									<p className="mb-3 text-xs font-medium text-error">{inquiryError}</p>
 								)}
 								<button
 									onClick={handleInquiry}
 									disabled={inquiryState === 'loading'}
-									className="w-full rounded-xl bg-amber-500 py-2.5 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-50"
+									className="w-full rounded-xl bg-tertiary py-2.5 text-sm font-semibold text-on-tertiary hover:bg-tertiary-dim disabled:opacity-50"
 								>
 									{inquiryState === 'loading' ? 'Memverifikasi...' : inquiryState === 'failed' ? 'Coba Lagi' : 'Verifikasi Nomor OVO'}
 								</button>
@@ -276,9 +275,9 @@ export default function ConfirmModal({ show, item, phoneNumber, operator, servic
 						)}
 
 						{needsInquiry && inquiryState === 'verified' && (
-							<div className="mb-4 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
-								<ShieldCheck className="size-4 text-green-600" />
-								<span className="text-sm text-green-700">
+							<div className="mb-4 flex items-center gap-2 rounded-xl border border-secondary-container bg-secondary-container/30 px-4 py-3">
+								<ShieldCheck className="size-4 text-secondary" />
+								<span className="text-sm text-on-secondary-container">
 									Terverifikasi: <span className="font-semibold">{ovoName}</span>
 								</span>
 							</div>
@@ -288,14 +287,14 @@ export default function ConfirmModal({ show, item, phoneNumber, operator, servic
 							<button
 								onClick={handleClose}
 								disabled={status === 'loading'}
-								className="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+								className="flex-1 rounded-xl border border-outline-variant/30 py-2.5 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low disabled:opacity-50"
 							>
 								Batal
 							</button>
 							<button
 								onClick={handleBuy}
 								disabled={status === 'loading' || (needsInquiry && inquiryState !== 'verified')}
-								className="flex-1 rounded-xl bg-green-600 py-2.5 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50"
+								className="flex-1 rounded-xl bg-primary py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-dim disabled:opacity-50"
 							>
 								{status === 'loading' ? 'Memproses...' : 'Konfirmasi'}
 							</button>

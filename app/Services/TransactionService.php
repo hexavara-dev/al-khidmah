@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Transaction;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -34,6 +35,7 @@ class TransactionService
         $refId = (string) Str::ulid();
 
         $transaction = Transaction::create([
+            'user_id'        => Auth::id(),
             'ref_id'         => $refId,
             'product_code'   => $productCode,
             'customer_id'    => $customerId,
@@ -197,6 +199,7 @@ class TransactionService
         }
 
         Transaction::create([
+            'user_id'        => Auth::id(),
             'ref_id'         => $refId,
             'product_code'   => $productCode,
             'customer_id'    => $customerId,
