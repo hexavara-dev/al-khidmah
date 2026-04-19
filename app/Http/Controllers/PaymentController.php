@@ -47,10 +47,12 @@ class PaymentController extends Controller
             'transactionStatus' => $transactionStatus,
             'statusCode'        => $statusCode,
             'transaction'       => $transaction ? [
-                'product_code' => $transaction->product_code,
-                'customer_id'  => $transaction->customer_id,
-                'price'        => $transaction->price,
-                'type'         => $transaction->type,
+                'product_code'  => $transaction->product_code,
+                'customer_id'   => $transaction->customer_id,
+                'customer_name' => $transaction->customer_name,
+                'segment_power' => $transaction->segment_power,
+                'price'         => $transaction->price,
+                'type'          => $transaction->type,
             ] : null,
         ]);
     }

@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Transaction extends Model
 {
     protected $fillable = [
+        'user_id',
         'ref_id',
         'product_code',
         'customer_id',
+        'customer_name',
+        'segment_power',
         'type',
         'price',
         'snap_token',
@@ -20,6 +23,11 @@ class Transaction extends Model
         'tr_id',
         'rc',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     protected $casts = [
         'status' => 'integer',

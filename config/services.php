@@ -35,9 +35,24 @@ return [
         ],
     ],
 
+    'jemaah' => [
+        'auth_server_url' => env('JEMAAH_AUTH_SERVER_URL', 'https://jamaah.alkhidmah.or.id'),
+        'client_id'       => env('JEMAAH_CLIENT_ID'),
+        'redirect_uri'    => env('JEMAAH_REDIRECT_URI', 'http://localhost:8000/auth/jemaah/callback'),
+    ],
+
+    'google' => [
+        'client_id'     => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect'      => env('GOOGLE_REDIRECT_URI', '/auth/google/callback'),
+    ],
+
     'iak' => [
-        'user_hp' => env('IAK_USER_HP'),
-        'api_key' => env('IAK_API_KEY'),
+        'user_hp'              => env('IAK_USER_HP'),
+        'api_key'              => env('IAK_API_KEY'),
+        'prepaid_url'          => env('IAK_PREPAID_URL',          'https://prepaid.iak.dev/api'),
+        'postpaid_url'         => env('IAK_POSTPAID_URL',         'https://testpostpaid.mobilepulsa.net/api/v1/bill/check'),
+        'postpaid_payment_url' => env('IAK_POSTPAID_PAYMENT_URL', 'https://testpostpaid.mobilepulsa.net/api/v1/bill/payment'),
     ],
 
     'midtrans' => [

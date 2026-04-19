@@ -22,3 +22,25 @@ export type Operator = {
     image: string;
     apiName: string;
 };
+
+export type PostpaidProvider = {
+    code: string;
+    name: string;
+    fee: number;
+    type: string;
+};
+
+export type PlnCustomer = {
+    name: string | null;
+    meter_no: string | null;
+    segment_power: string | null;
+};
+
+export type PostpaidBill = {
+    ref_id: string;
+    customer_name: string | null;
+    period: string | null;
+    nominal: number;
+    admin: number;
+    price: number;
+};

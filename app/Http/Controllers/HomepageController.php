@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Services\IAKService;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class HomepageController extends Controller
@@ -14,10 +16,17 @@ class HomepageController extends Controller
     }
 
     public function index() {
-        $saldo = $this->iakService->checkBalance();
+        $balance = null;
+
+        try {
+            $saldo   = $this->iakService->checkBalance();
+            $balance = $saldo['data']['balance'] ?? null;
+        } catch (ConnectionException $e) {
+            Log::warning('IAK API tidak dapat dijangkau: ' . $e->getMessage());
+        }
 
         return Inertia::render('Homepage', [
-            'balance' => $saldo['data']['balance'] ?? 0,
+            'balance' => $balance,
         ]);
     }
 
