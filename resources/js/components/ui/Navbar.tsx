@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Bell, Search, CircleDollarSign, LogOut, User, ChevronDown } from 'lucide-react';
-import { usePage, router } from '@inertiajs/react';
+import { usePage, router, Link } from '@inertiajs/react';
 import type { PageProps } from '@/types';
 
 const idr = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
@@ -11,8 +11,10 @@ type Props = {
 };
 
 export default function Navbar({ balance, appName = 'Al-Khidmah' }: Props) {
-    const { auth } = usePage<PageProps<{ balance: number }>>().props as any;
+    const page = usePage<PageProps<{ balance: number }>>();
+    const { auth } = page.props as any;
     const user = auth?.user;
+    const currentPath = new URL(page.url, window.location.origin).pathname;
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -64,14 +66,23 @@ export default function Navbar({ balance, appName = 'Al-Khidmah' }: Props) {
 
                 {/* Nav Links */}
                 <div className="hidden items-center gap-1 lg:flex">
-                    <a href="#" className="rounded-xl bg-primary-container px-4 py-2 text-sm font-semibold text-primary transition-all">
-                        Dashboard
-                    </a>
-                    <a href="#" className="rounded-xl px-4 py-2 text-sm font-medium text-on-surface-variant transition-all hover:bg-surface-container-low">
-                        Layanan
-                    </a>
-                    <a href="#" className="rounded-xl px-4 py-2 text-sm font-medium text-on-surface-variant transition-all hover:bg-surface-container-low">
+                    <Link
+                        href="/"
+                        className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all ${currentPath === '/' ? 'bg-primary-container text-primary' : 'text-on-surface-variant hover:bg-surface-container-low'}`}
+                    >
+                        Beranda
+                    </Link>
+                    <Link
+                        href="/history"
+                        className={`rounded-xl px-4 py-2 text-sm font-medium transition-all ${currentPath === '/history' ? 'bg-primary-container text-primary' : 'text-on-surface-variant hover:bg-surface-container-low'}`}
+                    >
                         Riwayat
+                    </Link>
+                    <a href="#" className="rounded-xl px-4 py-2 text-sm font-medium text-on-surface-variant transition-all hover:bg-surface-container-low">
+                        Tagihan
+                    </a>
+                    <a href="#" className="rounded-xl px-4 py-2 text-sm font-medium text-on-surface-variant transition-all hover:bg-surface-container-low">
+                        Profil
                     </a>
                 </div>
 

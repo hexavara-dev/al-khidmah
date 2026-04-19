@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\JemaahController;
+use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PPOBController;
@@ -9,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [HomepageController::class, 'index'])->name('home');
+    Route::get('/history', [HistoryController::class, 'index'])->name('history');
 
     Route::prefix('ppob')->group(function () {
         Route::get('/saldo', [PPOBController::class, 'checkBalance']);
