@@ -5,32 +5,40 @@ import CampaignCard from '../../components/CampaignCard';
 import Pagination from '../../components/Pagination';
 import { campaignService } from '../../services/campaignService';
 import { categoryService } from '../../services/categoryService';
+import { donationService } from '../../services/donationService';
+import { useAuth } from '../../context/AuthContext';
 
 const CATEGORY_ICONS = {
-    'Pendidikan': '📚',
-    'Kesehatan': '🏥',
-    'Bencana Alam': '🌊',
-    'Yatim & Dhuafa': '🤲',
-    'Masjid & Pesantren': '🕌',
-    'Lingkungan': '🌿',
+    'Pendidikan': { emoji: '📚', bg: 'bg-blue-100', color: 'text-blue-600' },
+    'Kesehatan':  { emoji: '🏥', bg: 'bg-red-100',  color: 'text-red-600' },
+    'Bencana Alam': { emoji: '🌊', bg: 'bg-cyan-100', color: 'text-cyan-600' },
+    'Yatim & Dhuafa': { emoji: '🤲', bg: 'bg-orange-100', color: 'text-orange-600' },
+    'Masjid & Pesantren': { emoji: '🕌', bg: 'bg-teal-100', color: 'text-teal-700' },
+    'Lingkungan': { emoji: '🌿', bg: 'bg-green-100', color: 'text-green-600' },
+    'Masjid': { emoji: '🕌', bg: 'bg-teal-100', color: 'text-teal-700' },
+    'Anak Yatim': { emoji: '🧒', bg: 'bg-orange-100', color: 'text-orange-600' },
 };
 
+const fmt = (n) => Number(n).toLocaleString('id-ID');
+
 export default function HomePage() {
-    const [campaigns,      setCampaigns]      = useState([]);
-    const [categories,     setCategories]     = useState([]);
-    const [meta,           setMeta]           = useState(null);
-    const [loading,        setLoading]        = useState(true);
-    const [search,         setSearch]         = useState('');
+    const { user } = useAuth();
+    const [campaigns,       setCampaigns]       = useState([]);
+    const [categories,      setCategories]      = useState([]);
+    const [meta,            setMeta]            = useState(null);
+    const [loading,         setLoading]         = useState(true);
+    const [search,          setSearch]          = useState('');
     const [committedSearch, setCommittedSearch] = useState('');
-    const [categoryId,     setCategoryId]     = useState('');
-    const [page,           setPage]           = useState(1);
+    const [categoryId,      setCategoryId]      = useState('');
+    const [page,            setPage]            = useState(1);
+    const [totalKontribusi, setTotalKontribusi] = useState(0);
 
     const fetchCampaigns = async (p, cat, q) => {
         setLoading(true);
         try {
             const { data } = await campaignService.getAll({
-                search:      q       || undefined,
-                category_id: cat     || undefined,
+                search:      q   || undefined,
+                category_id: cat || undefined,
                 is_active:   true,
                 page:        p,
             });
@@ -46,6 +54,18 @@ export default function HomePage() {
     }, []);
 
     useEffect(() => {
+        if (user) {
+            donationService.myDonations({ per_page: 200 }).then(({ data }) => {
+                const donations = data.data?.data ?? [];
+                const total = donations
+                    .filter(d => d.status === 'success')
+                    .reduce((sum, d) => sum + Number(d.amount ?? 0), 0);
+                setTotalKontribusi(total);
+            }).catch(() => {});
+        }
+    }, [user]);
+
+    useEffect(() => {
         fetchCampaigns(page, categoryId, committedSearch);
     }, [page, categoryId, committedSearch]);
 
@@ -57,22 +77,55 @@ export default function HomePage() {
 
     return (
         <MainLayout>
-            {/* Hero Section - Modern Glassmorphism + Gradient */}
-            <section className="relative bg-gradient-to-br from-blue-800 via-blue-700 to-emerald-600 text-white overflow-hidden">
-                {/* Background Ornament */}
+            {/* ===== MOBILE HEADER ===== */}
+            <div className="md:hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 px-4 pt-10 pb-6">
+                <div className="flex items-center gap-3 mb-6">
+                    <span className="text-2xl">🕌</span>
+                    <h1 className="text-white font-bold text-lg tracking-wide">Donasi Al Khidmah</h1>
+                </div>
+
+                {/* busi Card */}
+                <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-4 flex items-center justify-between">
+                    <div>
+                        <p className="text-blue-100 text-xs mb-1">Total Kontribusi Anda</p>
+                        <p className="text-white text-2xl font-bold">
+                            {user ? `Rp ${fmt(totalKontribusi)}` : 'Rp 0'}
+                        </p>
+                    </div>
+                    <div className="flex gap-2">
+                        {/* History quick action */}
+                        <Link to={user ? '/my-donations' : '/login'}
+                            className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="white" className="w-5 h-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </Link>
+                        {/* Profile quick action */}
+                        {/* <Link to={user ? '/my-donations' : '/login'}
+                            className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="white" className="w-5 h-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                            </svg>
+                        </Link> */}
+                    </div>
+                </div>
+            </div>
+
+            {/* ===== DESKTOP HERO ===== */}
+            <section className="hidden md:block relative bg-gradient-to-br from-blue-800 via-blue-700 to-emerald-600 text-white overflow-hidden">
                 <div className="absolute inset-0 opacity-20 pointer-events-none">
                     <div className="absolute top-0 left-0 w-72 h-72 bg-white rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl" />
                     <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-1/3 translate-y-1/3 blur-3xl" />
                 </div>
-                <div className="relative max-w-4xl mx-auto px-4 py-20 text-center">
+                <div className="relative max-w-4xl mx-auto px-6 py-16 text-center">
                     <span className="inline-block bg-white/20 backdrop-blur-md px-5 py-2 rounded-full text-sm font-medium mb-4 shadow-lg">
                         🌙 Platform Donasi Islami Terpercaya
                     </span>
-                    <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                    <h1 className="text-4xl md:text-5xl font-bold mb-5 leading-tight">
                         Bersama Membangun<br />
                         <span className="text-blue-200">Kebaikan untuk Ummat</span>
                     </h1>
-                    <p className="text-blue-100 text-lg md:text-xl mb-10 max-w-2xl mx-auto">
+                    <p className="text-blue-100 text-lg mb-8 max-w-xl mx-auto">
                         Setiap donasi Anda adalah amal jariyah yang mengalir tanpa henti.
                     </p>
                     <form onSubmit={handleSearch} className="flex gap-3 max-w-xl mx-auto">
@@ -80,32 +133,28 @@ export default function HomePage() {
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Cari campaign..."
-                            className="flex-1 px-5 py-3 rounded-2xl bg-white/90 backdrop-blur-sm text-black placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-xl transition-all duration-300"
+                            placeholder="Cari program donasi..."
+                            className="flex-1 px-5 py-3 rounded-2xl bg-white/90 backdrop-blur-sm text-black placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-xl transition-all"
                         />
-                        <button
-                            type="submit"
-                            className="bg-white text-blue-700 px-8 py-3 rounded-2xl font-semibold hover:bg-blue-50 hover:shadow-2xl hover:scale-105 transition-all duration-300 shadow-lg"
-                        >
+                        <button type="submit"
+                            className="bg-white text-blue-700 px-8 py-3 rounded-2xl font-semibold hover:bg-blue-50 hover:shadow-xl hover:scale-105 transition-all shadow-lg">
                             Cari
                         </button>
                     </form>
                 </div>
             </section>
 
-            {/* Stats Cards - With Hover Effects & Shadows */}
-            <section className="max-w-5xl mx-auto px-4 -mt-8 mb-8 relative z-10">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* ===== DESKTOP STATS ===== */}
+            <section className="hidden md:block max-w-5xl mx-auto px-6 -mt-6 mb-8 relative z-10">
+                <div className="grid grid-cols-4 gap-4">
                     {[
                         { label: 'Campaign Aktif', value: meta?.total ?? '...', icon: '📢' },
                         { label: 'Total Donatur',  value: '1.2K+',             icon: '👥' },
                         { label: 'Dana Tersalur',  value: 'Rp 500jt+',         icon: '💚' },
                         { label: 'Kategori',       value: categories.length || '...', icon: '🏷️' },
                     ].map((s) => (
-                        <div 
-                            key={s.label} 
-                            className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 text-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-default"
-                        >
+                        <div key={s.label}
+                            className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 text-center hover:shadow-2xl hover:-translate-y-1 transition-all cursor-default">
                             <div className="text-3xl mb-2">{s.icon}</div>
                             <p className="text-2xl font-extrabold text-gray-800">{s.value}</p>
                             <p className="text-sm text-gray-500 font-medium">{s.label}</p>
@@ -114,117 +163,136 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Categories - Interactive Chips with Shadow & Scale */}
-            <section className="max-w-5xl mx-auto px-4 py-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-5 flex items-center gap-2">
-                    <span className="w-1 h-6 bg-blue-500 rounded-full"></span>
-                    Program Pilihan
-                </h2>
-                <div className="flex gap-3 overflow-x-auto pb-3 custom-scrollbar" style={{ scrollbarWidth: 'thin' }}>
+            {/* ===== MOBILE SEARCH ===== */}
+            <div className="md:hidden px-4 py-3 bg-gray-50">
+                <form onSubmit={handleSearch} className="flex gap-2">
+                    <input
+                        type="text"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Cari program..."
+                        className="flex-1 px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
+                    />
+                    <button type="submit"
+                        className="bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition shadow-sm">
+                        Cari
+                    </button>
+                </form>
+            </div>
+
+            {/* ===== PROGRAM PILIHAN (Categories) ===== */}
+            <section className="px-4 md:max-w-5xl md:mx-auto py-4 md:py-6">
+                <div className="flex items-center justify-between mb-3 md:mb-4">
+                    <h2 className="text-base md:text-xl font-bold text-gray-800">Program Pilihan</h2>
+                </div>
+                <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
+                    {/* Semua */}
                     <button
                         onClick={() => { setCategoryId(''); setPage(1); }}
-                        className={`flex-none flex flex-col items-center gap-2 px-5 py-3 rounded-2xl text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-md hover:scale-105 ${
-                            !categoryId 
-                                ? 'bg-gradient-to-br from-blue-500 to-emerald-600 text-white shadow-lg' 
-                                : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300'
+                        className={`flex-none flex flex-col items-center gap-1.5 px-3 pt-3 pb-2.5 rounded-2xl border-2 transition-all min-w-[68px] ${
+                            !categoryId
+                                ? 'bg-blue-600 border-blue-600 shadow-md shadow-blue-200'
+                                : 'bg-white border-gray-100 hover:border-blue-200 shadow-sm'
                         }`}
                     >
-                        <span className="text-2xl">🌟</span>
-                        <span>Semua</span>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all ${
+                            !categoryId ? 'bg-white/20' : 'bg-amber-100'
+                        }`}>
+                            🌟
+                        </div>
+                        <span className={`text-[11px] font-semibold whitespace-nowrap ${
+                            !categoryId ? 'text-white' : 'text-gray-600'
+                        }`}>Semua</span>
                     </button>
-                    {categories.map((cat) => (
-                        <button
-                            key={cat.id}
-                            onClick={() => { setCategoryId(cat.id); setPage(1); }}
-                            className={`flex-none flex flex-col items-center gap-2 px-5 py-3 rounded-2xl text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-md hover:scale-105 ${
-                                categoryId === cat.id 
-                                    ? 'bg-gradient-to-br from-blue-500 to-emerald-600 text-white shadow-lg' 
-                                    : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300'
-                            }`}
-                        >
-                            <span className="text-2xl">{CATEGORY_ICONS[cat.name] ?? '❤️'}</span>
-                            <span className="text-center leading-tight">{cat.name}</span>
-                        </button>
-                    ))}
+
+                    {categories.map((cat) => {
+                        const cfg = CATEGORY_ICONS[cat.name] ?? { emoji: '❤️', bg: 'bg-pink-100', color: 'text-pink-600' };
+                        const active = categoryId === cat.id;
+                        return (
+                            <button
+                                key={cat.id}
+                                onClick={() => { setCategoryId(cat.id); setPage(1); }}
+                                className={`flex-none flex flex-col items-center gap-1.5 px-3 pt-3 pb-2.5 rounded-2xl border-2 transition-all min-w-[68px] ${
+                                    active
+                                        ? 'bg-blue-600 border-blue-600 shadow-md shadow-blue-200'
+                                        : 'bg-white border-gray-100 hover:border-blue-200 shadow-sm'
+                                }`}
+                            >
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all ${
+                                    active ? 'bg-white/20' : cfg.bg
+                                }`}>
+                                    {cfg.emoji}
+                                </div>
+                                <span className={`text-[11px] font-semibold whitespace-nowrap text-center leading-tight ${
+                                    active ? 'text-white' : 'text-gray-600'
+                                }`}>{cat.name}</span>
+                            </button>
+                        );
+                    })}
                 </div>
             </section>
 
-            {/* Campaigns Grid */}
-            <section className="max-w-5xl mx-auto px-4 pb-16">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                        <span className="w-1 h-6 bg-blue-500 rounded-full"></span>
+            {/* ===== CAMPAIGNS ===== */}
+            <section className="px-4 md:max-w-5xl md:mx-auto pb-8">
+                <div className="flex items-center justify-between mb-3 md:mb-5">
+                    <h2 className="text-base md:text-xl font-bold text-gray-800">
                         {categoryId
-                            ? categories.find(c => c.id === categoryId)?.name
+                            ? categories.find(c => c.id === categoryId)?.name ?? 'Campaign'
                             : 'Campaign Terbaru'}
                     </h2>
-                    {meta && <span className="text-sm text-gray-400 bg-gray-100 px-3 py-1 rounded-full">{meta.total} campaign</span>}
+                    {meta && (
+                        <span className="text-xs text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">
+                            {meta.total} program
+                        </span>
+                    )}
                 </div>
 
                 {loading ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-                        {[...Array(8)].map((_, i) => (
-                            <div 
-                                key={i} 
-                                className="bg-white rounded-2xl h-72 animate-pulse border border-gray-100 shadow-md relative overflow-hidden"
-                            >
-                                <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer" />
+                    <div className="space-y-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:space-y-0">
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 animate-pulse">
+                                <div className="h-44 bg-gray-200" />
+                                <div className="p-4 space-y-3">
+                                    <div className="h-4 bg-gray-200 rounded w-3/4" />
+                                    <div className="h-3 bg-gray-200 rounded w-full" />
+                                    <div className="h-2 bg-gray-200 rounded-full w-full" />
+                                    <div className="h-9 bg-gray-200 rounded-xl w-full" />
+                                </div>
                             </div>
                         ))}
                     </div>
                 ) : campaigns.length === 0 ? (
-                    <div className="text-center py-20 bg-gray-50 rounded-3xl">
-                        <div className="text-6xl mb-4">🔍</div>
-                        <p className="text-gray-500 text-lg">Tidak ada campaign ditemukan.</p>
-                        <button 
+                    <div className="text-center py-16 bg-white rounded-3xl shadow-sm border border-gray-100">
+                        <div className="text-5xl mb-3">🔍</div>
+                        <p className="text-gray-500 font-medium">Tidak ada program ditemukan.</p>
+                        <button
                             onClick={() => { setSearch(''); setCommittedSearch(''); setCategoryId(''); setPage(1); }}
-                            className="mt-4 text-blue-600 underline"
+                            className="mt-3 text-blue-600 text-sm underline"
                         >
                             Reset filter
                         </button>
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        {/* Mobile: vertical list | Desktop: grid */}
+                        <div className="space-y-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:space-y-0">
                             {campaigns.map((campaign) => (
-                                <Link 
-                                    key={campaign.id} 
-                                    to={`/campaigns/${campaign.id}`} 
-                                    className="block transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 rounded-2xl"
+                                <Link
+                                    key={campaign.id}
+                                    to={`/campaigns/${campaign.id}`}
+                                    className="block hover:shadow-xl transition-all duration-300 rounded-2xl"
                                 >
                                     <CampaignCard campaign={campaign} />
                                 </Link>
                             ))}
                         </div>
-                        <div className="mt-10">
+                        <div className="mt-8">
                             <Pagination meta={meta} onPageChange={setPage} />
                         </div>
                     </>
                 )}
             </section>
-
-            {/* Custom Shimmer Animation (add to global CSS or use inline style) */}
-            <style jsx>{`
-                @keyframes shimmer {
-                    100% {
-                        transform: translateX(100%);
-                    }
-                }
-                .animate-shimmer {
-                    animation: shimmer 1.5s infinite;
-                }
-                .custom-scrollbar::-webkit-scrollbar {
-                    height: 4px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: #f1f1f1;
-                    border-radius: 10px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: #c1c1c1;
-                    border-radius: 10px;
-                }
-            `}</style>
         </MainLayout>
     );
 }
+

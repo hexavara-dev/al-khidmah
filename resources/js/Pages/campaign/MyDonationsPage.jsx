@@ -37,7 +37,150 @@ const STATUS_CONFIG = {
     failed:  { label: 'Gagal',     bg: 'bg-red-100',   text: 'text-red-700',    icon: '❌' },
 };
 
-function DonationDetailModal({ donation, onClose, onStatusUpdated }) {
+function DonationStruktModal({ donation, onClose }) {
+    if (!donation) return null;
+
+    const fmtPay = (m) => {
+        if (!m || m === '-') return '-';
+        const map = { bca_va: 'BCA VA', bni_va: 'BNI VA', mandiri_va: 'Mandiri VA', bri_va: 'BRI VA', gopay: 'GoPay', shopeepay: 'ShopeePay', qris: 'QRIS', indomaret: 'Indomaret', alfamart: 'Alfamart', credit_card: 'Kartu Kredit', bank_transfer: 'Transfer Bank', cstore: 'Minimarket', echannel: 'Mandiri Bill' };
+        return map[m.toLowerCase()] ?? m.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    };
+    const paidAt = donation.updated_at ? new Date(donation.updated_at) : new Date(donation.created_at);
+    const dateStr = paidAt.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + paidAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    const txId = `AK-${String(donation.id).padStart(10, '0')}`;
+    const isAnon = donation.note?.startsWith('[Anonim]');
+    const cleanNote = (donation.note ?? '').replace('[Anonim]', '').trim();
+    const donorDisplay = isAnon ? 'Hamba Allah' : (donation.donor_name ?? 'Donatur');
+
+    const handleSave = () => {
+        toast('Membuka tampilan cetak...', { icon: '🖨️' });
+        setTimeout(() => window.print(), 300);
+    };
+    const handleShare = async () => {
+        const text = `Alhamdulillah, saya baru berdonasi Rp ${fmt(donation.amount)} untuk "${donation.campaign?.title}" melalui Al Khidmah. 🤲`;
+        if (navigator.share) {
+            try { await navigator.share({ title: 'Struk Donasi Al Khidmah', text }); } catch { /* cancelled */ }
+        } else {
+            await navigator.clipboard.writeText(text);
+            toast.success('Teks donasi disalin!');
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-[60] bg-gray-50 overflow-y-auto">
+            {/* Header */}
+            <div className="bg-white border-b border-gray-100 px-4 py-4 flex items-center justify-between sticky top-0 z-10">
+                <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-gray-700">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                </button>
+                <h1 className="text-base font-bold text-blue-700">Al Khidmah</h1>
+                <div className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-gray-400">
+                        <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
+                    </svg>
+                </div>
+            </div>
+
+            <div className="max-w-md mx-auto px-4 py-5 pb-36">
+                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    {/* Card header */}
+                    <div className="px-6 pt-8 pb-6 text-center border-b border-dashed border-gray-200">
+                        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#2563eb" className="w-9 h-9">
+                                {/* Small heart at top */}
+                                <path d="M12 7.5C11.4 6.4 9.75 6.35 9.75 8.1C9.75 9.75 12 11.25 12 11.25C12 11.25 14.25 9.75 14.25 8.1C14.25 6.35 12.6 6.4 12 7.5Z"/>
+                                {/* Open giving palm */}
+                                <path d="M5.5 12.5C5.5 12.5 4.5 13.3 4.5 14.75C4.5 16 5 16.75 5 16.75H19C19 16.75 19.5 16 19.5 14.75C19.5 13.3 18.5 12.5 18.5 12.5L15.75 11.5C15.75 11.5 14.75 12 12 12C9.25 12 8.25 11.5 8.25 11.5L5.5 12.5Z"/>
+                                {/* Wrist */}
+                                <path d="M5 17.25H19C19 17.25 19.75 17.75 19.75 18.5C19.75 19.25 19 19.75 19 19.75H5C5 19.75 4.25 19.25 4.25 18.5C4.25 17.75 5 17.25 5 17.25Z"/>
+                            </svg>
+                        </div>
+                        <h2 className="font-bold text-gray-800 text-lg">Struk Donasi Al Khidmah</h2>
+                        <p className="text-gray-400 text-sm mt-1">Terima kasih atas kebaikan Anda</p>
+                    </div>
+
+                    {/* Amount */}
+                    <div className="mx-5 my-5 bg-blue-50 rounded-2xl px-5 py-5 text-center">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-1">Jumlah Donasi</p>
+                        <p className="text-3xl font-extrabold text-blue-800">
+                            <span className="text-sm font-bold mr-1">IDR</span>{fmt(donation.amount)}
+                        </p>
+                        <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full mt-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
+                                <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
+                            </svg>
+                            Berhasil
+                        </span>
+                    </div>
+
+                    {/* Detail rows */}
+                    <div className="px-5 pb-4 space-y-3 border-b border-dashed border-gray-200">
+                        {[
+                            { label: 'Program', value: donation.campaign?.title ?? '-' },
+                            { label: 'Nama Donatur', value: donorDisplay },
+                            { label: 'ID Transaksi', value: txId },
+                            { label: 'Tanggal', value: dateStr },
+                            { label: 'Metode Pembayaran', value: fmtPay(donation.payment_method) },
+                        ].map(({ label, value }) => (
+                            <div key={label} className="flex justify-between items-start gap-3">
+                                <span className="text-sm text-gray-400 flex-none">{label}</span>
+                                <span className="text-sm font-semibold text-gray-800 text-right leading-snug">{value}</span>
+                            </div>
+                        ))}
+                        {cleanNote && (
+                            <div className="bg-gray-50 rounded-2xl px-4 py-3 mt-1">
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">Doa &amp; Niat</p>
+                                <p className="text-sm text-gray-600 italic">"{cleanNote}"</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* QR placeholder */}
+                    <div className="px-5 py-6 flex flex-col items-center gap-3">
+                        <div className="w-28 h-28 border-2 border-gray-200 rounded-2xl flex items-center justify-center bg-gray-50">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth={0.8} className="w-20 h-20">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 14.25l6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0c1.1.128 1.907 1.077 1.907 2.185z" />
+                            </svg>
+                        </div>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 text-center">Pindai untuk Verifikasi Keaslian Struk</p>
+                    </div>
+                </div>
+
+                <p className="text-center text-xs text-gray-400 mt-4 px-2 leading-relaxed">
+                    Bukti transaksi ini diterbitkan secara sah oleh Al Khidmah Foundation sebagai tanda terima donasi Anda.
+                </p>
+            </div>
+
+            {/* Sticky bottom buttons */}
+            <div className="fixed bottom-0 left-0 right-0 z-[61] bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] px-4 py-4">
+                <div className="max-w-md mx-auto flex gap-3">
+                    <button
+                        onClick={handleSave}
+                        className="flex-1 flex items-center justify-center gap-2 bg-blue-50 text-blue-700 py-4 rounded-2xl font-bold text-sm hover:bg-blue-100 transition border border-blue-100"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                        </svg>
+                        Simpan
+                    </button>
+                    <button
+                        onClick={handleShare}
+                        className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-bold text-sm transition shadow-md"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+                        </svg>
+                        Bagikan
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function DonationDetailModal({ donation, onClose, onStatusUpdated, onViewStruk }) {
     if (!donation) return null;
 
     const isAnon = donation.note?.startsWith('[Anonim]');
@@ -78,7 +221,7 @@ function DonationDetailModal({ donation, onClose, onStatusUpdated }) {
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
             {/* Sheet */}
-            <div className="relative bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-slide-up flex flex-col max-h-[90vh]">
+            <div className="relative bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-slide-up flex flex-col max-h-[calc(90vh-4rem)] sm:max-h-[90vh] mb-16 sm:mb-0">
                 {/* Handle bar */}
                 <div className="flex justify-center pt-3 pb-1 sm:hidden">
                     <div className="w-10 h-1.5 bg-gray-200 rounded-full" />
@@ -154,7 +297,18 @@ function DonationDetailModal({ donation, onClose, onStatusUpdated }) {
                 </div>
 
                 {/* Action */}
-                <div className="px-6 pb-6 pt-2 space-y-2 flex-none border-t border-gray-100">
+                <div className="px-6 pb-8 sm:pb-6 pt-2 space-y-2 flex-none border-t border-gray-100">
+                    {donation.status === 'success' && (
+                        <button
+                            onClick={onViewStruk}
+                            className="w-full flex items-center justify-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 py-3.5 rounded-2xl font-semibold transition border border-blue-100"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 14.25l6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0c1.1.128 1.907 1.077 1.907 2.185z" />
+                            </svg>
+                            Lihat Struk
+                        </button>
+                    )}
                     {donation.status === 'pending' && (
                         <button
                             onClick={handleCheckStatus}
@@ -187,6 +341,7 @@ export default function MyDonationsPage() {
     const [page, setPage]                   = useState(1);
     const [totalAmount, setTotalAmount]     = useState(0);
     const [selectedDonation, setSelected]   = useState(null);
+    const [struktDonation, setStruktDonation] = useState(null);
 
     const loadDonations = () => {
         setLoading(true);
@@ -308,6 +463,11 @@ export default function MyDonationsPage() {
                 donation={selectedDonation}
                 onClose={() => setSelected(null)}
                 onStatusUpdated={handleStatusUpdated}
+                onViewStruk={() => { setStruktDonation(selectedDonation); setSelected(null); }}
+            />
+            <DonationStruktModal
+                donation={struktDonation}
+                onClose={() => setStruktDonation(null)}
             />
         </MainLayout>
     );

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Campaign extends Model
 {
@@ -21,6 +22,8 @@ class Campaign extends Model
         'deadline',
         'is_active',
     ];
+
+    protected $appends = ['image_url', 'progress_percentage'];
 
     protected function casts(): array
     {
@@ -48,5 +51,13 @@ class Campaign extends Model
             return 0;
         }
         return min(100, ($this->collected_amount / $this->target_amount) * 100);
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->image) {
+            return null;
+        }
+        return Storage::disk('public')->url($this->image);
     }
 }
