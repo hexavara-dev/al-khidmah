@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CampaignController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\DonationController;
@@ -14,10 +13,6 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// Public routes
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-
 // Midtrans webhook (must be public, Midtrans calls this)
 Route::post('/midtrans/webhook', [DonationController::class, 'midtransWebhook']);
 
@@ -29,9 +24,6 @@ Route::get('/categories/{category}', [CategoryController::class, 'show']);
 
 // Authenticated routes
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/me', [AuthController::class, 'me']);
-
     // User donations
     Route::post('/donations', [DonationController::class, 'store']);
     Route::post('/donations/{id}/confirm-payment', [DonationController::class, 'confirmPayment']);
