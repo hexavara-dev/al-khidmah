@@ -34,7 +34,7 @@ export default function ConfirmModal({ show, item, phoneNumber, operator, servic
 	const [ovoName, setOvoName] = useState('');
 	const [inquiryError, setInquiryError] = useState('');
 
-	const needsInquiry = isOvoProduct(item);
+	const needsInquiry = isOvoProduct(item ?? null);
 
 	useEffect(() => {
 		if (!show) {

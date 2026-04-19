@@ -121,7 +121,8 @@ export default function Login({ status }: { status?: string; canResetPassword: b
                     <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-primary/8" />
                     <div className="absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-secondary/6" />
                 </div>
-
+            </div>
+            <div>
                 {/* Mobile logo */}
                 <div className="relative mb-8 flex flex-col items-center text-center">
                     <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-surface-container-lowest shadow-md">
@@ -167,10 +168,6 @@ export default function Login({ status }: { status?: string; canResetPassword: b
                         <p className="mt-4 max-w-sm text-sm leading-7 text-white/60">
                             Bayar tagihan listrik, internet, pulsa, dan berbagai layanan lainnya dengan mudah, cepat, dan aman.
                         </p>
-
-                      
-
-                    
                     </div>
 
                     <p className="relative text-xs text-white/40">
@@ -188,3 +185,4 @@ export default function Login({ status }: { status?: string; canResetPassword: b
         </>
     );
 }
+
