@@ -216,7 +216,7 @@ export default function Homepage({ balance }: HomepageProps) {
 
             <Navbar balance={balance} />
 
-            <div className="min-h-screen bg-surface-bright pt-[68px] pb-48">
+            <div className="min-h-screen bg-surface-bright pt-[68px] pb-28">
 
                 {/* Hero */}
                 <section className="mx-auto max-w-7xl px-6 pb-8 pt-12">

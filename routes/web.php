@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\Auth\JemaahController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PPOBController;
@@ -49,5 +50,8 @@ Route::get('/payment/finish', [PaymentController::class, 'finish'])
 
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
+
+Route::get('/auth/jemaah', [JemaahController::class, 'redirect'])->name('auth.jemaah');
+Route::get('/auth/jemaah/callback', [JemaahController::class, 'callback'])->name('auth.jemaah.callback');
 
 require __DIR__.'/auth.php';

@@ -20,10 +20,9 @@ type Props = {
 
 export default function BottomNav({ active = 'beranda', onChange }: Props) {
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-50 w-full border-t border-outline-variant/20 bg-surface-bright pt-4 pb-5">
-            {/* Nav pill — centered, hugs content */}
-            <div className="flex justify-center mb-6">
-                <nav className="inline-flex items-center gap-1 rounded-3xl border border-outline-variant/20 bg-surface-container-lowest px-3 py-3 shadow-lg shadow-on-surface/5">
+        <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center pointer-events-none">
+            <div className="flex justify-center pointer-events-auto">
+                <nav className="inline-flex items-center gap-1 rounded-3xl border border-outline-variant/20 bg-surface-container-lowest/90 px-3 py-3 shadow-xl shadow-on-surface/10 backdrop-blur-xl">
                     {navItems.map(({ key, label, icon: Icon }) => {
                         const isActive = active === key;
                         return (
@@ -53,15 +52,6 @@ export default function BottomNav({ active = 'beranda', onChange }: Props) {
                 </nav>
             </div>
 
-            {/* Footer links — outside the white pill */}
-            {/* <div className="flex justify-center gap-8 mb-2">
-                <a href="#" className="text-xs text-on-surface-variant transition-colors hover:text-primary">Privacy Policy</a>
-                <a href="#" className="text-xs text-on-surface-variant transition-colors hover:text-primary">Terms of Service</a>
-                <a href="#" className="text-xs text-on-surface-variant transition-colors hover:text-primary">Contact Us</a>
-            </div>
-            <p className="text-center text-xs text-on-surface-variant">
-                &copy; {new Date().getFullYear()} Al-Khidmah. Didukung oleh IAK PPOB.
-            </p> */}
         </div>
     );
 }
