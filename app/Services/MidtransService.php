@@ -4,11 +4,14 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 
-class MidtransService{
+class MidtransService {
     private string $serverKey;
     private string $clientKey;
     private bool $isProduction;
     private string $snapUrl;
+    private string $snapJsUrl;
+    private string $snapBaseUrl;
+    private string $apiBaseUrl;
 
     public function __construct() {
         $this->serverKey = (string) config('services.midtrans.server_key', '');
@@ -26,6 +29,10 @@ class MidtransService{
         $this->snapBaseUrl = $this->isProduction
             ? 'https://app.midtrans.com/snap'
             : 'https://app.sandbox.midtrans.com/snap';
+
+        $this->apiBaseUrl = $this->isProduction
+            ? 'https://api.midtrans.com'
+            : 'https://api.sandbox.midtrans.com';
     }
 
     public function createSnapToken(array $transactionDetails, array $customerDetails, array $options = []): string {
@@ -41,8 +48,39 @@ class MidtransService{
             throw new \Exception('Failed to create Midtrans Snap token: ' . $response->body());
         }
 
-        $responseData = $response->json('token');
-        return $responseData;
+        return $response->json('token');
+    }
+
+    /**
+     * Get transaction status from Midtrans API v2.
+     */
+    public function getTransactionStatus(string $orderId): object
+    {
+        $response = Http::withBasicAuth($this->serverKey, '')
+            ->get("{$this->apiBaseUrl}/v2/{$orderId}/status");
+
+        if ($response->failed()) {
+            throw new \Exception('Failed to get Midtrans transaction status: ' . $response->body());
+        }
+
+        return $response->object();
+    }
+
+    /**
+     * Parse and verify a Midtrans webhook notification payload.
+     */
+    public function parseWebhookNotification(array $payload): object
+    {
+        $orderId = $payload['order_id'] ?? '';
+        $statusCode = $payload['status_code'] ?? '';
+        $grossAmount = $payload['gross_amount'] ?? '';
+        $signatureKey = $payload['signature_key'] ?? '';
+
+        if (!$this->verifySignature($orderId, $statusCode, $grossAmount, $signatureKey)) {
+            throw new \Exception('Invalid Midtrans webhook signature.');
+        }
+
+        return (object) $payload;
     }
 
     public function verifySignature(string $orderId, string $statusCode, string $grossAmount, string $signatureKey) {

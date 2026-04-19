@@ -7,23 +7,21 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCampaignRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            //
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'target_amount' => 'required|numeric|min:1',
+            'category_id' => 'required|exists:categories,id',
+            'deadline' => 'required|date|after:today',
+            'is_active' => 'boolean',
         ];
     }
 }

@@ -3,6 +3,9 @@ interface SnapResult {
     payment_type: string;
     transaction_status: string;
     fraud_status: string;
+    va_numbers?: { bank: string; va_number: string }[];
+    bank?: string;
+    [key: string]: unknown;
 }
 
 interface Snap {

@@ -27,6 +27,7 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
+        "react-hot-toast": "^2.6.0",
         "@base-ui/react": "^1.4.0",
         "@fontsource-variable/geist": "^5.2.8",
         "class-variance-authority": "^0.7.1",

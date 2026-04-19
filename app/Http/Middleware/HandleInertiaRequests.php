@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\MidtransService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -29,10 +30,16 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $midtrans = app(MidtransService::class);
+
         return [
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
+            ],
+            'midtrans' => [
+                'snapJsUrl' => $midtrans->getSnapJsUrl(),
+                'clientKey' => $midtrans->getSnapClientKey(),
             ],
         ];
     }
