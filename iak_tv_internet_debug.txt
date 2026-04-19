@@ -1,0 +1,315 @@
+======================================================================
+  TV KABEL — PRICELIST (type: tv)
+======================================================================
+
+[0] BIZNET HOME
+{
+    "code": "BIZNET",
+    "name": "BIZNET HOME",
+    "komisi": 1500,
+    "fee": 5000,
+    "status": 1,
+    "type": "tv",
+    "category": "tv"
+}
+
+[1] ICONNET TV
+{
+    "code": "ICONNET",
+    "name": "ICONNET TV",
+    "komisi": 900,
+    "fee": 3500,
+    "status": 1,
+    "type": "tv",
+    "category": "tv"
+}
+
+[2] KVISION 100
+{
+    "code": "KVISION100",
+    "name": "KVISION 100",
+    "komisi": 2500,
+    "fee": 0,
+    "status": 1,
+    "type": "tv",
+    "category": "postpaid"
+}
+
+[3] KVISION125
+{
+    "code": "KVISION125",
+    "name": "KVISION125",
+    "komisi": 2500,
+    "fee": 0,
+    "status": 1,
+    "type": "tv",
+    "category": "postpaid"
+}
+
+[4] KVISION 150
+{
+    "code": "KVISION150",
+    "name": "KVISION 150",
+    "komisi": 2500,
+    "fee": 0,
+    "status": 1,
+    "type": "tv",
+    "category": "postpaid"
+}
+
+[5] KVISION 200
+{
+    "code": "KVISION200",
+    "name": "KVISION 200",
+    "komisi": 2500,
+    "fee": 0,
+    "status": 1,
+    "type": "tv",
+    "category": "postpaid"
+}
+
+[6] KVISION 300
+{
+    "code": "KVISION300",
+    "name": "KVISION 300",
+    "komisi": 2500,
+    "fee": 0,
+    "status": 1,
+    "type": "tv",
+    "category": "postpaid"
+}
+
+[7] KVISION 50
+{
+    "code": "KVISION50",
+    "name": "KVISION 50",
+    "komisi": 2500,
+    "fee": 0,
+    "status": 1,
+    "type": "tv",
+    "category": "postpaid"
+}
+
+[8] KVISION 500
+{
+    "code": "KVISION500",
+    "name": "KVISION 500",
+    "komisi": 2500,
+    "fee": 0,
+    "status": 1,
+    "type": "tv",
+    "category": "postpaid"
+}
+
+[9] KVISION 75
+{
+    "code": "KVISION75",
+    "name": "KVISION 75",
+    "komisi": 2500,
+    "fee": 0,
+    "status": 1,
+    "type": "tv",
+    "category": "postpaid"
+}
+
+[10] BIG TV
+{
+    "code": "TVBIG",
+    "name": "BIG TV",
+    "komisi": 1100,
+    "fee": 0,
+    "status": 1,
+    "type": "tv",
+    "category": "postpaid"
+}
+
+[11] DENS TV
+{
+    "code": "TVDENS",
+    "name": "DENS TV",
+    "komisi": 500,
+    "fee": 2500,
+    "status": 1,
+    "type": "tv",
+    "category": "tv"
+}
+
+[12] FIRSTMEDIA
+{
+    "code": "TVFIRST",
+    "name": "FIRSTMEDIA",
+    "komisi": 1700,
+    "fee": 0,
+    "status": 1,
+    "type": "tv",
+    "category": "postpaid"
+}
+
+[13] INDOVISION
+{
+    "code": "TVINDVS",
+    "name": "INDOVISION",
+    "komisi": 800,
+    "fee": 0,
+    "status": 1,
+    "type": "tv",
+    "category": "postpaid"
+}
+
+[14] NEX MEDIA
+{
+    "code": "TVNEX",
+    "name": "NEX MEDIA",
+    "komisi": 600,
+    "fee": 0,
+    "status": 1,
+    "type": "tv",
+    "category": "postpaid"
+}
+
+[15] TELKOMVISION
+{
+    "code": "TVTLKMV",
+    "name": "TELKOMVISION",
+    "komisi": 1000,
+    "fee": 2500,
+    "status": 1,
+    "type": "tv",
+    "category": "postpaid"
+}
+
+======================================================================
+  INTERNET RUMAH — PRICELIST (type: internet)
+======================================================================
+
+[0] CBN Internet
+{
+    "code": "CBN",
+    "name": "CBN Internet",
+    "komisi": 3500,
+    "fee": 0,
+    "status": 1,
+    "type": "internet",
+    "category": "postpaid"
+}
+
+[1] FIRSTMEDIA INTERNET
+{
+    "code": "FIRSTMEDIA",
+    "name": "FIRSTMEDIA INTERNET",
+    "komisi": 1700,
+    "fee": 0,
+    "status": 1,
+    "type": "internet",
+    "category": "internet"
+}
+
+[2] MYREPRETAIL
+{
+    "code": "MYREPUBLIC",
+    "name": "MYREPRETAIL",
+    "komisi": 1500,
+    "fee": 0,
+    "status": 1,
+    "type": "internet",
+    "category": "postpaid"
+}
+
+[3] NET1
+{
+    "code": "NET1",
+    "name": "NET1",
+    "komisi": 500,
+    "fee": 2500,
+    "status": 1,
+    "type": "internet",
+    "category": "internet"
+}
+
+[4] INDIHOME (SPEEDY)
+{
+    "code": "SPEEDY",
+    "name": "INDIHOME (SPEEDY)",
+    "komisi": 1200,
+    "fee": 2500,
+    "status": 1,
+    "type": "internet",
+    "category": "postpaid"
+}
+
+[5] INDIHOME (SPEEDY)
+{
+    "code": "SPEEDYC",
+    "name": "INDIHOME (SPEEDY)",
+    "komisi": 1200,
+    "fee": 2500,
+    "status": 1,
+    "type": "internet",
+    "category": "internet"
+}
+
+[6] TELKOM
+{
+    "code": "TELKOMPSTN",
+    "name": "TELKOM",
+    "komisi": 1200,
+    "fee": 2500,
+    "status": 1,
+    "type": "internet",
+    "category": "postpaid"
+}
+
+======================================================================
+  CONTOH INQUIRY TV — BIZNET (nomor pelanggan dummy)
+======================================================================
+
+{
+    "data": {
+        "response_code": "14",
+        "message": "NO PELANGGAN TIDAK DITEMUKAN"
+    },
+    "meta": []
+}
+
+======================================================================
+  CONTOH INQUIRY INTERNET — SPEEDY/IndiHome (nomor pelanggan dummy)
+======================================================================
+
+{
+    "data": {
+        "response_code": "14",
+        "message": "NO PELANGGAN TIDAK DITEMUKAN"
+    },
+    "meta": []
+}
+
+======================================================================
+  CATATAN: FORMAT INQUIRY SUKSES (response_code = "00")
+======================================================================
+
+Berdasarkan kode TransactionService.php, field yang diambil saat inquiry berhasil:
+
+{
+    "data": {
+        "response_code": "00",
+        "message": "INQUIRY SUCCESS",
+        "tr_id": 123456789,          // ID transaksi IAK — wajib disimpan untuk pembayaran
+        "code": "BIZNET",            // kode produk
+        "hp": "123456789",           // nomor pelanggan
+        "tr_name": "NAMA PELANGGAN", // nama subscriber
+        "period": "MEI 2025",        // periode tagihan
+        "nominal": 250000,           // tagihan pokok (IDR)
+        "admin": 5000,               // biaya admin (IDR)
+        "price": 255000              // total yang harus dibayar (nominal + admin)
+    },
+    "meta": []
+}
+
+Field error umum:
+- response_code "14" → NO PELANGGAN TIDAK DITEMUKAN
+- response_code "20" → PRODUK TIDAK TERDAFTAR
+- response_code "35" → TRANSAKSI DUPLIKAT
+
+======================================================================
+  Generated: 19 Apr 2026 07:44:51
+======================================================================
