@@ -11,7 +11,7 @@ const GoogleIcon = () => (
 );
 
 const JemaahIcon = () => (
-    <svg className="size-5 text-secondary flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <svg className="size-5 text-primary flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M12 2L3 7v5c0 5 3.8 9.7 9 11 5.2-1.3 9-6 9-11V7l-9-5z" strokeLinejoin="round" />
         <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
@@ -21,23 +21,23 @@ function SsoCard({ status }: { status?: string }) {
     return (
         <div className="flex flex-col">
             {status && (
-                <div className="mb-5 rounded-2xl border border-secondary-container bg-secondary-container/30 px-4 py-3 text-sm font-medium text-on-surface">
+                <div className="mb-5 rounded-2xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground">
                     {status}
                 </div>
             )}
 
             {/* Greeting */}
             <div className="mb-6 flex flex-col items-center text-center lg:items-start lg:text-left">
-                <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary-container/60 px-3 py-1">
+                <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1">
                     <div className="h-1.5 w-1.5 rounded-full bg-primary" />
                     <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
                         Selamat Datang
                     </span>
                 </div>
-                <h2 className="font-headline text-2xl font-extrabold text-on-surface">
+                <h2 className="font-headline text-2xl font-extrabold text-foreground">
                     Masuk ke Al-Khidmah
                 </h2>
-                <p className="mt-1.5 max-w-xs text-sm text-on-surface-variant">
+                <p className="mt-1.5 max-w-xs text-sm text-muted-foreground">
                     Pilih metode masuk yang Anda gunakan.
                 </p>
             </div>
@@ -47,21 +47,21 @@ function SsoCard({ status }: { status?: string }) {
                 {/* Jemaah Al-Khidmah */}
                 <a
                     href="/auth/jemaah"
-                    className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-secondary/20 bg-secondary-container/20 px-5 py-4 transition hover:bg-secondary-container/35 hover:shadow-md active:scale-[0.98]"
+                    className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-primary/20 bg-primary/[0.06] px-5 py-4 transition hover:bg-primary/10 hover:shadow-md active:scale-[0.98]"
                 >
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-secondary/15">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary/15">
                         <JemaahIcon />
                     </div>
                     <div className="flex-1">
-                        <p className="text-sm font-bold text-secondary">
+                        <p className="text-sm font-bold text-primary">
                             Jemaah Al-Khidmah
                         </p>
-                        <p className="text-xs text-secondary/70">
+                        <p className="text-xs text-primary/60">
                             Masuk sebagai jemaah
                         </p>
                     </div>
                     <svg
-                        className="size-4 text-secondary/40 transition group-hover:translate-x-0.5 group-hover:text-secondary"
+                        className="size-4 text-primary/40 transition group-hover:translate-x-0.5 group-hover:text-primary"
                         viewBox="0 0 16 16"
                         fill="none"
                     >
@@ -78,21 +78,21 @@ function SsoCard({ status }: { status?: string }) {
                 {/* Google */}
                 <a
                     href="/auth/google"
-                    className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-outline-variant/20 bg-surface-container-lowest px-5 py-4 shadow-sm transition hover:border-primary/30 hover:shadow-md active:scale-[0.98]"
+                    className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-border bg-background px-5 py-4 shadow-sm transition hover:border-primary/30 hover:shadow-md active:scale-[0.98]"
                 >
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-outline-variant/15 bg-white shadow-sm">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-border bg-white shadow-sm">
                         <GoogleIcon />
                     </div>
                     <div className="flex-1">
-                        <p className="text-sm font-bold text-on-surface">
+                        <p className="text-sm font-bold text-foreground">
                             Masuk dengan Google
                         </p>
-                        <p className="text-xs text-on-surface-variant">
+                        <p className="text-xs text-muted-foreground">
                             Gunakan akun Google Anda
                         </p>
                     </div>
                     <svg
-                        className="size-4 text-outline-variant transition group-hover:translate-x-0.5 group-hover:text-primary"
+                        className="size-4 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-primary"
                         viewBox="0 0 16 16"
                         fill="none"
                     >
@@ -118,18 +118,17 @@ export default function Login({ status }: { status?: string; canResetPassword: b
             {/* ── MOBILE (< lg) ── */}
             <div className="flex min-h-screen flex-col items-center justify-start overflow-hidden bg-surface-container-low px-4 pb-10 pt-14 lg:hidden sm:justify-center sm:pt-0">
                 <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                    <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-primary/8" />
-                    <div className="absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-secondary/6" />
+                    <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-primary/[0.08]" />
+                    <div className="absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-accent" />
                 </div>
-            </div>
-            <div>
+
                 {/* Mobile logo */}
                 <div className="relative mb-8 flex flex-col items-center text-center">
                     <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-surface-container-lowest shadow-md">
                         <Zap className="size-9 text-primary" strokeWidth={2.5} />
                     </div>
                     <h1 className="font-headline text-3xl font-extrabold text-primary">Al-Khidmah</h1>
-                    <p className="mt-1 max-w-xs text-sm text-on-surface-variant">Kelola finansial Anda dengan tenang dan berkah.</p>
+                    <p className="mt-1 max-w-xs text-sm text-muted-foreground">Kelola finansial Anda dengan tenang dan berkah.</p>
                 </div>
 
                 <div className="relative w-full max-w-sm rounded-3xl bg-surface-container-lowest px-6 py-7 shadow-lg">

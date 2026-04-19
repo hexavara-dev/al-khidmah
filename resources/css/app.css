@@ -42,6 +42,38 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  /* ── Material Design 3 surface tokens ── */
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+
+  /* ── Material Design 3 primary container tokens ── */
+  --color-primary-container: var(--primary-container);
+  --color-on-primary: var(--on-primary);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-primary-dim: var(--primary-dim);
+
+  /* ── Material Design 3 secondary container tokens ── */
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary: var(--on-secondary);
+
+  /* ── Material Design 3 outline tokens ── */
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+
+  /* ── Material Design 3 error tokens ── */
+  --color-error: var(--error);
+  --color-error-container: var(--error-container);
+  --color-on-error: var(--on-error);
+
+  /* ── Material Design 3 tertiary ── */
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-container: var(--tertiary-container);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -81,7 +113,29 @@
     --sidebar-accent: oklch(0.95 0.03 264);
     --sidebar-accent-foreground: oklch(0.4 0.18 264);
     --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.546 0.218 263.831)
+    --sidebar-ring: oklch(0.546 0.218 263.831);
+
+    /* ── Material Design 3 tokens ── */
+    --surface-bright: oklch(0.985 0.002 264);
+    --surface-container: oklch(0.955 0.008 264);
+    --surface-container-low: oklch(0.968 0.005 264);
+    --surface-container-lowest: oklch(1 0 0);
+    --surface-container-high: oklch(0.94 0.012 264);
+    --on-surface: oklch(0.18 0.02 264);
+    --on-surface-variant: oklch(0.46 0.03 264);
+    --primary-container: oklch(0.91 0.06 264);
+    --on-primary: oklch(1 0 0);
+    --on-primary-container: oklch(0.35 0.15 264);
+    --primary-dim: oklch(0.48 0.2 264);
+    --secondary-container: oklch(0.92 0.04 264);
+    --on-secondary: oklch(1 0 0);
+    --outline: oklch(0.58 0.02 264);
+    --outline-variant: oklch(0.82 0.02 264);
+    --error: oklch(0.55 0.22 27);
+    --error-container: oklch(0.93 0.05 25);
+    --on-error: oklch(1 0 0);
+    --tertiary: oklch(0.55 0.15 165);
+    --tertiary-container: oklch(0.91 0.05 165);
   }
   .dark {
     --background: oklch(0.145 0 0);
@@ -114,7 +168,29 @@
     --sidebar-accent: oklch(0.25 0.06 264);
     --sidebar-accent-foreground: oklch(0.85 0.1 264);
     --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.623 0.214 259.815)
+    --sidebar-ring: oklch(0.623 0.214 259.815);
+
+    /* ── Material Design 3 tokens (dark) ── */
+    --surface-bright: oklch(0.25 0.01 264);
+    --surface-container: oklch(0.22 0.01 264);
+    --surface-container-low: oklch(0.19 0.008 264);
+    --surface-container-lowest: oklch(0.15 0.005 264);
+    --surface-container-high: oklch(0.28 0.015 264);
+    --on-surface: oklch(0.93 0.01 264);
+    --on-surface-variant: oklch(0.72 0.03 264);
+    --primary-container: oklch(0.32 0.12 264);
+    --on-primary: oklch(0.25 0.1 264);
+    --on-primary-container: oklch(0.88 0.08 264);
+    --primary-dim: oklch(0.55 0.18 264);
+    --secondary-container: oklch(0.3 0.04 264);
+    --on-secondary: oklch(0.25 0.05 264);
+    --outline: oklch(0.55 0.02 264);
+    --outline-variant: oklch(0.35 0.02 264);
+    --error: oklch(0.7 0.19 22);
+    --error-container: oklch(0.3 0.08 25);
+    --on-error: oklch(0.25 0.1 25);
+    --tertiary: oklch(0.7 0.12 165);
+    --tertiary-container: oklch(0.3 0.06 165);
   }
   * {
     @apply border-border outline-ring/50;
