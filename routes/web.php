@@ -1,22 +1,25 @@
 <?php
 
+use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PPOBController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [HomepageController::class, 'index'])->name('home');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/', [HomepageController::class, 'index'])->name('home');
 
-Route::prefix('ppob')->group(function () {
-    Route::get('/saldo', [PPOBController::class, 'checkBalance']);
-    Route::get('/inquiry-pln/{hp}', [PPOBController::class, 'inquiryPln']);
-    Route::get('/pricelist/{type}', [PPOBController::class, 'priceList']);
-    Route::get('/pricelist-pasca/{type}', [PPOBController::class, 'priceListPasca']);
-    Route::post('/inquiry-ovo', [PPOBController::class, 'inquiryOvo'])->name('ppob.inquiry-ovo');
-    Route::post('/checkout', [PPOBController::class, 'checkout'])->name('ppob.checkout');
-    Route::post('/checkout-pasca', [PPOBController::class, 'checkoutPasca'])->name('ppob.checkout.pasca');
-    Route::post('/inquiry', [PPOBController::class, 'inquiry'])->name('ppob.inquiry');
-    Route::post('/callback', [PPOBController::class, 'callback'])->name('ppob.callback');
+    Route::prefix('ppob')->group(function () {
+        Route::get('/saldo', [PPOBController::class, 'checkBalance']);
+        Route::get('/inquiry-pln/{hp}', [PPOBController::class, 'inquiryPln']);
+        Route::get('/pricelist/{type}', [PPOBController::class, 'priceList']);
+        Route::get('/pricelist-pasca/{type}', [PPOBController::class, 'priceListPasca']);
+        Route::post('/inquiry-ovo', [PPOBController::class, 'inquiryOvo'])->name('ppob.inquiry-ovo');
+        Route::post('/checkout', [PPOBController::class, 'checkout'])->name('ppob.checkout');
+        Route::post('/checkout-pasca', [PPOBController::class, 'checkoutPasca'])->name('ppob.checkout.pasca');
+        Route::post('/inquiry', [PPOBController::class, 'inquiry'])->name('ppob.inquiry');
+        Route::post('/callback', [PPOBController::class, 'callback'])->name('ppob.callback');
+    });
 });
 
 // Midtrans payment notification webhook — must be exempt from CSRF
@@ -43,5 +46,8 @@ Route::get('/payment/finish', [PaymentController::class, 'finish'])
 //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
+
+Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
+Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 
 require __DIR__.'/auth.php';

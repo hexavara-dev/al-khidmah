@@ -1,4 +1,7 @@
-import { Bell, Search, CircleDollarSign } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Bell, Search, CircleDollarSign, LogOut, User, ChevronDown } from 'lucide-react';
+import { usePage, router } from '@inertiajs/react';
+import type { PageProps } from '@/types';
 
 const idr = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
 
@@ -8,6 +11,30 @@ type Props = {
 };
 
 export default function Navbar({ balance, appName = 'Al-Khidmah' }: Props) {
+    const { auth } = usePage<PageProps<{ balance: number }>>().props as any;
+    const user = auth?.user;
+
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        function handleClickOutside(e: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+                setDropdownOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleLogout = () => {
+        router.post('/logout');
+    };
+
+    const initials = user?.name
+        ? user.name.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()
+        : 'AK';
+
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 border-b border-outline-variant/10 bg-surface-bright/85 px-8 py-4 backdrop-blur-2xl">
             <div className="mx-auto flex max-w-7xl items-center justify-between gap-8">
@@ -63,11 +90,64 @@ export default function Navbar({ balance, appName = 'Al-Khidmah' }: Props) {
                         <span className="absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-surface-bright bg-error" />
                     </button>
 
-                    {/* Avatar */}
-                    <div className="h-10 w-10 flex-shrink-0 cursor-pointer overflow-hidden rounded-full border-2 border-primary-container p-0.5">
-                        <div className="flex h-full w-full items-center justify-center rounded-full bg-primary-container">
-                            <span className="font-headline text-xs font-bold text-primary">AK</span>
-                        </div>
+                    {/* Avatar + Dropdown */}
+                    <div className="relative" ref={dropdownRef}>
+                        <button
+                            onClick={() => setDropdownOpen(!dropdownOpen)}
+                            className="flex items-center gap-2 rounded-full border border-outline-variant/20 bg-surface-container-low pl-1 pr-2.5 py-1 transition hover:bg-surface-container"
+                        >
+                            {/* Avatar */}
+                            <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full border-2 border-primary-container">
+                                {user?.avatar ? (
+                                    <img src={user.avatar} alt={user.name} className="h-full w-full object-cover" />
+                                ) : (
+                                    <div className="flex h-full w-full items-center justify-center rounded-full bg-primary-container">
+                                        <span className="font-headline text-xs font-bold text-primary">{initials}</span>
+                                    </div>
+                                )}
+                            </div>
+                            <span className="hidden max-w-[100px] truncate text-xs font-semibold text-on-surface lg:block">
+                                {user?.name ?? 'Pengguna'}
+                            </span>
+                            <ChevronDown className={`size-3.5 text-on-surface-variant transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {/* Dropdown */}
+                        {dropdownOpen && (
+                            <div className="absolute right-0 top-full mt-2 w-64 overflow-hidden rounded-2xl border border-outline-variant/20 bg-surface-container-lowest shadow-xl">
+                                {/* User info */}
+                                <div className="flex items-center gap-3 border-b border-outline-variant/10 px-4 py-4">
+                                    <div className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-full border-2 border-primary-container">
+                                        {user?.avatar ? (
+                                            <img src={user.avatar} alt={user.name} className="h-full w-full object-cover" />
+                                        ) : (
+                                            <div className="flex h-full w-full items-center justify-center rounded-full bg-primary-container">
+                                                <span className="font-headline text-sm font-bold text-primary">{initials}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="truncate text-sm font-bold text-on-surface">{user?.name ?? 'Pengguna'}</p>
+                                        <p className="truncate text-xs text-on-surface-variant">{user?.email ?? ''}</p>
+                                    </div>
+                                </div>
+
+                                {/* Menu items */}
+                                <div className="p-2">
+                                    <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-on-surface transition hover:bg-surface-container-low">
+                                        <User className="size-4 text-on-surface-variant" />
+                                        <span>Profil Saya</span>
+                                    </button>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-error transition hover:bg-error-container/30"
+                                    >
+                                        <LogOut className="size-4" />
+                                        <span>Keluar</span>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
