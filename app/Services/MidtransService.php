@@ -9,6 +9,9 @@ class MidtransService {
     private string $clientKey;
     private bool $isProduction;
     private string $snapUrl;
+    private string $snapJsUrl;
+    private string $snapBaseUrl;
+    private string $apiBaseUrl;
 
     public function __construct() {
         $this->serverKey = (string) config('services.midtrans.server_key', '');
@@ -26,6 +29,10 @@ class MidtransService {
         $this->snapBaseUrl = $this->isProduction
             ? 'https://app.midtrans.com/snap'
             : 'https://app.sandbox.midtrans.com/snap';
+
+        $this->apiBaseUrl = $this->isProduction
+            ? 'https://api.midtrans.com'
+            : 'https://api.sandbox.midtrans.com';
     }
 
     public function createSnapToken(array $transactionDetails, array $customerDetails, array $options = []): string {

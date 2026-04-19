@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
                 'name'              => 'Admin',
                 'password'          => bcrypt('12345678'),
                 'is_admin'          => true,
+                'role'              => 'admin',
                 'email_verified_at' => now(),
             ]
         );
@@ -37,6 +38,7 @@ class DatabaseSeeder extends Seeder
                 'name'     => 'Test User',
                 'password' => bcrypt('12345678'),
                 'is_admin' => false,
+                'role'     => 'user',
             ]
         );
 

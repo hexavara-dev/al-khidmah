@@ -1,8 +1,13 @@
+import { ReactNode } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import BottomNavbar from '../components/BottomNavbar';
 
-export default function MainLayout({ children }) {
+interface MainLayoutProps {
+    children: ReactNode;
+}
+
+export default function MainLayout({ children }: MainLayoutProps) {
     return (
         <div className="flex flex-col min-h-screen bg-gray-50">
             {/* Top navbar — shown on desktop, hidden on mobile */}

@@ -1,14 +1,22 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, usePage, router } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import CampaignCard from '../../components/CampaignCard';
 import Pagination from '../../components/Pagination';
-import { campaignService } from '../../services/campaignService';
-import { categoryService } from '../../services/categoryService';
-import { donationService } from '../../services/donationService';
-import { useAuth } from '../../context/AuthContext';
+import type { Campaign, Category, PaginatedData, PageProps } from '../../types';
 
-const CATEGORY_ICONS = {
+interface HomePageProps extends PageProps {
+    campaigns: PaginatedData<Campaign>;
+    categories: Category[];
+    totalKontribusi: number;
+    filters: {
+        search?: string;
+        category_id?: string;
+        is_active?: string;
+    };
+}
+
+const CATEGORY_ICONS: Record<string, { emoji: string; bg: string; color: string }> = {
     'Pendidikan': { emoji: '📚', bg: 'bg-blue-100', color: 'text-blue-600' },
     'Kesehatan':  { emoji: '🏥', bg: 'bg-red-100',  color: 'text-red-600' },
     'Bencana Alam': { emoji: '🌊', bg: 'bg-cyan-100', color: 'text-cyan-600' },
@@ -19,60 +27,52 @@ const CATEGORY_ICONS = {
     'Anak Yatim': { emoji: '🧒', bg: 'bg-orange-100', color: 'text-orange-600' },
 };
 
-const fmt = (n) => Number(n).toLocaleString('id-ID');
+const fmt = (n: number) => Number(n).toLocaleString('id-ID');
 
 export default function HomePage() {
-    const { user } = useAuth();
-    const [campaigns,       setCampaigns]       = useState([]);
-    const [categories,      setCategories]      = useState([]);
-    const [meta,            setMeta]            = useState(null);
-    const [loading,         setLoading]         = useState(true);
-    const [search,          setSearch]          = useState('');
-    const [committedSearch, setCommittedSearch] = useState('');
-    const [categoryId,      setCategoryId]      = useState('');
-    const [page,            setPage]            = useState(1);
-    const [totalKontribusi, setTotalKontribusi] = useState(0);
+    const { auth, campaigns, categories, totalKontribusi, filters } = usePage<HomePageProps>().props;
+    const user = auth?.user;
+    const campaignList = campaigns.data;
+    const meta = campaigns;
+    const [search, setSearch] = useState(filters?.search ?? '');
+    const [categoryId, setCategoryId] = useState(filters?.category_id ?? '');
 
-    const fetchCampaigns = async (p, cat, q) => {
-        setLoading(true);
-        try {
-            const { data } = await campaignService.getAll({
-                search:      q   || undefined,
-                category_id: cat || undefined,
-                is_active:   true,
-                page:        p,
-            });
-            setCampaigns(data.data.data);
-            setMeta(data.data);
-        } finally {
-            setLoading(false);
-        }
+    const navigateWithFilters = (overrides: Record<string, unknown> = {}) => {
+        const params: Record<string, unknown> = {
+            search: search || undefined,
+            category_id: categoryId || undefined,
+            is_active: true,
+            ...overrides,
+        };
+        // Clean undefined values
+        Object.keys(params).forEach(k => params[k] === undefined && delete params[k]);
+        router.get('/donasi', params as Record<string, string>, {
+            preserveState: true,
+            preserveScroll: true,
+        });
     };
 
-    useEffect(() => {
-        categoryService.getAll().then(({ data }) => setCategories(data.data));
-    }, []);
-
-    useEffect(() => {
-        if (user) {
-            donationService.myDonations({ per_page: 200 }).then(({ data }) => {
-                const donations = data.data?.data ?? [];
-                const total = donations
-                    .filter(d => d.status === 'success')
-                    .reduce((sum, d) => sum + Number(d.amount ?? 0), 0);
-                setTotalKontribusi(total);
-            }).catch(() => {});
-        }
-    }, [user]);
-
-    useEffect(() => {
-        fetchCampaigns(page, categoryId, committedSearch);
-    }, [page, categoryId, committedSearch]);
-
-    const handleSearch = (e) => {
+    const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        setCommittedSearch(search);
-        setPage(1);
+        navigateWithFilters({ page: 1 });
+    };
+
+    const handleCategoryChange = (catId: number | string) => {
+        const newCatId = catId === categoryId ? '' : String(catId);
+        setCategoryId(newCatId);
+        router.get('/donasi', {
+            search: search || undefined,
+            category_id: newCatId || undefined,
+            is_active: 'true',
+            page: '1',
+        } as Record<string, string>, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    };
+
+    const handlePageChange = (page: number) => {
+        navigateWithFilters({ page });
     };
 
     return (
@@ -94,14 +94,14 @@ export default function HomePage() {
                     </div>
                     <div className="flex gap-2">
                         {/* History quick action */}
-                        <Link to={user ? '/my-donations' : '/login'}
+                        <Link href={user ? '/my-donations' : '/login'}
                             className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="white" className="w-5 h-5">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </Link>
                         {/* Profile quick action */}
-                        {/* <Link to={user ? '/my-donations' : '/login'}
+                        {/* <Link href={user ? '/my-donations' : '/login'}
                             className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="white" className="w-5 h-5">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
@@ -188,7 +188,7 @@ export default function HomePage() {
                 <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
                     {/* Semua */}
                     <button
-                        onClick={() => { setCategoryId(''); setPage(1); }}
+                        onClick={() => handleCategoryChange('')}
                         className={`flex-none flex flex-col items-center gap-1.5 px-3 pt-3 pb-2.5 rounded-2xl border-2 transition-all min-w-[68px] ${
                             !categoryId
                                 ? 'bg-blue-600 border-blue-600 shadow-md shadow-blue-200'
@@ -207,11 +207,11 @@ export default function HomePage() {
 
                     {categories.map((cat) => {
                         const cfg = CATEGORY_ICONS[cat.name] ?? { emoji: '❤️', bg: 'bg-pink-100', color: 'text-pink-600' };
-                        const active = categoryId === cat.id;
+                        const active = String(categoryId) === String(cat.id);
                         return (
                             <button
                                 key={cat.id}
-                                onClick={() => { setCategoryId(cat.id); setPage(1); }}
+                                onClick={() => handleCategoryChange(cat.id)}
                                 className={`flex-none flex flex-col items-center gap-1.5 px-3 pt-3 pb-2.5 rounded-2xl border-2 transition-all min-w-[68px] ${
                                     active
                                         ? 'bg-blue-600 border-blue-600 shadow-md shadow-blue-200'
@@ -237,7 +237,7 @@ export default function HomePage() {
                 <div className="flex items-center justify-between mb-3 md:mb-5">
                     <h2 className="text-base md:text-xl font-bold text-gray-800">
                         {categoryId
-                            ? categories.find(c => c.id === categoryId)?.name ?? 'Campaign'
+                            ? categories.find(c => String(c.id) === String(categoryId))?.name ?? 'Campaign'
                             : 'Campaign Terbaru'}
                     </h2>
                     {meta && (
@@ -247,26 +247,12 @@ export default function HomePage() {
                     )}
                 </div>
 
-                {loading ? (
-                    <div className="space-y-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:space-y-0">
-                        {[...Array(4)].map((_, i) => (
-                            <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 animate-pulse">
-                                <div className="h-44 bg-gray-200" />
-                                <div className="p-4 space-y-3">
-                                    <div className="h-4 bg-gray-200 rounded w-3/4" />
-                                    <div className="h-3 bg-gray-200 rounded w-full" />
-                                    <div className="h-2 bg-gray-200 rounded-full w-full" />
-                                    <div className="h-9 bg-gray-200 rounded-xl w-full" />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : campaigns.length === 0 ? (
+                {campaignList.length === 0 ? (
                     <div className="text-center py-16 bg-white rounded-3xl shadow-sm border border-gray-100">
                         <div className="text-5xl mb-3">🔍</div>
                         <p className="text-gray-500 font-medium">Tidak ada program ditemukan.</p>
                         <button
-                            onClick={() => { setSearch(''); setCommittedSearch(''); setCategoryId(''); setPage(1); }}
+                            onClick={() => { setSearch(''); setCategoryId(''); navigateWithFilters({ search: undefined, category_id: undefined, page: 1 }); }}
                             className="mt-3 text-blue-600 text-sm underline"
                         >
                             Reset filter
@@ -276,10 +262,10 @@ export default function HomePage() {
                     <>
                         {/* Mobile: vertical list | Desktop: grid */}
                         <div className="space-y-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:space-y-0">
-                            {campaigns.map((campaign) => (
+                            {campaignList.map((campaign) => (
                                 <Link
                                     key={campaign.id}
-                                    to={`/campaigns/${campaign.id}`}
+                                    href={`/campaigns/${campaign.id}`}
                                     className="block hover:shadow-xl transition-all duration-300 rounded-2xl"
                                 >
                                     <CampaignCard campaign={campaign} />
@@ -287,7 +273,7 @@ export default function HomePage() {
                             ))}
                         </div>
                         <div className="mt-8">
-                            <Pagination meta={meta} onPageChange={setPage} />
+                            <Pagination meta={meta} onPageChange={handlePageChange} />
                         </div>
                     </>
                 )}

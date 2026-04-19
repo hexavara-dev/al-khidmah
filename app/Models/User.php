@@ -28,6 +28,7 @@ class User extends Authenticatable
         'avatar',
         'email_verified_at',
         'is_admin',
+        'role',
     ];
 
     /**

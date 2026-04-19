@@ -1,7 +1,7 @@
-import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Link, usePage } from '@inertiajs/react';
+import type { PageProps } from '../types';
 
-const HomeIcon = ({ active }) => (
+const HomeIcon = ({ active }: { active: boolean }) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={active ? 'currentColor' : 'none'}
         stroke="currentColor" strokeWidth={active ? 0 : 1.8} className="w-6 h-6">
         <path strokeLinecap="round" strokeLinejoin="round"
@@ -9,7 +9,7 @@ const HomeIcon = ({ active }) => (
     </svg>
 );
 
-const HistoryIcon = ({ active }) => (
+const HistoryIcon = ({ active }: { active: boolean }) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={active ? 'currentColor' : 'none'}
         stroke="currentColor" strokeWidth={active ? 0 : 1.8} className="w-6 h-6">
         <path strokeLinecap="round" strokeLinejoin="round"
@@ -18,21 +18,21 @@ const HistoryIcon = ({ active }) => (
 );
 
 export default function BottomNavbar() {
-    const location = useLocation();
-    const { user } = useAuth();
+    const { url, props } = usePage<PageProps>();
+    const user = props.auth?.user;
 
     const items = [
         {
-            to: '/donasi',
+            href: '/donasi',
             label: 'Home',
             Icon: HomeIcon,
-            isActive: () => location.pathname === '/donasi' || location.pathname.startsWith('/campaigns'),
+            isActive: () => url === '/donasi' || url.startsWith('/campaigns'),
         },
         {
-            to: user ? '/my-donations' : '/login',
+            href: user ? '/my-donations' : '/login',
             label: 'History',
             Icon: HistoryIcon,
-            isActive: () => location.pathname === '/my-donations',
+            isActive: () => url === '/my-donations',
         },
     ];
 
@@ -44,7 +44,7 @@ export default function BottomNavbar() {
                     return (
                         <Link
                             key={item.label}
-                            to={item.to}
+                            href={item.href}
                             className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${
                                 active ? 'text-blue-600' : 'text-gray-400'
                             }`}

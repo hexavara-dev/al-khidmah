@@ -1,10 +1,18 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import MainLayout from '../../layouts/MainLayout';
-import { campaignService } from '../../services/campaignService';
+import { Link, usePage, router } from '@inertiajs/react';
+import MainLayout from '../../Layouts/MainLayout';
 import { donationService } from '../../services/donationService';
-import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
+import type { Campaign, Donor, Donation, PageProps } from '../../types';
+
+interface CampaignDetailPageProps extends PageProps {
+    campaign: Campaign;
+    donors: Donor[];
+    midtrans: {
+        snapJsUrl: string;
+        clientKey: string;
+    };
+}
 
 const PRESET_AMOUNTS = [
     { value: 10000,  label: 'Sedekah Ringan', icon: '🌱' },
@@ -13,7 +21,7 @@ const PRESET_AMOUNTS = [
     { value: 500000, label: 'Donasi Utama',   icon: '💎' },
 ];
 
-const fmt = (n) => Number(n).toLocaleString('id-ID');
+const fmt = (n: number | string) => Number(n).toLocaleString('id-ID');
 
 const AVATAR_COLORS = [
     'from-blue-400 to-blue-600',
@@ -24,13 +32,9 @@ const AVATAR_COLORS = [
 ];
 
 export default function CampaignDetailPage() {
-    const { id }   = useParams();
-    const { user } = useAuth();
-    const navigate = useNavigate();
-
-    const [campaign, setCampaign]         = useState(null);
-    const [loading, setLoading]           = useState(true);
-    const [recentDonors, setRecentDonors] = useState([]);
+    const { auth, midtrans, campaign, donors } = usePage<CampaignDetailPageProps>().props;
+    const user = auth?.user;
+    const [recentDonors] = useState<Donor[]>(donors ?? []);
     // step 1=detail, 2=amount+donor, 3=success
     const [step, setStep] = useState(1);
 
@@ -40,56 +44,47 @@ export default function CampaignDetailPage() {
     const [anonymous, setAnonymous]       = useState(false);
     const [note, setNote]                 = useState('');
     const [donating, setDonating]         = useState(false);
-    const [donation, setDonation]         = useState(null);
-    const [paymentResult, setPaymentResult] = useState(null);
+    const [donation, setDonation]         = useState<Donation | null>(null);
+    const [paymentResult, setPaymentResult] = useState<string | null>(null);
     const [showFullDesc, setShowFullDesc]   = useState(false);
     const [showAllDonors, setShowAllDonors] = useState(false);
     const [showStruk, setShowStruk]         = useState(false);
 
+    // Load Midtrans Snap JS dynamically
     useEffect(() => {
-        campaignService.getById(id)
-            .then(({ data }) => setCampaign(data.data))
-            .catch(() => navigate('/donasi'))
-            .finally(() => setLoading(false));
-
-        donationService.forCampaign(id)
-            .then(({ data }) => setRecentDonors(data.data ?? []))
-            .catch(() => {});
-    }, [id]);
+        if (midtrans?.snapJsUrl && !document.querySelector('script[src*="snap.js"]')) {
+            const script = document.createElement('script');
+            script.src = midtrans.snapJsUrl;
+            script.dataset.clientKey = midtrans.clientKey;
+            script.async = true;
+            document.head.appendChild(script);
+        }
+    }, [midtrans]);
 
     useEffect(() => {
         if (user?.name) setDonorName(user.name);
     }, [user]);
 
-    if (loading) return (
-        <MainLayout>
-            <div className="max-w-2xl mx-auto px-4 py-16 space-y-4 animate-pulse">
-                <div className="h-64 bg-gray-200 rounded-2xl" />
-                <div className="h-6 bg-gray-200 rounded w-3/4" />
-                <div className="h-4 bg-gray-200 rounded w-1/2" />
-            </div>
-        </MainLayout>
-    );
     if (!campaign) return null;
 
     const progress = campaign.target_amount > 0
         ? Math.min(100, (campaign.collected_amount / campaign.target_amount) * 100)
         : 0;
-    const daysLeft = Math.max(0, Math.ceil((new Date(campaign.deadline) - new Date()) / 86400000));
+    const daysLeft = Math.max(0, Math.ceil((new Date(campaign.deadline).getTime() - Date.now()) / 86400000));
     const finalAmount = amount || customAmount;
 
     const handlePay = async () => {
-        if (!user) { navigate('/login'); return; }
+        if (!user) { router.visit('/login'); return; }
         if (!finalAmount || Number(finalAmount) < 1000) { toast.error('Minimal donasi Rp 1.000'); return; }
         setDonating(true);
         try {
-            const { data } = await donationService.create({
+            const { data: resp } = await donationService.create({
                 campaign_id: campaign.id,
                 amount:      Number(finalAmount),
                 note:        anonymous ? `[Anonim] ${note}` : note,
             });
-            const snapToken = data.snap_token;
-            setDonation(data.data);
+            const snapToken = resp.snap_token;
+            setDonation(resp.data);
 
             if (!snapToken || !window.snap) {
                 toast.error('Gagal memuat payment gateway. Coba lagi.');
@@ -99,23 +94,21 @@ export default function CampaignDetailPage() {
 
             window.snap.pay(snapToken, {
                 onSuccess: async (result) => {
-                    // Directly confirm payment — trusts Midtrans onSuccess callback
                     try {
                         const bank = result?.va_numbers?.[0]?.bank ?? result?.bank ?? null;
-                        const { data: confirmed } = await donationService.confirmPayment(data.data.id, {
+                        const { data: confirmed } = await donationService.confirmPayment(resp.data.id, {
                             payment_type: result?.payment_type ?? null,
                             bank,
                         });
                         setDonation(confirmed.data);
-                    } catch { /* continue — show success screen regardless */ }
+                    } catch { /* continue */ }
                     setPaymentResult('success');
                     setStep(3);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 },
-                onPending: async (result) => {
-                    // Bank transfer / certain methods need async confirmation
+                onPending: async () => {
                     try {
-                        await donationService.checkPayment(data.data.id);
+                        await donationService.checkPayment(resp.data.id);
                     } catch { /* ignore */ }
                     setPaymentResult('pending');
                     setStep(3);
@@ -126,13 +119,13 @@ export default function CampaignDetailPage() {
                     setDonating(false);
                 },
                 onClose: () => {
-                    // User dismissed popup WITHOUT completing payment — do NOT show success
                     toast('Pembayaran belum diselesaikan.', { icon: '⚠️' });
                     setDonating(false);
                 },
             });
-        } catch (err) {
-            toast.error(err.response?.data?.message ?? 'Gagal membuat donasi.');
+        } catch (err: unknown) {
+            const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? 'Gagal membuat donasi.';
+            toast.error(message);
             setDonating(false);
         }
     };
@@ -140,10 +133,10 @@ export default function CampaignDetailPage() {
     // ── Step 3: Success / Pending ──────────────────────────────────
     if (step === 3) {
         const isSuccess = paymentResult === 'success';
-        const fmtPay = (m) => {
+        const fmtPay = (m: string | null | undefined): string => {
             if (!m || m === '-') return '-';
-            const map = { bca_va: 'BCA VA', bni_va: 'BNI VA', mandiri_va: 'Mandiri VA', bri_va: 'BRI VA', gopay: 'GoPay', shopeepay: 'ShopeePay', qris: 'QRIS', indomaret: 'Indomaret', alfamart: 'Alfamart', credit_card: 'Kartu Kredit', bank_transfer: 'Transfer Bank', cstore: 'Minimarket', echannel: 'Mandiri Bill' };
-            return map[m.toLowerCase()] ?? m.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const map: Record<string, string> = { bca_va: 'BCA VA', bni_va: 'BNI VA', mandiri_va: 'Mandiri VA', bri_va: 'BRI VA', gopay: 'GoPay', shopeepay: 'ShopeePay', qris: 'QRIS', indomaret: 'Indomaret', alfamart: 'Alfamart', credit_card: 'Kartu Kredit', bank_transfer: 'Transfer Bank', cstore: 'Minimarket', echannel: 'Mandiri Bill' };
+            return map[m.toLowerCase()] ?? m.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
         };
         const paidAt = donation?.updated_at ? new Date(donation.updated_at) : new Date();
         const dateStr = paidAt.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + paidAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
@@ -381,7 +374,7 @@ export default function CampaignDetailPage() {
                             </button>
                         )}
                         <Link
-                            to="/donasi"
+                            href="/donasi"
                             className="block w-full bg-blue-50 hover:bg-blue-100 text-blue-700 py-4 rounded-2xl font-bold text-center transition border border-blue-100"
                         >
                             Kembali ke Beranda
@@ -514,7 +507,7 @@ export default function CampaignDetailPage() {
                         </div>
                         {!user && (
                             <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3">
-                                ⚠️ Anda perlu <Link to="/login" className="font-semibold underline">login</Link> untuk melanjutkan donasi.
+                                ⚠️ Anda perlu <Link href="/login" className="font-semibold underline">login</Link> untuk melanjutkan donasi.
                             </p>
                         )}
                         <button
@@ -639,7 +632,7 @@ export default function CampaignDetailPage() {
                             <div className="space-y-2">
                                 {(showAllDonors ? recentDonors : recentDonors.slice(0, 3)).map((d, i) => {
                                     const initials = d.donor_name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-                                    const hoursAgo = Math.floor((Date.now() - new Date(d.created_at)) / 3600000);
+                                    const hoursAgo = Math.floor((Date.now() - new Date(d.created_at).getTime()) / 3600000);
                                     const timeStr  = hoursAgo < 1
                                         ? 'Baru saja'
                                         : hoursAgo < 24

@@ -1,13 +1,19 @@
-const fmt = (n) => Number(n).toLocaleString('id-ID');
+import type { Campaign } from '../types';
 
-export default function CampaignCard({ campaign }) {
+const fmt = (n: number) => Number(n).toLocaleString('id-ID');
+
+interface CampaignCardProps {
+    campaign: Campaign;
+}
+
+export default function CampaignCard({ campaign }: CampaignCardProps) {
     const progress = campaign.target_amount > 0
         ? Math.min(100, (campaign.collected_amount / campaign.target_amount) * 100)
         : 0;
 
     const daysLeft = Math.max(
         0,
-        Math.ceil((new Date(campaign.deadline) - new Date()) / (1000 * 60 * 60 * 24))
+        Math.ceil((new Date(campaign.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
     );
 
     const isNearDeadline = daysLeft > 0 && daysLeft <= 7;

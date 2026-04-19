@@ -1,27 +1,29 @@
 import { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Link, usePage, router } from '@inertiajs/react';
 import toast from 'react-hot-toast';
+import type { PageProps } from '../types';
 
 export default function Navbar() {
-    const { user, logout } = useAuth();
-    const navigate         = useNavigate();
-    const location         = useLocation();
+    const { auth } = usePage<PageProps>().props;
+    const user = auth?.user;
+    const currentUrl = usePage().url;
     const [menuOpen, setMenuOpen] = useState(false);
 
-    const handleLogout = async () => {
-        await logout();
-        toast.success('Berhasil logout');
-        navigate('/login');
+    const handleLogout = () => {
+        router.post('/logout', {}, {
+            onSuccess: () => {
+                toast.success('Berhasil logout');
+            },
+        });
         setMenuOpen(false);
     };
 
-    const navLink = (to, label) => (
+    const navLink = (href: string, label: string) => (
         <Link
-            to={to}
+            href={href}
             onClick={() => setMenuOpen(false)}
             className={`text-sm font-medium transition ${
-                location.pathname === to ? 'text-white' : 'text-blue-100 hover:text-white'
+                currentUrl === href ? 'text-white' : 'text-blue-100 hover:text-white'
             }`}
         >
             {label}
@@ -32,7 +34,7 @@ export default function Navbar() {
         <nav className="bg-gradient-to-r from-blue-800 to-blue-600 text-white shadow-lg sticky top-0 z-40">
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
                 <div className="flex items-center justify-between h-16">
-                    <Link to="/" className="flex items-center gap-2">
+                    <Link href="/" className="flex items-center gap-2">
                         <span className="text-2xl">🕌</span>
                         <span className="font-bold text-lg tracking-wide">Al-Khidmah</span>
                     </Link>
@@ -42,7 +44,7 @@ export default function Navbar() {
                         {navLink('/donasi', 'Beranda')}
                         {user ? (
                             <>
-                                {user.role === 'admin' && navLink('/dashboard', 'Dashboard')}
+                                {user.role === 'admin' && navLink('/admin/dashboard', 'Dashboard')}
                                 {navLink('/my-donations', 'Donasiku')}
                                 <span className="text-blue-200 text-sm">Hi, {user.name.split(' ')[0]}</span>
                                 <button
@@ -56,7 +58,7 @@ export default function Navbar() {
                             <>
                                 {navLink('/login', 'Masuk')}
                                 <Link
-                                    to="/register"
+                                    href="/register"
                                     className="bg-white text-blue-700 px-4 py-1.5 rounded-full text-sm font-semibold hover:bg-blue-50 transition"
                                 >
                                     Daftar
@@ -80,19 +82,19 @@ export default function Navbar() {
                 {/* Mobile menu */}
                 {menuOpen && (
                     <div className="md:hidden pb-4 space-y-3 border-t border-blue-700/50 pt-4">
-                        <Link to="/" onClick={() => setMenuOpen(false)} className="block text-sm text-blue-100 hover:text-white">Beranda</Link>
+                        <Link href="/" onClick={() => setMenuOpen(false)} className="block text-sm text-blue-100 hover:text-white">Beranda</Link>
                         {user ? (
                             <>
-                                {user.role === 'admin' && <Link to="/dashboard" onClick={() => setMenuOpen(false)} className="block text-sm text-blue-100 hover:text-white">Dashboard</Link>}
-                                <Link to="/my-donations" onClick={() => setMenuOpen(false)} className="block text-sm text-blue-100 hover:text-white">Donasiku</Link>
+                                {user.role === 'admin' && <Link href="/admin/dashboard" onClick={() => setMenuOpen(false)} className="block text-sm text-blue-100 hover:text-white">Dashboard</Link>}
+                                <Link href="/my-donations" onClick={() => setMenuOpen(false)} className="block text-sm text-blue-100 hover:text-white">Donasiku</Link>
                                 <button onClick={handleLogout} className="block w-full text-left text-sm text-blue-100 hover:text-white">
                                     Logout ({user.name.split(' ')[0]})
                                 </button>
                             </>
                         ) : (
                             <>
-                                <Link to="/login" onClick={() => setMenuOpen(false)} className="block text-sm text-blue-100 hover:text-white">Masuk</Link>
-                                <Link to="/register" onClick={() => setMenuOpen(false)} className="block text-sm text-blue-100 hover:text-white">Daftar</Link>
+                                <Link href="/login" onClick={() => setMenuOpen(false)} className="block text-sm text-blue-100 hover:text-white">Masuk</Link>
+                                <Link href="/register" onClick={() => setMenuOpen(false)} className="block text-sm text-blue-100 hover:text-white">Daftar</Link>
                             </>
                         )}
                     </div>

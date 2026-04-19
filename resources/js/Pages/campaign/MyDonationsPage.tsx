@@ -1,16 +1,22 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import MainLayout from '../../layouts/MainLayout';
+import { useState } from 'react';
+import { Link, router, usePage } from '@inertiajs/react';
+import MainLayout from '../../Layouts/MainLayout';
 import StatusBadge from '../../components/StatusBadge';
 import Pagination from '../../components/Pagination';
 import { donationService } from '../../services/donationService';
 import toast from 'react-hot-toast';
+import { Donation, PaginatedData, PageProps } from '../../types';
 
-const fmt = (n) => Number(n).toLocaleString('id-ID');
+interface MyDonationsPageProps extends PageProps {
+    donations: PaginatedData<Donation>;
+    totalAmount: number;
+}
 
-const formatPaymentMethod = (method) => {
+const fmt = (n: number | string) => Number(n).toLocaleString('id-ID');
+
+const formatPaymentMethod = (method: string | null | undefined): string => {
     if (!method || method === '-') return '-';
-    const map = {
+    const map: Record<string, string> = {
         bca_va:       'Transfer BCA',
         bni_va:       'Transfer BNI',
         bri_va:       'Transfer BRI',
@@ -28,22 +34,22 @@ const formatPaymentMethod = (method) => {
         echannel:     'Mandiri Bill',
         cstore:       'Minimarket',
     };
-    return map[method.toLowerCase()] ?? method.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    return map[method.toLowerCase()] ?? method.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
 };
 
-const STATUS_CONFIG = {
+const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; icon: string }> = {
     success: { label: 'Berhasil',  bg: 'bg-green-100', text: 'text-green-700',  icon: '✅' },
     pending: { label: 'Menunggu',  bg: 'bg-amber-100', text: 'text-amber-700',  icon: '⏳' },
     failed:  { label: 'Gagal',     bg: 'bg-red-100',   text: 'text-red-700',    icon: '❌' },
 };
 
-function DonationStruktModal({ donation, onClose }) {
+function DonationStruktModal({ donation, onClose }: { donation: Donation | null; onClose: () => void }) {
     if (!donation) return null;
 
-    const fmtPay = (m) => {
+    const fmtPay = (m: string | null | undefined): string => {
         if (!m || m === '-') return '-';
-        const map = { bca_va: 'BCA VA', bni_va: 'BNI VA', mandiri_va: 'Mandiri VA', bri_va: 'BRI VA', gopay: 'GoPay', shopeepay: 'ShopeePay', qris: 'QRIS', indomaret: 'Indomaret', alfamart: 'Alfamart', credit_card: 'Kartu Kredit', bank_transfer: 'Transfer Bank', cstore: 'Minimarket', echannel: 'Mandiri Bill' };
-        return map[m.toLowerCase()] ?? m.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const map: Record<string, string> = { bca_va: 'BCA VA', bni_va: 'BNI VA', mandiri_va: 'Mandiri VA', bri_va: 'BRI VA', gopay: 'GoPay', shopeepay: 'ShopeePay', qris: 'QRIS', indomaret: 'Indomaret', alfamart: 'Alfamart', credit_card: 'Kartu Kredit', bank_transfer: 'Transfer Bank', cstore: 'Minimarket', echannel: 'Mandiri Bill' };
+        return map[m.toLowerCase()] ?? m.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
     };
     const paidAt = donation.updated_at ? new Date(donation.updated_at) : new Date(donation.created_at);
     const dateStr = paidAt.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + paidAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
@@ -180,12 +186,17 @@ function DonationStruktModal({ donation, onClose }) {
     );
 }
 
-function DonationDetailModal({ donation, onClose, onStatusUpdated, onViewStruk }) {
+function DonationDetailModal({ donation, onClose, onStatusUpdated, onViewStruk }: {
+    donation: Donation | null;
+    onClose: () => void;
+    onStatusUpdated: (d: Donation) => void;
+    onViewStruk: () => void;
+}) {
     if (!donation) return null;
 
     const isAnon = donation.note?.startsWith('[Anonim]');
     const cleanNote = isAnon
-        ? donation.note.replace('[Anonim]', '').trim()
+        ? (donation.note ?? '').replace('[Anonim]', '').trim()
         : donation.note;
     const statusCfg = STATUS_CONFIG[donation.status] ?? STATUS_CONFIG.pending;
 
@@ -335,34 +346,24 @@ function DonationDetailModal({ donation, onClose, onStatusUpdated, onViewStruk }
 }
 
 export default function MyDonationsPage() {
-    const [donations, setDonations]         = useState([]);
-    const [meta, setMeta]                   = useState(null);
-    const [loading, setLoading]             = useState(true);
-    const [page, setPage]                   = useState(1);
-    const [totalAmount, setTotalAmount]     = useState(0);
-    const [selectedDonation, setSelected]   = useState(null);
-    const [struktDonation, setStruktDonation] = useState(null);
+    const { donations, totalAmount } = usePage<MyDonationsPageProps>().props;
+    const [selectedDonation, setSelected]   = useState<Donation | null>(null);
+    const [struktDonation, setStruktDonation] = useState<Donation | null>(null);
+    const [localTotalAmount, setLocalTotalAmount] = useState(totalAmount);
 
-    const loadDonations = () => {
-        setLoading(true);
-        donationService.myDonations({ page })
-            .then(({ data }) => {
-                setDonations(data.data.data);
-                setMeta(data.data);
-                if (data.total_amount !== undefined) setTotalAmount(data.total_amount);
-            })
-            .finally(() => setLoading(false));
+    const donationList = donations.data;
+    const meta = donations;
+
+    const handlePageChange = (p: number) => {
+        router.get('/my-donations', { page: p }, { preserveState: true, preserveScroll: true });
     };
 
-    useEffect(() => {
-        loadDonations();
-    }, [page]);
-
-    const handleStatusUpdated = (updatedDonation) => {
-        setDonations(prev => prev.map(d => d.id === updatedDonation.id ? { ...d, ...updatedDonation } : d));
+    const handleStatusUpdated = (updatedDonation: Donation) => {
+        // Reload page data from server
+        router.reload({ only: ['donations', 'totalAmount'] });
         setSelected(updatedDonation);
         if (updatedDonation.status === 'success') {
-            setTotalAmount(prev => prev + Number(updatedDonation.amount));
+            setLocalTotalAmount(prev => prev + Number(updatedDonation.amount));
         }
     };
 
@@ -372,14 +373,14 @@ export default function MyDonationsPage() {
                 <div className="bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 px-6 pt-10 pb-14">
                     <p className="text-blue-200 text-sm mb-1">Total Kontribusi Anda</p>
                     <p className="text-4xl font-bold text-white mb-6">
-                        Rp {fmt(totalAmount)}
+                        Rp {fmt(localTotalAmount)}
                     </p>
                     <div className="flex gap-3">
                         <button className="flex items-center gap-2 bg-white text-blue-700 px-5 py-2.5 rounded-full text-sm font-semibold shadow">
                             🕐 Riwayat
                         </button>
                         <Link
-                            to="/donasi"
+                            href="/donasi"
                             className="flex items-center gap-2 bg-white/20 text-white border border-white/30 px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-white/30 transition"
                         >
                             🤲 Donasi Baru
@@ -398,19 +399,13 @@ export default function MyDonationsPage() {
                         )}
                     </div>
 
-                    {loading ? (
-                        <div className="space-y-3">
-                            {[...Array(4)].map((_, i) => (
-                                <div key={i} className="bg-white rounded-2xl h-24 animate-pulse border border-gray-100" />
-                            ))}
-                        </div>
-                    ) : donations.length === 0 ? (
+                    {donationList.length === 0 ? (
                         <div className="text-center py-16">
                             <div className="text-5xl mb-3">🤲</div>
                             <p className="text-gray-600 font-medium">Belum ada riwayat donasi.</p>
                             <p className="text-gray-400 text-sm mt-1">Yuk mulai berdonasi untuk sesama!</p>
                             <Link
-                                to="/donasi"
+                                href="/donasi"
                                 className="mt-4 inline-block bg-gradient-to-r from-blue-500 to-emerald-600 text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow"
                             >
                                 Lihat Program Donasi
@@ -419,8 +414,8 @@ export default function MyDonationsPage() {
                     ) : (
                         <>
                             <div className="space-y-3">
-                                {donations.map((d) => {
-                                    const initials = (d.campaign?.title ?? 'D').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+                                {donationList.map((d) => {
+                                    const initials = (d.campaign?.title ?? 'D').split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase();
                                     return (
                                         <button
                                             key={d.id}
@@ -452,7 +447,7 @@ export default function MyDonationsPage() {
                                     );
                                 })}
                             </div>
-                            <Pagination meta={meta} onPageChange={setPage} />
+                            <Pagination meta={meta} onPageChange={handlePageChange} />
                         </>
                     )}
                 </div>

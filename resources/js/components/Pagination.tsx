@@ -1,12 +1,19 @@
-export default function Pagination({ meta, onPageChange }) {
+import type { PaginationMeta } from '../types';
+
+interface PaginationProps {
+    meta: PaginationMeta | null;
+    onPageChange: (page: number) => void;
+}
+
+export default function Pagination({ meta, onPageChange }: PaginationProps) {
     if (!meta || meta.last_page <= 1) return null;
 
     const current = meta.current_page;
     const last    = meta.last_page;
 
     // Build page number list with ellipsis
-    const range = (from, to) => Array.from({ length: to - from + 1 }, (_, i) => from + i);
-    let pages;
+    const range = (from: number, to: number): number[] => Array.from({ length: to - from + 1 }, (_, i) => from + i);
+    let pages: (number | string)[];
     if (last <= 7) {
         pages = range(1, last);
     } else if (current <= 4) {
@@ -36,7 +43,7 @@ export default function Pagination({ meta, onPageChange }) {
                     ) : (
                         <button
                             key={p}
-                            onClick={() => onPageChange(p)}
+                            onClick={() => onPageChange(p as number)}
                             className={`w-8 h-8 rounded-lg text-sm font-medium transition ${
                                 p === current
                                     ? 'bg-gradient-to-br from-blue-600 to-emerald-600 text-white shadow-sm'
