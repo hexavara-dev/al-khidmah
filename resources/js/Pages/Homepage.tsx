@@ -1,11 +1,13 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
-import { CircleDollarSign } from 'lucide-react';
 import type { PageProps } from '@/types';
 import type { Service, PricelistItem, Operator, PostpaidBill, PostpaidProvider, PlnCustomer } from '@/types/ppob';
-import { idr, services } from '@/lib/ppob';
+import { services } from '@/lib/ppob';
 import phonePrefix from '@/lib/phonePrefix';
+import Navbar from '@/components/ui/Navbar';
+import BottomNav from '@/components/ui/BottomNav';
 import ServiceCard from '@/components/ppob/ServiceCard';
+import ServiceDetailPanel from '@/components/ppob/ServiceDetailPanel';
 import NumberInputBar from '@/components/ppob/NumberInputBar';
 import ProductList from '@/components/ppob/ProductList';
 import BillInquiryCard from '@/components/ppob/BillInquiryCard';
@@ -197,140 +199,158 @@ export default function Homepage({ balance }: HomepageProps) {
         setIsValid(value.length >= 10 ? /^08\d{8,11}$/.test(value) : null);
     };
 
+    const serviceLabel = selected?.type === 'tv'
+        ? (selectedProvider?.name ?? selected?.label)
+        : selected?.label;
+
     return (
         <>
             <Head title="Layanan PPOB" />
 
             {isLoading && (
-                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
-                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-green-200 border-t-green-600" />
-                    <p className="mt-4 text-sm font-medium text-green-700">Memuat produk...</p>
+                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-surface-bright/80 backdrop-blur-sm">
+                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-outline-variant border-t-primary" />
+                    <p className="mt-4 text-sm font-medium text-primary">Memuat produk...</p>
                 </div>
             )}
 
-            <div className="min-h-screen bg-green-50 font-sans">
-                {/* Navbar */}
-                <header className="border-b border-green-100 bg-white/80 backdrop-blur-sm">
-                    <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-                        <div className="flex items-center gap-2.5">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-600">
-                                <CircleDollarSign className="size-4 text-white" />
-                            </div>
-                            <span className="text-base font-semibold text-green-900">Al-Khidmah</span>
-                        </div>
-                        <div className="flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-1.5">
-                            <div className="h-2 w-2 rounded-full bg-green-500" />
-                            <span className="text-xs font-medium text-green-700">Saldo</span>
-                            <span className="text-sm font-semibold text-green-900">{idr.format(balance ?? 0)}</span>
-                        </div>
-                    </div>
-                </header>
+            <Navbar balance={balance} />
+
+            <div className="min-h-screen bg-surface-bright pt-[68px] pb-48">
 
                 {/* Hero */}
-                <section className="mx-auto max-w-6xl px-6 pb-8 pt-12">
-                    <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-green-200 bg-white px-3 py-1">
-                        <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                        <span className="text-xs font-medium text-green-600">Payment Point Online Bank</span>
+                <section className="mx-auto max-w-7xl px-6 pb-8 pt-12">
+                    <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-outline-variant/30 bg-surface-container-low px-3 py-1">
+                        <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                        <span className="text-xs font-medium text-primary">Payment Point Online Bank</span>
                     </div>
-                    <h1 className="mt-4 max-w-xl text-3xl font-semibold leading-snug text-gray-900 sm:text-4xl">
+                    <h1 className="font-headline mt-4 max-w-xl text-3xl font-extrabold leading-snug text-on-surface sm:text-4xl">
                         Layanan pembayaran<br />
-                        <span className="text-green-600">digital terpercaya.</span>
+                        <span className="text-primary">digital terpercaya.</span>
                     </h1>
-                    <p className="mt-3 max-w-lg text-sm leading-7 text-gray-500">
-                        Tersedia enam kategori layanan PPOB yang bisa kamu akses kapan saja dan di mana saja dengan aman dan cepat.
+                    <p className="mt-3 max-w-lg text-sm leading-7 text-on-surface-variant">
+                        Tersedia {services.length} kategori layanan PPOB yang bisa kamu akses kapan saja dan di mana saja dengan aman dan cepat.
                     </p>
                 </section>
 
-                {/* Service Cards */}
-                <section className="mx-auto max-w-6xl px-6 pb-16">
+                {/* Digital Services */}
+                <section className="mx-auto max-w-7xl px-6 pb-8">
                     <div className="mb-6 flex items-center justify-between">
-                        <h2 className="text-sm font-semibold uppercase tracking-widest text-green-700">Layanan Tersedia</h2>
-                        <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                        <h2 className="font-headline text-xl font-bold text-on-surface">Digital Services</h2>
+                        <span className="rounded-full bg-surface-container px-3 py-1 text-xs font-bold text-primary">
                             {services.length} layanan
                         </span>
                     </div>
-                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                        {services.map((s, i) => (
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+                        {services.map((s) => (
                             <ServiceCard
                                 key={s.label}
                                 service={s}
-                                index={i}
                                 isSelected={selected?.label === s.label}
                                 onClick={() => handleSelect(s)}
                             />
                         ))}
                     </div>
-                    {selected?.type === 'tv' && (
-                        tvProvidersLoading ? (
-                            <div className="mt-6 flex items-center gap-3 py-6 text-sm text-green-700">
-                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-green-200 border-t-green-600" />
-                                Memuat penyedia layanan...
-                            </div>
-                        ) : (
-                            <ProviderSelector
-                                providers={tvProviders ?? []}
-                                selected={selectedProvider?.code ?? null}
-                                onSelect={setSelectedProvider}
-                            />
-                        )
-                    )}
-                    {selected && (selected.type !== 'tv' || selectedProvider !== null) && (
-                        <NumberInputBar
-                            value={phoneNumber}
-                            placeholder={selected.placeholder}
-                            isValid={isValid}
-                            onChange={handlePhoneNumberChange}
-                            onCheck={handleServiceCheck}
-                            operator={(selected.type === 'pulsa' || selected.type === 'data') ? operator : undefined}
-                            buttonLabel={
-                                selected.type === 'pln' && selected.endpoint === 'prepaid' ? 'Cek Token' :
-                                selected.type === 'pln_pasca' || selected.type === 'tv' ? 'Cek Tagihan' : 'Cek Layanan'
-                            }
-                            type={selected.type}
-                            emoneyProvider={emoneyProvider}
-                            onEmoneyChange={setEmoneyProvider}
-                        />
-                    )}
                 </section>
 
-                {billData && (
-                    <BillInquiryCard
-                        bill={billData}
-                        customerNumber={phoneNumber}
-                        serviceType={selected?.type}
-                        serviceLabel={selected?.type === 'tv' ? (selectedProvider?.name ?? selected?.label) : selected?.label}
-                        onPay={(bill) => setConfirmBill(bill)}
+                {/* Service Detail Panel */}
+                {selected && (
+                    <ServiceDetailPanel
+                        service={selected}
+                        onBack={() => handleSelect(selected)}
+                        sidebar={
+                            <>
+                                {selected.type === 'tv' && (
+                                    tvProvidersLoading ? (
+                                        <div className="flex items-center gap-3 text-sm text-primary">
+                                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-outline-variant border-t-primary" />
+                                            Memuat penyedia layanan...
+                                        </div>
+                                    ) : (
+                                        <ProviderSelector
+                                            providers={tvProviders ?? []}
+                                            selected={selectedProvider?.code ?? null}
+                                            onSelect={setSelectedProvider}
+                                        />
+                                    )
+                                )}
+                                {(selected.type !== 'tv' || selectedProvider !== null) && (
+                                    <div className={selected.type === 'tv' ? 'mt-6' : ''}>
+                                        <NumberInputBar
+                                            value={phoneNumber}
+                                            placeholder={selected.placeholder}
+                                            isValid={isValid}
+                                            onChange={handlePhoneNumberChange}
+                                            onCheck={handleServiceCheck}
+                                            operator={(selected.type === 'pulsa' || selected.type === 'data') ? operator : undefined}
+                                            buttonLabel={
+                                                selected.type === 'pln' && selected.endpoint === 'prepaid' ? 'Cek Token' :
+                                                selected.type === 'pln_pasca' || selected.type === 'tv' ? 'Cek Tagihan' : 'Cek Layanan'
+                                            }
+                                            type={selected.type}
+                                            emoneyProvider={emoneyProvider}
+                                            onEmoneyChange={setEmoneyProvider}
+                                        />
+                                    </div>
+                                )}
+                            </>
+                        }
+                        content={
+                            <>
+                                {!billData && prepaidService === null && (
+                                    <div className="flex h-full min-h-[200px] flex-col items-center justify-center rounded-2xl border border-dashed border-outline-variant/30 py-16 text-center">
+                                        <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container">
+                                            <selected.icon className="size-7 text-on-surface-variant" />
+                                        </div>
+                                        <p className="text-sm font-semibold text-on-surface">Siap melayani</p>
+                                        <p className="mt-1 max-w-xs text-xs text-on-surface-variant">
+                                            Masukkan nomor di sebelah kiri lalu klik tombol cek untuk melihat produk atau tagihan.
+                                        </p>
+                                    </div>
+                                )}
+                                {billData && (
+                                    <BillInquiryCard
+                                        bill={billData}
+                                        customerNumber={phoneNumber}
+                                        serviceType={selected.type}
+                                        serviceLabel={serviceLabel}
+                                        onPay={(bill) => setConfirmBill(bill)}
+                                    />
+                                )}
+                                {prepaidService !== null && (
+                                    <ProductList
+                                        items={prepaidService}
+                                        selected={selected}
+                                        operator={operator}
+                                        onBuy={setConfirmItem}
+                                        customerNumber={phoneNumber}
+                                        plnCustomer={plnCustomer}
+                                    />
+                                )}
+                            </>
+                        }
                     />
                 )}
 
-                {prepaidService !== null && (
-                    <ProductList items={prepaidService} selected={selected} operator={operator} onBuy={setConfirmItem} customerNumber={phoneNumber} plnCustomer={plnCustomer} />
-                )}
-
-                <ConfirmModal
-                    show={confirmItem !== null}
-                    item={confirmItem}
-                    phoneNumber={phoneNumber}
-                    operator={operator}
-                    service={selected}
-                    onClose={() => setConfirmItem(null)}
-                />
-
-                <ConfirmModal
-                    show={confirmBill !== null}
-                    bill={confirmBill}
-                    serviceType={selected?.type}
-                    serviceLabel={selected?.type === 'tv' ? (selectedProvider?.name ?? selected?.label) : selected?.label}
-                    onClose={() => setConfirmBill(null)}
-                />
-
-                {/* Footer */}
-                <footer className="border-t border-green-100 bg-white py-6">
-                    <p className="text-center text-xs text-gray-400">
-                        &copy; {new Date().getFullYear()} Al-Khidmah. Didukung oleh IAK PPOB.
-                    </p>
-                </footer>
+                <BottomNav active="beranda" />
             </div>
+
+            <ConfirmModal
+                show={confirmItem !== null}
+                item={confirmItem}
+                phoneNumber={phoneNumber}
+                operator={operator}
+                service={selected}
+                onClose={() => setConfirmItem(null)}
+            />
+
+            <ConfirmModal
+                show={confirmBill !== null}
+                bill={confirmBill}
+                serviceType={selected?.type}
+                serviceLabel={serviceLabel}
+                onClose={() => setConfirmBill(null)}
+            />
         </>
     );
 }
