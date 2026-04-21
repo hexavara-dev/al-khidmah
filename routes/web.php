@@ -5,6 +5,7 @@ use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\DonationController;
 use App\Http\Controllers\API\ReportController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\JemaahController;
 use App\Http\Controllers\DonasiController;
@@ -85,6 +86,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/dashboard', function () {
         return Inertia::render('Admin/Dashboard');
     })->name('dashboard');
+
+    // Slider management
+    Route::get('/sliders', [SliderController::class, 'index'])->name('sliders.index');
+    Route::post('/sliders', [SliderController::class, 'store'])->name('sliders.store');
+    Route::put('/sliders/{slider}', [SliderController::class, 'update'])->name('sliders.update');
+    Route::delete('/sliders/{slider}', [SliderController::class, 'destroy'])->name('sliders.destroy');
 });
 
 Route::get('/dashboard', function () {
@@ -93,8 +100,9 @@ Route::get('/dashboard', function () {
 
 // ─── OAuth ───────────────────────────────────────────────────────
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
+Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('google.redirect');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 Route::get('/auth/jemaah', [JemaahController::class, 'redirect'])->name('auth.jemaah');
 Route::get('/auth/jemaah/callback', [JemaahController::class, 'callback'])->name('auth.jemaah.callback');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

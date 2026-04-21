@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import BottomNavbar from '../components/BottomNavbar';
+import BottomNav from '../components/ui/BottomNav';
 
 interface MainLayoutProps {
     children: ReactNode;
@@ -25,7 +25,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             </div>
 
             {/* Bottom navbar — mobile only */}
-            <BottomNavbar />
+            <BottomNav />
         </div>
     );
 }
