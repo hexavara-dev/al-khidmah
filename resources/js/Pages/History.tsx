@@ -33,14 +33,14 @@ type Paginator = {
 type Props = PageProps<{ transactions: Paginator }>;
 
 const typeIcon: Record<string, { icon: React.ReactNode; bg: string }> = {
-    pln:            { icon: <Zap className="size-5 text-yellow-500" />,    bg: 'bg-yellow-50' },
-    pln_pasca:      { icon: <Zap className="size-5 text-yellow-500" />,    bg: 'bg-yellow-50' },
-    pulsa:          { icon: <Smartphone className="size-5 text-primary" />, bg: 'bg-primary-container/40' },
-    data:           { icon: <Wifi className="size-5 text-primary" />,       bg: 'bg-primary-container/40' },
-    tv:             { icon: <Tv2 className="size-5 text-secondary" />,      bg: 'bg-secondary-container/40' },
-    tv_pasca:       { icon: <Tv2 className="size-5 text-secondary" />,      bg: 'bg-secondary-container/40' },
-    internet_pasca: { icon: <Wifi className="size-5 text-secondary" />,     bg: 'bg-secondary-container/40' },
-    etoll:          { icon: <Wallet className="size-5 text-[#f59e0b]" />,   bg: 'bg-amber-50' },
+    pln:            { icon: <Zap className="size-5 text-amber-600" />,      bg: 'bg-amber-100' },
+    pln_pasca:      { icon: <Zap className="size-5 text-amber-600" />,      bg: 'bg-amber-100' },
+    pulsa:          { icon: <Smartphone className="size-5 text-primary" />, bg: 'bg-primary-container' },
+    data:           { icon: <Wifi className="size-5 text-primary" />,       bg: 'bg-primary-container' },
+    tv:             { icon: <Tv2 className="size-5 text-secondary" />,      bg: 'bg-secondary-container' },
+    tv_pasca:       { icon: <Tv2 className="size-5 text-secondary" />,      bg: 'bg-secondary-container' },
+    internet_pasca: { icon: <Wifi className="size-5 text-secondary" />,     bg: 'bg-secondary-container' },
+    etoll:          { icon: <Wallet className="size-5 text-orange-600" />,  bg: 'bg-orange-100' },
 };
 
 const typeLabel: Record<string, string> = {

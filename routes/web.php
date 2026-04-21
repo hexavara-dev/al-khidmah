@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\JemaahController;
 use App\Http\Controllers\DonasiController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\HomepageController;
+use App\Http\Controllers\PpobPageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PPOBController;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +20,7 @@ use Inertia\Inertia;
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [HomepageController::class, 'index'])->name('home');
     Route::get('/history', [HistoryController::class, 'index'])->name('history');
+    Route::get('/ppob/{type}', [PpobPageController::class, 'show'])->name('ppob.service');
 
     Route::prefix('ppob')->group(function () {
         Route::get('/saldo', [PPOBController::class, 'checkBalance']);
@@ -98,5 +100,6 @@ Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 Route::get('/auth/jemaah', [JemaahController::class, 'redirect'])->name('auth.jemaah');
 Route::get('/auth/jemaah/callback', [JemaahController::class, 'callback'])->name('auth.jemaah.callback');
+Route::post('/auth/jemaah/login', [JemaahController::class, 'loginWithPassword'])->name('auth.jemaah.login');
 
 require __DIR__ . '/auth.php';
