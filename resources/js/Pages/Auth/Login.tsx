@@ -18,6 +18,12 @@ const JemaahIcon = () => (
 );
 
 function SsoCard({ status }: { status?: string }) {
+    // Deteksi mobile: cek URL atau sessionStorage (agar tetap ada setelah navigasi)
+    const fromUrl = new URLSearchParams(window.location.search).get('mobile') === '1';
+    if (fromUrl) sessionStorage.setItem('mobile', '1');
+    const isMobile = fromUrl || sessionStorage.getItem('mobile') === '1';
+    const googleHref = isMobile ? '/auth/google?mobile=1' : '/auth/google';
+
     return (
         <div className="flex flex-col">
             {status && (
@@ -77,7 +83,7 @@ function SsoCard({ status }: { status?: string }) {
 
                 {/* Google */}
                 <a
-                    href="/auth/google"
+                    href={googleHref}
                     className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-border bg-background px-5 py-4 shadow-sm transition hover:border-primary/30 hover:shadow-md active:scale-[0.98]"
                 >
                     <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-border bg-white shadow-sm">
