@@ -6,6 +6,7 @@ use App\Http\Controllers\API\DonationController;
 use App\Http\Controllers\API\ReportController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\Auth\MobileAuthController;
 use App\Http\Controllers\Auth\JemaahController;
 use App\Http\Controllers\DonasiController;
 use App\Http\Controllers\HistoryController;
@@ -98,5 +99,18 @@ Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 Route::get('/auth/jemaah', [JemaahController::class, 'redirect'])->name('auth.jemaah');
 Route::get('/auth/jemaah/callback', [JemaahController::class, 'callback'])->name('auth.jemaah.callback');
+
+Route::get('/mobile-auth/consume', [MobileAuthController::class, 'consume'])
+    ->name('mobile.auth.consume');
+Route::get('/mobile-auth/consume', function (Request $request) {
+    $token = $request->token;
+
+    if (!$token) {
+        return response('Token tidak ada', 400);
+    }
+
+    // simulasi login
+    return redirect('/donasi');
+});
 
 require __DIR__ . '/auth.php';
