@@ -112,12 +112,6 @@ export default function HomePage() {
                 </div>
             </div>
 
-            {/* ===== DESKTOP HERO ===== */}
-            {/* Replaced by HeroSlider above */}
-
-            {/* ===== DESKTOP STATS ===== */}
-            {/* Removed — replaced by HeroSlider */}
-
             {/* ===== MOBILE SEARCH ===== */}
             <div className="md:hidden px-4 py-3 bg-gray-50">
                 <form onSubmit={handleSearch} className="flex gap-2">

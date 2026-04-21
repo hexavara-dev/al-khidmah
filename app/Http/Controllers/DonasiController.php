@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Campaign;
 use App\Models\Category;
 use App\Models\Donation;
-use App\Models\Slider;
 use App\Services\CampaignService;
 use App\Services\DonationService;
 use Illuminate\Http\Request;
@@ -31,14 +30,11 @@ class DonasiController extends Controller
                 ->sum('amount');
         }
 
-        $sliders = Slider::where('is_active', true)->orderBy('order')->orderBy('id')->get();
-
         return Inertia::render('home/HomePage', [
             'campaigns' => $campaigns,
             'categories' => $categories,
             'totalKontribusi' => $totalKontribusi,
             'filters' => $request->only(['search', 'category_id', 'is_active']),
-            'sliders' => $sliders,
         ]);
     }
 
