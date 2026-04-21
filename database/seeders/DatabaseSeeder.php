@@ -10,7 +10,6 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
-
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
@@ -38,7 +37,7 @@ class DatabaseSeeder extends Seeder
                 'name'     => 'Test User',
                 'password' => bcrypt('12345678'),
                 'is_admin' => false,
-                'role'     => 'user',
+                'role'     => 'admin',
             ]
         );
 
