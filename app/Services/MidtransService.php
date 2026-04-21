@@ -109,7 +109,7 @@ class MidtransService {
     {
         $tz    = 'Asia/Jakarta';
         $now   = now()->timezone($tz);
-        $start = $now->copy()->startOfYear()->format('Y-m-d\TH:i:sP');
+        $start = $now->copy()->startOfDay()->format('Y-m-d\TH:i:sP');
         $end   = $now->format('Y-m-d\TH:i:sP');
 
         $response = Http::withBasicAuth($this->serverKey, '')

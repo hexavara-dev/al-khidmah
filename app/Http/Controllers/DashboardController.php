@@ -8,11 +8,16 @@ use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
+    public function __construct(
+        private IAKService $iakService,
+        private MidtransService $midtransService,
+    ) {}
+
     public function index(): \Inertia\Response
     {
         $iakBalance = 0;
         try {
-            $res        = app(IAKService::class)->checkBalance();
+            $res        = $this->iakService->checkBalance();
             $iakBalance = (int) ($res['data']['balance'] ?? 0);
         } catch (\Throwable) {
             // keep 0
@@ -23,7 +28,7 @@ class DashboardController extends Controller
 
         if (! $isSandbox) {
             try {
-                $midtransBalance = app(MidtransService::class)->getMerchantBalance();
+                $midtransBalance = $this->midtransService->getMerchantBalance();
             } catch (\Throwable) {
                 // keep 0
             }
