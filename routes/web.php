@@ -87,6 +87,22 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
         return Inertia::render('Admin/Dashboard');
     })->name('dashboard');
 
+    Route::get('/donations', function () {
+        return Inertia::render('Admin/Donations');
+    })->name('donations');
+
+    Route::get('/donations/overview', function () {
+        return Inertia::render('dashboard/DashboardOverviewDonationPage');
+    })->name('donations.overview');
+
+    Route::get('/donations/campaigns', function () {
+        return Inertia::render('dashboard/DashboardCampaignsDonasiPage');
+    })->name('donations.campaigns');
+
+    Route::get('/donations/categories', function () {
+        return Inertia::render('dashboard/DashboardCategoriesDonasiPage');
+    })->name('donations.categories');
+
 });
 
 Route::get('/dashboard', function () {

@@ -40,9 +40,10 @@ const navMain = [
         url: '/admin/donations',
         icon: <Heart />,
         items: [
-            { title: 'Zakat & Infaq', url: '/admin/donations/zakat' },
-            { title: 'Wakaf', url: '/admin/donations/wakaf' },
-            { title: 'Kelola Slider', url: '/admin/sliders' },
+            { title: 'Overview Donasi',   url: '/admin/donations/overview' },
+            { title: 'Manajemen Donasi',  url: '/admin/donations' },
+            { title: 'Kelola Campaign',   url: '/admin/donations/campaigns' },
+            { title: 'Kelola Kategori',   url: '/admin/donations/categories' },
         ],
     },
     {
