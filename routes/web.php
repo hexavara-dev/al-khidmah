@@ -8,12 +8,12 @@ use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\MobileAuthController;
 use App\Http\Controllers\Auth\JemaahController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DonasiController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PPOBController;
-use App\Http\Controllers\PPOBServiceCategoryController;
 use App\Http\Controllers\PPOBServiceController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -85,9 +85,7 @@ Route::prefix('api')->group(function () {
 
 // ─── Admin dashboard ─────────────────────────────────────────────
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Admin/Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // -- PPOB product sync (prepaid only) -------------------------
     Route::prefix('ppob')->name('ppob.')->group(function () {
