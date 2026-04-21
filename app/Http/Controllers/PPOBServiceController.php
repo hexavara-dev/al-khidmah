@@ -3,19 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\PPOBService;
+use App\Models\PPOBServiceProduct;
 use App\Http\Requests\StorePPOBServiceRequest;
 use App\Http\Requests\UpdatePPOBServiceRequest;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PPOBServiceController extends Controller
 {
-    public function index()
+    private const IAK_SUPPORTED = ['pulsa', 'data', 'pln', 'emoney'];
+
+    public function show(string $code, Request $request)
     {
-        return Inertia::render('Admin/PPOB/Index', [
-            'services' => PPOBService::withCount('categories')
-                ->with('categories')
-                ->orderBy('description')
-                ->get(),
+        $service   = PPOBService::where('code', $code)->firstOrFail();
+        $supported = in_array($code, self::IAK_SUPPORTED);
+
+        $products = PPOBServiceProduct::where('ppob_service_id', $service->id)
+            ->select(['id', 'name', 'label', 'price', 'period', 'status', 'fee'])
+            ->orderBy('name')
+            ->get();
+
+        return Inertia::render('Admin/PPOB/ServicePage', [
+            'service'   => $service,
+            'supported' => $supported,
+            'products'  => $products,
         ]);
     }
 
