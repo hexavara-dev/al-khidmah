@@ -16,7 +16,8 @@ class DonasiController extends Controller
     public function __construct(
         private CampaignService $campaignService,
         private DonationService $donationService,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request): Response
     {

@@ -42,8 +42,6 @@ export default function Footer() {
                             {[
                                 { label: 'Beranda Donasi', href: '/donasi' },
                                 { label: 'Riwayat Donasi', href: '/my-donations' },
-                                { label: 'Masuk', href: '/login' },
-                                { label: 'Daftar Akun', href: '/register' },
                             ].map(({ label, href }) => (
                                 <li key={href}>
                                     <a href={href} className="text-[#b3ecee] text-sm hover:text-white transition flex items-center gap-1.5 group">

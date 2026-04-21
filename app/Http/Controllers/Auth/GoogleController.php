@@ -12,13 +12,13 @@ class GoogleController extends Controller
 {
     public function redirect(Request $request)
     {
-        $isMobile = $request->get('mobile'); // ambil parameter mobile
+        $isMobile = $request->get('mobile');
 
         return Socialite::driver('google')
             ->stateless()
             ->with([
                 'prompt' => 'select_account',
-                'state' => $isMobile ? 'mobile' : 'web', // penanda
+                'state' => $isMobile ? 'mobile' : 'web',
             ])
             ->redirect();
     }
@@ -49,11 +49,11 @@ class GoogleController extends Controller
             // FLOW MOBILE
             // =========================
             if ($state === 'mobile') {
+                // Redirect ke deep link app dengan token + return_url
+                $returnUrl = urlencode(url('/donasi?mobile=1'));
+                $deepLink = "ekhidmah://callback?token={$token}&return_url={$returnUrl}";
 
-                // redirect ke halaman bridge dulu (WAJIB HTTPS)
-                return redirect()->route('auth.success', [
-                    'token' => $token
-                ]);
+                return redirect($deepLink);
             }
 
             // =========================
