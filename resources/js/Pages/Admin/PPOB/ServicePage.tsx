@@ -38,7 +38,6 @@ interface SavedProduct {
     name: string
     price: number
     period: string
-    type: string
     status: number
     fee: number | null
 }
@@ -101,13 +100,6 @@ function makeColumns(supported: boolean): ColumnDef<SavedProduct>[] {
             accessorKey: 'period',
             header: 'Masa Aktif',
             cell: ({ getValue }) => formatPeriod(getValue() as string),
-        },
-        {
-            accessorKey: 'type',
-            header: 'Tipe',
-            cell: ({ getValue }) => (
-                <span className="text-muted-foreground">{getValue() as string}</span>
-            ),
         },
         {
             accessorKey: 'status',
