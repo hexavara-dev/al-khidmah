@@ -14,7 +14,6 @@ use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PPOBController;
-use App\Http\Controllers\PPOBServiceCategoryController;
 use App\Http\Controllers\PPOBServiceController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;

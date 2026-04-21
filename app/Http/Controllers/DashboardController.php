@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\IAKService;
+use App\Services\MidtransService;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -17,11 +18,20 @@ class DashboardController extends Controller
             // keep 0
         }
 
-        $isSandbox = ! (bool) config('services.midtrans.is_production', false);
+        $isSandbox       = ! (bool) config('services.midtrans.is_production', false);
+        $midtransBalance = 0;
+
+        if (! $isSandbox) {
+            try {
+                $midtransBalance = app(MidtransService::class)->getMerchantBalance();
+            } catch (\Throwable) {
+                // keep 0
+            }
+        }
 
         return Inertia::render('Admin/Dashboard', [
             'iakBalance'      => $iakBalance,
-            'midtransBalance' => 0,
+            'midtransBalance' => $midtransBalance,
             'midtransSandbox' => $isSandbox,
         ]);
     }

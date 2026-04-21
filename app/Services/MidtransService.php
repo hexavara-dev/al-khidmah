@@ -99,4 +99,30 @@ class MidtransService {
     public function getSnapRedirectUrl(string $token): string {
         return $this->snapBaseUrl . '/v2/vtweb/' . $token;
     }
+
+    /**
+     * Fetch the merchant's current effective balance via the Balance Mutation API.
+     * Docs: https://docs.midtrans.com/reference/merchant-balance-mutation-api
+     * Uses closing_balance_effective at end of queried window as the "current balance".
+     */
+    public function getMerchantBalance(): float
+    {
+        $tz    = 'Asia/Jakarta';
+        $now   = now()->timezone($tz);
+        $start = $now->copy()->startOfYear()->format('Y-m-d\TH:i:sP');
+        $end   = $now->format('Y-m-d\TH:i:sP');
+
+        $response = Http::withBasicAuth($this->serverKey, '')
+            ->get("{$this->apiBaseUrl}/v1/balance/mutation", [
+                'currency'   => 'IDR',
+                'start_time' => $start,
+                'end_time'   => $end,
+            ]);
+
+        if ($response->failed()) {
+            return 0;
+        }
+
+        return (float) ($response->json('closing_balance_effective') ?? 0);
+    }
 }
