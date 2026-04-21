@@ -81,7 +81,7 @@ function DonationStruktModal({ donation, onClose }: { donation: Donation | null;
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                     </svg>
                 </button>
-                <h1 className="text-base font-bold text-blue-700">Al Khidmah</h1>
+                <h1 className="text-base font-bold text-[#00cacd]">Al Khidmah</h1>
                 <div className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-gray-400">
                         <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
@@ -93,8 +93,8 @@ function DonationStruktModal({ donation, onClose }: { donation: Donation | null;
                 <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                     {/* Card header */}
                     <div className="px-6 pt-8 pb-6 text-center border-b border-dashed border-gray-200">
-                        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#2563eb" className="w-9 h-9">
+                        <div className="w-16 h-16 bg-[#00cacd]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#00cacd" className="w-9 h-9">
                                 {/* Small heart at top */}
                                 <path d="M12 7.5C11.4 6.4 9.75 6.35 9.75 8.1C9.75 9.75 12 11.25 12 11.25C12 11.25 14.25 9.75 14.25 8.1C14.25 6.35 12.6 6.4 12 7.5Z"/>
                                 {/* Open giving palm */}
@@ -108,9 +108,9 @@ function DonationStruktModal({ donation, onClose }: { donation: Donation | null;
                     </div>
 
                     {/* Amount */}
-                    <div className="mx-5 my-5 bg-blue-50 rounded-2xl px-5 py-5 text-center">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-1">Jumlah Donasi</p>
-                        <p className="text-3xl font-extrabold text-blue-800">
+                    <div className="mx-5 my-5 bg-[#00cacd]/10 rounded-2xl px-5 py-5 text-center">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#00cacd]/70 mb-1">Jumlah Donasi</p>
+                        <p className="text-3xl font-extrabold text-[#007b7e]">
                             <span className="text-sm font-bold mr-1">IDR</span>{fmt(donation.amount)}
                         </p>
                         <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full mt-3">
@@ -164,7 +164,7 @@ function DonationStruktModal({ donation, onClose }: { donation: Donation | null;
                 <div className="max-w-md mx-auto flex gap-3">
                     <button
                         onClick={handleSave}
-                        className="flex-1 flex items-center justify-center gap-2 bg-blue-50 text-blue-700 py-4 rounded-2xl font-bold text-sm hover:bg-blue-100 transition border border-blue-100"
+                        className="flex-1 flex items-center justify-center gap-2 bg-[#00cacd]/10 text-[#00cacd] py-4 rounded-2xl font-bold text-sm hover:bg-[#00cacd]/20 transition border border-[#00cacd]/20"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -173,7 +173,7 @@ function DonationStruktModal({ donation, onClose }: { donation: Donation | null;
                     </button>
                     <button
                         onClick={handleShare}
-                        className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-bold text-sm transition shadow-md"
+                        className="flex-1 flex items-center justify-center gap-2 bg-[#00cacd] hover:bg-[#00b8bb] text-white py-4 rounded-2xl font-bold text-sm transition shadow-md"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
@@ -265,7 +265,7 @@ function DonationDetailModal({ donation, onClose, onStatusUpdated, onViewStruk }
                 <div className="px-6 py-5 space-y-4 overflow-y-auto flex-1">
                     <div className="flex justify-between items-start">
                         <span className="text-sm text-gray-400">ID Transaksi</span>
-                        <span className="text-sm font-semibold text-blue-600 font-mono">
+                        <span className="text-sm font-semibold text-[#00cacd] font-mono">
                             AK-{String(donation.id).padStart(8, '0')}
                         </span>
                     </div>
@@ -303,7 +303,7 @@ function DonationDetailModal({ donation, onClose, onStatusUpdated, onViewStruk }
 
                     <div className="border-t border-gray-100 pt-4 flex justify-between items-center">
                         <span className="text-sm font-semibold text-gray-700">Total Donasi</span>
-                        <span className="text-xl font-bold text-blue-600">Rp {fmt(donation.amount)}</span>
+                        <span className="text-xl font-bold text-[#00cacd]">Rp {fmt(donation.amount)}</span>
                     </div>
                 </div>
 
@@ -312,7 +312,7 @@ function DonationDetailModal({ donation, onClose, onStatusUpdated, onViewStruk }
                     {donation.status === 'success' && (
                         <button
                             onClick={onViewStruk}
-                            className="w-full flex items-center justify-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 py-3.5 rounded-2xl font-semibold transition border border-blue-100"
+                            className="w-full flex items-center justify-center gap-2 bg-[#00cacd]/10 hover:bg-[#00cacd]/20 text-[#00cacd] py-3.5 rounded-2xl font-semibold transition border border-[#00cacd]/20"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 14.25l6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0c1.1.128 1.907 1.077 1.907 2.185z" />
@@ -335,7 +335,7 @@ function DonationDetailModal({ donation, onClose, onStatusUpdated, onViewStruk }
                     )}
                     <button
                         onClick={onClose}
-                        className="w-full bg-gradient-to-r from-blue-500 to-emerald-600 text-white py-3.5 rounded-2xl font-semibold hover:opacity-90 transition"
+                        className="w-full bg-gradient-to-r from-[#00cacd] to-emerald-600 text-white py-3.5 rounded-2xl font-semibold hover:opacity-90 transition"
                     >
                         Tutup
                     </button>
@@ -370,13 +370,13 @@ export default function MyDonationsPage() {
     return (
         <MainLayout>
             <div className="max-w-2xl mx-auto">
-                <div className="bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 px-6 pt-10 pb-14">
-                    <p className="text-blue-200 text-sm mb-1">Total Kontribusi Anda</p>
+                <div className="bg-gradient-to-br from-[#008f92] via-[#00cacd] to-[#00b8bb] px-6 pt-10 pb-14">
+                    <p className="text-[#e0fafa] text-sm mb-1">Total Kontribusi Anda</p>
                     <p className="text-4xl font-bold text-white mb-6">
                         Rp {fmt(localTotalAmount)}
                     </p>
                     <div className="flex gap-3">
-                        <button className="flex items-center gap-2 bg-white text-blue-700 px-5 py-2.5 rounded-full text-sm font-semibold shadow">
+                        <button className="flex items-center gap-2 bg-white text-[#00cacd]] px-5 py-2.5 rounded-full text-sm font-semibold shadow">
                             🕐 Riwayat
                         </button>
                         <Link
@@ -406,7 +406,7 @@ export default function MyDonationsPage() {
                             <p className="text-gray-400 text-sm mt-1">Yuk mulai berdonasi untuk sesama!</p>
                             <Link
                                 href="/donasi"
-                                className="mt-4 inline-block bg-gradient-to-r from-blue-500 to-emerald-600 text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow"
+                                className="mt-4 inline-block bg-gradient-to-r from-[#00cacd]] to-emerald-600 text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow"
                             >
                                 Lihat Program Donasi
                             </Link>
@@ -420,10 +420,10 @@ export default function MyDonationsPage() {
                                         <button
                                             key={d.id}
                                             onClick={() => setSelected(d)}
-                                            className="w-full bg-white rounded-2xl border border-gray-100 p-4 shadow-sm hover:shadow-md hover:border-blue-100 transition text-left"
+                                            className="w-full bg-white rounded-2xl border border-gray-100 p-4 shadow-sm hover:shadow-md hover:border-[#00cacd]/2d]/20 transition text-left"
                                         >
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-emerald-500 flex items-center justify-center flex-none">
+                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#00cacd]] to-emerald-500 flex items-center justify-center flex-none">
                                                     <span className="text-white text-xs font-bold">{initials}</span>
                                                 </div>
                                                 <div className="flex-1 min-w-0">
@@ -439,7 +439,7 @@ export default function MyDonationsPage() {
                                                     )}
                                                 </div>
                                                 <div className="text-right flex-none">
-                                                    <p className="font-bold text-blue-600 text-sm">Rp {fmt(d.amount)}</p>
+                                                    <p className="font-bold text-[#00cacd]] text-sm">Rp {fmt(d.amount)}</p>
                                                     <div className="mt-1"><StatusBadge status={d.status} /></div>
                                                 </div>
                                             </div>

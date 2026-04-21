@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(PPOBServiceSeeder::class);
+        $this->call(PPOBProductSeeder::class);
 
         // Admin user
         User::updateOrCreate(

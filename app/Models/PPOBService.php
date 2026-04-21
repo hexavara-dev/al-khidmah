@@ -20,4 +20,9 @@ class PPOBService extends Model
     {
         return $this->hasMany(PPOBServiceCategory::class, 'ppob_id');
     }
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(PPOBServiceProduct::class, 'ppob_service_id');
+    }
 }

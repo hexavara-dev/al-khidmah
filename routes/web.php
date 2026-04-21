@@ -12,6 +12,8 @@ use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PPOBController;
+use App\Http\Controllers\PPOBServiceCategoryController;
+use App\Http\Controllers\PPOBServiceController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -86,6 +88,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
         return Inertia::render('Admin/Dashboard');
     })->name('dashboard');
 
+    // -- PPOB product sync (prepaid only) -------------------------
+    Route::prefix('ppob')->name('ppob.')->group(function () {
+        Route::get('/{code}',       [PPOBServiceController::class, 'show'])->name('page');
+        Route::get('/{code}/sync',  [PPOBController::class, 'sync'])->name('sync');
+        Route::post('/{code}/save', [PPOBController::class, 'store'])->name('save');
+    });
 });
 
 Route::get('/dashboard', function () {
