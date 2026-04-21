@@ -75,10 +75,11 @@ export default function HomePage() {
         navigateWithFilters({ page });
     };
 
+
     return (
         <MainLayout>
             {/* ===== MOBILE HEADER ===== */}
-            <div className="md:hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 px-4 pt-10 pb-6">
+            <div className="md:hidden bg-gradient-to-br from-[#00cacd] via-[#00b8bb] to-[#008f92] px-4 pt-10 pb-6">
                 <div className="flex items-center gap-3 mb-6">
                     <span className="text-2xl">🕌</span>
                     <h1 className="text-white font-bold text-lg tracking-wide">Donasi Al Khidmah</h1>
@@ -87,7 +88,7 @@ export default function HomePage() {
                 {/* busi Card */}
                 <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-4 flex items-center justify-between">
                     <div>
-                        <p className="text-blue-100 text-xs mb-1">Total Kontribusi Anda</p>
+                        <p className="text-[#e0fafa] text-xs mb-1">Total Kontribusi Anda</p>
                         <p className="text-white text-2xl font-bold">
                             {user ? `Rp ${fmt(totalKontribusi)}` : 'Rp 0'}
                         </p>
@@ -111,58 +112,6 @@ export default function HomePage() {
                 </div>
             </div>
 
-            {/* ===== DESKTOP HERO ===== */}
-            <section className="hidden md:block relative bg-gradient-to-br from-blue-800 via-blue-700 to-emerald-600 text-white overflow-hidden">
-                <div className="absolute inset-0 opacity-20 pointer-events-none">
-                    <div className="absolute top-0 left-0 w-72 h-72 bg-white rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl" />
-                    <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-1/3 translate-y-1/3 blur-3xl" />
-                </div>
-                <div className="relative max-w-4xl mx-auto px-6 py-16 text-center">
-                    <span className="inline-block bg-white/20 backdrop-blur-md px-5 py-2 rounded-full text-sm font-medium mb-4 shadow-lg">
-                        🌙 Platform Donasi Islami Terpercaya
-                    </span>
-                    <h1 className="text-4xl md:text-5xl font-bold mb-5 leading-tight">
-                        Bersama Membangun<br />
-                        <span className="text-blue-200">Kebaikan untuk Ummat</span>
-                    </h1>
-                    <p className="text-blue-100 text-lg mb-8 max-w-xl mx-auto">
-                        Setiap donasi Anda adalah amal jariyah yang mengalir tanpa henti.
-                    </p>
-                    <form onSubmit={handleSearch} className="flex gap-3 max-w-xl mx-auto">
-                        <input
-                            type="text"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Cari program donasi..."
-                            className="flex-1 px-5 py-3 rounded-2xl bg-white/90 backdrop-blur-sm text-black placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-xl transition-all"
-                        />
-                        <button type="submit"
-                            className="bg-white text-blue-700 px-8 py-3 rounded-2xl font-semibold hover:bg-blue-50 hover:shadow-xl hover:scale-105 transition-all shadow-lg">
-                            Cari
-                        </button>
-                    </form>
-                </div>
-            </section>
-
-            {/* ===== DESKTOP STATS ===== */}
-            <section className="hidden md:block max-w-5xl mx-auto px-6 -mt-6 mb-8 relative z-10">
-                <div className="grid grid-cols-4 gap-4">
-                    {[
-                        { label: 'Campaign Aktif', value: meta?.total ?? '...', icon: '📢' },
-                        { label: 'Total Donatur',  value: '1.2K+',             icon: '👥' },
-                        { label: 'Dana Tersalur',  value: 'Rp 500jt+',         icon: '💚' },
-                        { label: 'Kategori',       value: categories.length || '...', icon: '🏷️' },
-                    ].map((s) => (
-                        <div key={s.label}
-                            className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 text-center hover:shadow-2xl hover:-translate-y-1 transition-all cursor-default">
-                            <div className="text-3xl mb-2">{s.icon}</div>
-                            <p className="text-2xl font-extrabold text-gray-800">{s.value}</p>
-                            <p className="text-sm text-gray-500 font-medium">{s.label}</p>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
             {/* ===== MOBILE SEARCH ===== */}
             <div className="md:hidden px-4 py-3 bg-gray-50">
                 <form onSubmit={handleSearch} className="flex gap-2">
@@ -171,40 +120,38 @@ export default function HomePage() {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Cari program..."
-                        className="flex-1 px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
+                        className="flex-1 px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00cacd]/40 shadow-sm"
                     />
                     <button type="submit"
-                        className="bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition shadow-sm">
+                        className="bg-[#00cacd] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#00b8bb] transition shadow-sm">
                         Cari
                     </button>
                 </form>
             </div>
 
             {/* ===== PROGRAM PILIHAN (Categories) ===== */}
-            <section className="px-4 md:max-w-5xl md:mx-auto py-4 md:py-6">
-                <div className="flex items-center justify-between mb-3 md:mb-4">
+            <section className="py-4 md:py-6 md:px-4 md:max-w-5xl md:mx-auto">
+                <div className="flex items-center justify-between mb-3 md:mb-4 px-4 md:px-0">
                     <h2 className="text-base md:text-xl font-bold text-gray-800">Program Pilihan</h2>
                 </div>
-                <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
+                {/* Mobile: horizontal scroll | Desktop: grid */}
+                <div className="flex gap-3 overflow-x-auto pb-2 px-4 md:hidden" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
                     {/* Semua */}
                     <button
                         onClick={() => handleCategoryChange('')}
-                        className={`flex-none flex flex-col items-center gap-1.5 px-3 pt-3 pb-2.5 rounded-2xl border-2 transition-all min-w-[68px] ${
+                        className={`flex-none flex flex-col items-center gap-2 py-3 px-3 rounded-2xl border-2 transition-all w-[72px] ${
                             !categoryId
-                                ? 'bg-blue-600 border-blue-600 shadow-md shadow-blue-200'
-                                : 'bg-white border-gray-100 hover:border-blue-200 shadow-sm'
+                                ? 'bg-[#00cacd] border-[#00cacd] shadow-md shadow-[#00cacd]/30'
+                                : 'bg-white border-gray-100 shadow-sm'
                         }`}
                     >
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all ${
-                            !categoryId ? 'bg-white/20' : 'bg-amber-100'
-                        }`}>
-                            🌟
-                        </div>
-                        <span className={`text-[11px] font-semibold whitespace-nowrap ${
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${
+                            !categoryId ? 'bg-white/25' : 'bg-amber-100'
+                        }`}>🌟</div>
+                        <span className={`text-[10px] font-semibold text-center leading-tight ${
                             !categoryId ? 'text-white' : 'text-gray-600'
                         }`}>Semua</span>
                     </button>
-
                     {categories.map((cat) => {
                         const cfg = CATEGORY_ICONS[cat.name] ?? { emoji: '❤️', bg: 'bg-pink-100', color: 'text-pink-600' };
                         const active = String(categoryId) === String(cat.id);
@@ -212,18 +159,57 @@ export default function HomePage() {
                             <button
                                 key={cat.id}
                                 onClick={() => handleCategoryChange(cat.id)}
-                                className={`flex-none flex flex-col items-center gap-1.5 px-3 pt-3 pb-2.5 rounded-2xl border-2 transition-all min-w-[68px] ${
+                                className={`flex-none flex flex-col items-center gap-2 py-3 px-3 rounded-2xl border-2 transition-all w-[72px] ${
                                     active
-                                        ? 'bg-blue-600 border-blue-600 shadow-md shadow-blue-200'
-                                        : 'bg-white border-gray-100 hover:border-blue-200 shadow-sm'
+                                        ? 'bg-[#00cacd] border-[#00cacd] shadow-md shadow-[#00cacd]/30'
+                                        : 'bg-white border-gray-100 shadow-sm'
                                 }`}
                             >
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all ${
-                                    active ? 'bg-white/20' : cfg.bg
-                                }`}>
-                                    {cfg.emoji}
-                                </div>
-                                <span className={`text-[11px] font-semibold whitespace-nowrap text-center leading-tight ${
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${
+                                    active ? 'bg-white/25' : cfg.bg
+                                }`}>{cfg.emoji}</div>
+                                <span className={`text-[10px] font-semibold text-center leading-tight ${
+                                    active ? 'text-white' : 'text-gray-600'
+                                }`}>{cat.name}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Desktop: grid */}
+                <div className="hidden md:grid md:grid-cols-5 lg:grid-cols-7 gap-3">
+                    <button
+                        onClick={() => handleCategoryChange('')}
+                        className={`flex flex-col items-center gap-2 py-4 px-2 rounded-2xl border-2 transition-all ${
+                            !categoryId
+                                ? 'bg-[#00cacd] border-[#00cacd] shadow-md shadow-[#00cacd]/30'
+                                : 'bg-white border-gray-100 hover:border-[#00cacd]/40 hover:shadow-md shadow-sm'
+                        }`}
+                    >
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
+                            !categoryId ? 'bg-white/25' : 'bg-amber-100'
+                        }`}>🌟</div>
+                        <span className={`text-[11px] font-semibold text-center leading-tight ${
+                            !categoryId ? 'text-white' : 'text-gray-600'
+                        }`}>Semua</span>
+                    </button>
+                    {categories.map((cat) => {
+                        const cfg = CATEGORY_ICONS[cat.name] ?? { emoji: '❤️', bg: 'bg-pink-100', color: 'text-pink-600' };
+                        const active = String(categoryId) === String(cat.id);
+                        return (
+                            <button
+                                key={cat.id}
+                                onClick={() => handleCategoryChange(cat.id)}
+                                className={`flex flex-col items-center gap-2 py-4 px-2 rounded-2xl border-2 transition-all ${
+                                    active
+                                        ? 'bg-[#00cacd] border-[#00cacd] shadow-md shadow-[#00cacd]/30'
+                                        : 'bg-white border-gray-100 hover:border-[#00cacd]/40 hover:shadow-md shadow-sm'
+                                }`}
+                            >
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
+                                    active ? 'bg-white/25' : cfg.bg
+                                }`}>{cfg.emoji}</div>
+                                <span className={`text-[11px] font-semibold text-center leading-tight ${
                                     active ? 'text-white' : 'text-gray-600'
                                 }`}>{cat.name}</span>
                             </button>
@@ -253,7 +239,7 @@ export default function HomePage() {
                         <p className="text-gray-500 font-medium">Tidak ada program ditemukan.</p>
                         <button
                             onClick={() => { setSearch(''); setCategoryId(''); navigateWithFilters({ search: undefined, category_id: undefined, page: 1 }); }}
-                            className="mt-3 text-blue-600 text-sm underline"
+                            className="mt-3 text-[#00cacd] text-sm underline"
                         >
                             Reset filter
                         </button>

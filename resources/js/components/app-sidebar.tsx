@@ -14,6 +14,7 @@ import {
     BarChart3,
     CreditCard,
     Heart,
+    Image,
     LayoutDashboard,
     Settings,
     ShoppingBag,
@@ -41,6 +42,7 @@ const navMain = [
         items: [
             { title: 'Zakat & Infaq', url: '/admin/donations/zakat' },
             { title: 'Wakaf', url: '/admin/donations/wakaf' },
+            { title: 'Kelola Slider', url: '/admin/sliders' },
         ],
     },
     {

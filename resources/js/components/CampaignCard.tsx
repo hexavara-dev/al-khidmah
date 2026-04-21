@@ -30,14 +30,14 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
                         className="w-full h-48 object-cover"
                     />
                 ) : (
-                    <div className="w-full h-48 bg-gradient-to-br from-blue-100 to-emerald-200 flex items-center justify-center text-5xl">
+                    <div className="w-full h-48 bg-gradient-to-br from-[#00cacd]/10 to-emerald-200 flex items-center justify-center text-5xl">
                         🕌
                     </div>
                 )}
                 {/* Days left badge */}
                 {daysLeft > 0 && (
                     <span className={`absolute top-3 right-3 flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold text-white shadow ${
-                        isNearDeadline ? 'bg-red-500' : 'bg-blue-500'
+                        isNearDeadline ? 'bg-red-500' : 'bg-[#00cacd]'
                     }`}>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z" clipRule="evenodd" />
@@ -65,7 +65,7 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
                 <div className="w-full bg-gray-100 rounded-full h-2 mb-3 overflow-hidden">
                     <div
                         className={`h-2 rounded-full transition-all ${
-                            isFull ? 'bg-emerald-500' : 'bg-blue-500'
+                            isFull ? 'bg-emerald-500' : 'bg-[#00cacd]'
                         }`}
                         style={{ width: `${progress}%` }}
                     />
@@ -75,7 +75,7 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
                 <div className="flex justify-between items-start mb-3 text-xs">
                     <div>
                         <p className="text-gray-400 uppercase font-semibold tracking-wide text-[10px]">Terkumpul</p>
-                        <p className="text-blue-600 font-bold text-sm">Rp {fmt(campaign.collected_amount)}</p>
+                        <p className="text-[#00cacd] font-bold text-sm">Rp {fmt(campaign.collected_amount)}</p>
                     </div>
                     <div className="text-right">
                         <p className="text-gray-400 uppercase font-semibold tracking-wide text-[10px]">Target</p>
@@ -84,16 +84,16 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
                 </div>
 
                 {/* Donate Button */}
-                <button
-                    className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                        isFull
-                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                            : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md'
-                    }`}
-                    disabled={isFull}
-                >
-                    {isFull ? 'Target Tercapai' : 'Donasi Sekarang'}
-                </button>
+             <button
+                className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                    isFull
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-[#00cacd] hover:bg-[#00b8bb] text-white shadow-sm hover:shadow-md'
+                }`}
+                disabled={isFull}
+            >
+                {isFull ? 'Target Tercapai' : 'Donasi Sekarang'}
+            </button>
             </div>
         </div>
     );

@@ -169,7 +169,7 @@ export default function CampaignDetailPage() {
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                                 </svg>
                             </button>
-                            <h1 className="text-base font-bold text-blue-700">Al Khidmah</h1>
+                            <h1 className="text-base font-bold text-[#00cacd]">Al Khidmah</h1>
                             <div className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-gray-400">
                                     <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
@@ -182,8 +182,8 @@ export default function CampaignDetailPage() {
                             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                                 {/* Card header */}
                                 <div className="px-6 pt-8 pb-6 text-center border-b border-dashed border-gray-200">
-                                    <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#2563eb" className="w-9 h-9">
+                                    <div className="w-16 h-16 bg-[#00cacd]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#00cacd" className="w-9 h-9">
                                             {/* Small heart at top */}
                                             <path d="M12 7.5C11.4 6.4 9.75 6.35 9.75 8.1C9.75 9.75 12 11.25 12 11.25C12 11.25 14.25 9.75 14.25 8.1C14.25 6.35 12.6 6.4 12 7.5Z"/>
                                             {/* Open giving palm */}
@@ -197,9 +197,9 @@ export default function CampaignDetailPage() {
                                 </div>
 
                                 {/* Amount */}
-                                <div className="mx-5 my-5 bg-blue-50 rounded-2xl px-5 py-5 text-center">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-1">Jumlah Donasi</p>
-                                    <p className="text-3xl font-extrabold text-blue-800">
+                                <div className="mx-5 my-5 bg-[#00cacd]/10 rounded-2xl px-5 py-5 text-center">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#00cacd] mb-1">Jumlah Donasi</p>
+                                    <p className="text-3xl font-extrabold text-[#008f92]">
                                         <span className="text-sm font-bold mr-1">IDR</span>{fmt(finalAmount)}
                                     </p>
                                     <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full mt-3">
@@ -254,7 +254,7 @@ export default function CampaignDetailPage() {
                         <div className="max-w-md mx-auto flex gap-3">
                             <button
                                 onClick={handleSave}
-                                className="flex-1 flex items-center justify-center gap-2 bg-blue-50 text-blue-700 py-4 rounded-2xl font-bold text-sm hover:bg-blue-100 transition border border-blue-100"
+                                className="flex-1 flex items-center justify-center gap-2 bg-[#00cacd]/10 text-[#00cacd] py-4 rounded-2xl font-bold text-sm hover:bg-[#00cacd]/20 transition border border-[#00cacd]/20"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -263,7 +263,7 @@ export default function CampaignDetailPage() {
                             </button>
                             <button
                                 onClick={handleShare}
-                                className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-bold text-sm transition shadow-md"
+                                className="flex-1 flex items-center justify-center gap-2 bg-[#00cacd] hover:bg-[#00b8bb] text-white py-4 rounded-2xl font-bold text-sm transition shadow-md"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
@@ -298,14 +298,14 @@ export default function CampaignDetailPage() {
 
                     {isSuccess ? (
                         <>
-                            <h1 className="text-2xl font-extrabold text-blue-900 mb-3 leading-snug">
+                            <h1 className="text-2xl font-extrabold text-[#008f92] mb-3 leading-snug">
                                 Alhamdulillah, Donasi<br />Berhasil!
                             </h1>
                             <p className="text-gray-500 text-sm mb-8">Semoga menjadi amal jariyah yang berkah<br />bagi Anda dan keluarga.</p>
                         </>
                     ) : (
                         <>
-                            <h1 className="text-2xl font-extrabold text-blue-900 mb-3">Donasi Dalam Proses</h1>
+                            <h1 className="text-2xl font-extrabold text-[#008f92] mb-3">Donasi Dalam Proses</h1>
                             <p className="text-gray-500 text-sm mb-8">Pembayaran sedang menunggu konfirmasi.</p>
                         </>
                     )}
@@ -315,7 +315,7 @@ export default function CampaignDetailPage() {
                         {donation?.id && (
                             <div className="px-5 py-4 flex justify-between items-center border-b border-gray-50">
                                 <span className="text-sm text-gray-400">ID Transaksi</span>
-                                <span className="text-sm font-bold text-blue-600 font-mono">{txId}</span>
+                                <span className="text-sm font-bold text-[#00cacd] font-mono">{txId}</span>
                             </div>
                         )}
                         <div className="px-5 py-4 border-b border-gray-50">
@@ -336,7 +336,7 @@ export default function CampaignDetailPage() {
                         </div>
                         <div className="mx-4 my-4 bg-gray-50 rounded-2xl px-5 py-4 flex items-center justify-between">
                             <span className="font-bold text-gray-700 text-sm">Total Donasi</span>
-                            <p className="font-extrabold text-blue-700 text-lg">
+                            <p className="font-extrabold text-[#00cacd] text-lg">
                                 <span className="text-xs font-bold mr-1">IDR</span>{fmt(finalAmount)}
                             </p>
                         </div>
@@ -345,7 +345,7 @@ export default function CampaignDetailPage() {
                                 {campaign.image ? (
                                     <img src={`/storage/${campaign.image}`} alt="" className="w-14 h-14 rounded-xl object-cover flex-none" />
                                 ) : (
-                                    <div className="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center flex-none text-2xl">🕌</div>
+                                    <div className="w-14 h-14 rounded-xl bg-[#00cacd]/10 flex items-center justify-center flex-none text-2xl">🕌</div>
                                 )}
                                 <div>
                                     <p className="text-xs font-bold text-teal-600 uppercase tracking-wide mb-1">Terverifikasi</p>
@@ -365,7 +365,7 @@ export default function CampaignDetailPage() {
                         {isSuccess && (
                             <button
                                 onClick={() => setShowStruk(true)}
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition shadow-md"
+                                className="w-full bg-[#00cacd] hover:bg-[#00b8bb] text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition shadow-md"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 14.25l6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0c1.1.128 1.907 1.077 1.907 2.185z" />
@@ -375,14 +375,14 @@ export default function CampaignDetailPage() {
                         )}
                         <Link
                             href="/donasi"
-                            className="block w-full bg-blue-50 hover:bg-blue-100 text-blue-700 py-4 rounded-2xl font-bold text-center transition border border-blue-100"
+                            className="block w-full bg-[#00cacd]/10 hover:bg-[#00cacd]/20 text-[#00cacd] py-4 rounded-2xl font-bold text-center transition border border-[#00cacd]/20"
                         >
                             Kembali ke Beranda
                         </Link>
                     </div>
                     <p className="mt-6 text-xs text-gray-400">
                         Butuh bantuan?{' '}
-                        <button className="text-blue-600 font-semibold hover:underline">Hubungi Support</button>
+                        <button className="text-[#00cacd] font-semibold hover:underline">Hubungi Support</button>
                     </p>
                 </div>
             </MainLayout>
@@ -401,7 +401,7 @@ export default function CampaignDetailPage() {
                     <p className="text-xs text-gray-400 mb-4">Minimum donasi Rp 1.000</p>
 
                     {/* Campaign mini card */}
-                    <div className="flex items-center gap-3 bg-blue-50 rounded-2xl p-4 border border-blue-100 mb-5">
+                    <div className="flex items-center gap-3 bg-[#00cacd]/10 rounded-2xl p-4 border border-[#00cacd]/20 mb-5">
                         <div className="w-12 h-12 rounded-xl overflow-hidden flex-none bg-gray-200">
                             {campaign.image
                                 ? <img src={`/storage/${campaign.image}`} alt="" className="w-full h-full object-cover" />
@@ -421,8 +421,8 @@ export default function CampaignDetailPage() {
                                     onClick={() => { setAmount(String(a.value)); setCustomAmount(''); }}
                                     className={`relative p-4 rounded-2xl border-2 text-left transition-all duration-150 ${
                                         selected
-                                            ? 'border-blue-600 bg-gradient-to-br from-blue-600 to-blue-500 shadow-md shadow-blue-200'
-                                            : 'border-gray-100 bg-white hover:border-blue-300 hover:shadow-sm'
+                                            ? 'border-[#00cacd] bg-gradient-to-br from-[#00cacd] to-[#00b8bb] shadow-md shadow-[#00cacd]/30'
+                                            : 'border-gray-100 bg-white hover:border-[#00cacd]/40 hover:shadow-sm'
                                     }`}
                                 >
                                     {a.popular && !selected && (
@@ -444,7 +444,7 @@ export default function CampaignDetailPage() {
                                         Rp {fmt(a.value)}
                                     </p>
                                     <p className={`text-xs mt-0.5 ${
-                                        selected ? 'text-blue-100' : 'text-gray-400'
+                                        selected ? 'text-[#e0fafa]' : 'text-gray-400'
                                     }`}>{a.label}</p>
                                 </button>
                             );
@@ -460,7 +460,7 @@ export default function CampaignDetailPage() {
                             onChange={(e) => { setCustomAmount(e.target.value); setAmount(''); }}
                             min="1000"
                             placeholder="0"
-                            className="w-full border-2 border-gray-100 rounded-2xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-blue-400 bg-gray-50"
+                            className="w-full border-2 border-gray-100 rounded-2xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#00cacd] bg-gray-50"
                         />
                     </div>
 
@@ -473,15 +473,15 @@ export default function CampaignDetailPage() {
                                 value={donorName}
                                 onChange={(e) => setDonorName(e.target.value)}
                                 placeholder="Masukkan nama Anda"
-                                className="w-full border-2 border-gray-100 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 bg-gray-50"
+                                className="w-full border-2 border-gray-100 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-[#00cacd] bg-gray-50"
                             />
                         </div>
                         <button
                             type="button"
                             onClick={() => setAnonymous(!anonymous)}
-                            className="flex items-center gap-3 w-full p-3 rounded-2xl border-2 border-gray-100 bg-gray-50 hover:border-blue-200 transition"
+                            className="flex items-center gap-3 w-full p-3 rounded-2xl border-2 border-gray-100 bg-gray-50 hover:border-[#00cacd]/30 transition"
                         >
-                            <div className={`w-11 h-6 rounded-full transition-colors relative flex-none ${anonymous ? 'bg-blue-500' : 'bg-gray-300'}`}>
+                            <div className={`w-11 h-6 rounded-full transition-colors relative flex-none ${anonymous ? 'bg-[#00cacd]' : 'bg-gray-300'}`}>
                                 <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all shadow ${anonymous ? 'left-5' : 'left-0.5'}`} />
                             </div>
                             <span className="text-sm text-gray-600">Sembunyikan nama saya (Anonim)</span>
@@ -493,15 +493,15 @@ export default function CampaignDetailPage() {
                                 onChange={(e) => setNote(e.target.value)}
                                 rows={3}
                                 placeholder="Tuliskan doa atau niat baik Anda di sini..."
-                                className="w-full border-2 border-gray-100 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 bg-gray-50 resize-none"
+                                className="w-full border-2 border-gray-100 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-[#00cacd] bg-gray-50 resize-none"
                             />
                         </div>
                     </div>
 
-                    <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100">
+                    <div className="bg-[#00cacd]/10 rounded-2xl p-4 border border-[#00cacd]/20">
                         <div className="flex justify-between items-center mb-3">
                             <span className="text-gray-600 text-sm font-medium">Total Donasi</span>
-                            <span className="text-xl font-bold text-blue-700">
+                            <span className="text-xl font-bold text-[#00cacd]">
                                 {finalAmount ? `Rp ${fmt(finalAmount)}` : 'Rp 0'}
                             </span>
                         </div>
@@ -513,7 +513,7 @@ export default function CampaignDetailPage() {
                         <button
                             onClick={handlePay}
                             disabled={donating || !finalAmount}
-                            className="w-full bg-gradient-to-r from-blue-500 to-emerald-600 text-white py-4 rounded-2xl font-bold text-base hover:opacity-90 transition shadow-md disabled:opacity-60 flex items-center justify-center gap-2"
+                            className="w-full bg-gradient-to-r from-[#00cacd] to-emerald-600 text-white py-4 rounded-2xl font-bold text-base hover:opacity-90 transition shadow-md disabled:opacity-60 flex items-center justify-center gap-2"
                         >
                             {donating ? (
                                 <>
@@ -545,7 +545,7 @@ export default function CampaignDetailPage() {
                     {campaign.image ? (
                         <img src={`/storage/${campaign.image}`} alt={campaign.title} className="w-full h-64 md:h-72 object-cover" />
                     ) : (
-                        <div className="w-full h-64 md:h-72 bg-gradient-to-br from-blue-100 to-emerald-200 flex items-center justify-center text-8xl">
+                        <div className="w-full h-64 md:h-72 bg-gradient-to-br from-[#00cacd]/20 to-emerald-200 flex items-center justify-center text-8xl">
                             🕌
                         </div>
                     )}
@@ -570,7 +570,7 @@ export default function CampaignDetailPage() {
                         <div className="flex justify-between items-start mb-3">
                             <div>
                                 <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Terkumpul</p>
-                                <p className="text-2xl font-bold text-blue-700">Rp {fmt(campaign.collected_amount)}</p>
+                                <p className="text-2xl font-bold text-[#00cacd]">Rp {fmt(campaign.collected_amount)}</p>
                             </div>
                             <div className="text-right">
                                 <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Target</p>
@@ -579,23 +579,23 @@ export default function CampaignDetailPage() {
                         </div>
                         <div className="w-full bg-gray-100 rounded-full h-2.5 mb-4">
                             <div
-                                className="bg-gradient-to-r from-blue-500 to-emerald-500 h-2.5 rounded-full transition-all"
+                                className="bg-gradient-to-r from-[#00cacd] to-emerald-500 h-2.5 rounded-full transition-all"
                                 style={{ width: `${progress}%` }}
                             />
                         </div>
                         <div className="grid grid-cols-3 divide-x divide-gray-100 text-center">
                             <div className="px-2">
-                                <p className="text-base font-bold text-blue-700">{progress.toFixed(0)}%</p>
+                                <p className="text-base font-bold text-[#00cacd]">{progress.toFixed(0)}%</p>
                                 <p className="text-xs text-gray-400 uppercase tracking-wide">Progres</p>
                             </div>
                             <div className="px-2">
-                                <p className="text-base font-bold text-blue-700">
+                                <p className="text-base font-bold text-[#00cacd]">
                                     {(campaign.donations_count ?? 0).toLocaleString('id-ID')}
                                 </p>
                                 <p className="text-xs text-gray-400 uppercase tracking-wide">Donatur</p>
                             </div>
                             <div className="px-2">
-                                <p className="text-base font-bold text-blue-700">{daysLeft}</p>
+                                <p className="text-base font-bold text-[#00cacd]">{daysLeft}</p>
                                 <p className="text-xs text-gray-400 uppercase tracking-wide">Hari Lagi</p>
                             </div>
                         </div>
@@ -609,7 +609,7 @@ export default function CampaignDetailPage() {
                         </p>
                         <button
                             onClick={() => setShowFullDesc(!showFullDesc)}
-                            className="text-blue-600 text-xs mt-2 font-medium"
+                            className="text-[#00cacd] text-xs mt-2 font-medium"
                         >
                             {showFullDesc ? 'Tutup ▴' : 'Baca Selengkapnya ▾'}
                         </button>
@@ -623,7 +623,7 @@ export default function CampaignDetailPage() {
                                 {recentDonors.length > 3 && (
                                     <button
                                         onClick={() => setShowAllDonors(v => !v)}
-                                        className="text-xs text-blue-600 font-medium hover:underline"
+                                        className="text-xs text-[#00cacd] font-medium hover:underline"
                                     >
                                         {showAllDonors ? 'Sembunyikan' : `Lihat Semua (${recentDonors.length})`}
                                     </button>
@@ -639,7 +639,7 @@ export default function CampaignDetailPage() {
                                             ? `${hoursAgo} jam yang lalu`
                                             : new Date(d.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
                                     return (
-                                        <div key={d.id} className="flex items-center gap-3 bg-gray-50 rounded-2xl p-3 hover:bg-blue-50 transition">
+                                        <div key={d.id} className="flex items-center gap-3 bg-gray-50 rounded-2xl p-3 hover:bg-[#00cacd]/10 transition">
                                             <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center flex-none shadow-sm`}>
                                                 <span className="text-white text-xs font-bold">{initials}</span>
                                             </div>
@@ -651,7 +651,7 @@ export default function CampaignDetailPage() {
                                                 <p className="text-xs text-gray-300">{timeStr}</p>
                                             </div>
                                             <div className="flex-none">
-                                                <p className="text-sm font-bold text-blue-600">Rp {fmt(d.amount)}</p>
+                                                <p className="text-sm font-bold text-[#00cacd]">Rp {fmt(d.amount)}</p>
                                             </div>
                                         </div>
                                     );
@@ -673,7 +673,7 @@ export default function CampaignDetailPage() {
                     {campaign.is_active && daysLeft > 0 && (
                         <button
                             onClick={() => { setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                           className="w-full bg-blue-600 text-white text-xs font-semibold py-4 rounded-xl text-center"
+                            className="w-full bg-[#00cacd] hover:bg-[#00b8bb] text-white text-xs font-semibold py-4 rounded-xl text-center transition-all active:scale-95"
                         >
                             🤲 Donasi Sekarang
                         </button>

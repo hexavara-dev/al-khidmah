@@ -85,6 +85,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/dashboard', function () {
         return Inertia::render('Admin/Dashboard');
     })->name('dashboard');
+
 });
 
 Route::get('/dashboard', function () {
@@ -93,8 +94,9 @@ Route::get('/dashboard', function () {
 
 // ─── OAuth ───────────────────────────────────────────────────────
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
+Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('google.redirect');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 Route::get('/auth/jemaah', [JemaahController::class, 'redirect'])->name('auth.jemaah');
 Route::get('/auth/jemaah/callback', [JemaahController::class, 'callback'])->name('auth.jemaah.callback');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
