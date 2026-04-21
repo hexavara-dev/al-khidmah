@@ -15,6 +15,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PPOBController;
 use App\Http\Controllers\PPOBServiceCategoryController;
 use App\Http\Controllers\PPOBServiceController;
+use App\Services\IAKService;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -86,7 +87,22 @@ Route::prefix('api')->group(function () {
 // ─── Admin dashboard ─────────────────────────────────────────────
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
-        return Inertia::render('Admin/Dashboard');
+        $iakBalance = 0;
+        try {
+            $res        = app(IAKService::class)->checkBalance();
+            $iakBalance = (int) ($res['data']['balance'] ?? 0);
+        } catch (\Throwable) {
+            // keep 0
+        }
+
+        $isSandbox       = ! (bool) config('services.midtrans.is_production', false);
+        $midtransBalance = 0; // Midtrans is a payment gateway, no wallet balance endpoint
+
+        return Inertia::render('Admin/Dashboard', [
+            'iakBalance'      => $iakBalance,
+            'midtransBalance' => $midtransBalance,
+            'midtransSandbox' => $isSandbox,
+        ]);
     })->name('dashboard');
 
     // -- PPOB product sync (prepaid only) -------------------------
