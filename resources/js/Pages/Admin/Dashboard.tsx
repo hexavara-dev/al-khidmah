@@ -13,6 +13,7 @@ import {
     ShoppingCart,
     TrendingUp,
     Users,
+    Wallet,
     Zap,
 } from 'lucide-react';
 
@@ -36,6 +37,9 @@ interface Transaction {
 
 interface Props {
     stats?: Stats;
+    iakBalance?: number;
+    midtransBalance?: number;
+    midtransSandbox?: boolean;
 }
 
 const statusConfig = {
@@ -46,6 +50,47 @@ const statusConfig = {
 
 function formatRupiah(amount: number) {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
+}
+
+function BalanceCard({
+    title,
+    subtitle,
+    balance,
+    isSandbox,
+    gradient,
+    icon: Icon,
+}: {
+    title: string;
+    subtitle: string;
+    balance: number;
+    isSandbox?: boolean;
+    gradient: string;
+    icon: React.ElementType;
+}) {
+    return (
+        <div className={`relative overflow-hidden rounded-xl p-6 text-white ${gradient}`}>
+            {/* decorative blob */}
+            <div className="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-white/10" />
+            <div className="pointer-events-none absolute -bottom-8 -left-4 h-24 w-24 rounded-full bg-white/10" />
+
+            <div className="relative flex items-start justify-between">
+                <div className="space-y-1">
+                    <p className="text-sm font-medium text-white/80">{title}</p>
+                    <p className="text-2xl font-bold tracking-tight">{formatRupiah(balance)}</p>
+                    <p className="text-xs text-white/60">{subtitle}</p>
+                </div>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20 backdrop-blur-sm">
+                    <Icon className="h-5 w-5 text-white" />
+                </div>
+            </div>
+
+            {isSandbox && (
+                <span className="absolute right-3 top-3 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+                    Sandbox
+                </span>
+            )}
+        </div>
+    );
 }
 
 function StatCard({
@@ -101,7 +146,7 @@ const demoTransactions: Transaction[] = [
     { id: 5, order_id: 'TRX-005', customer_name: 'Rizky Pratama', product_name: 'Paket Data XL 10GB', amount: 65000, status: 'failed', created_at: '2026-04-19 08:20' },
 ];
 
-export default function AdminDashboard({ stats }: Props) {
+export default function AdminDashboard({ stats, iakBalance = 0, midtransBalance = 0, midtransSandbox = true }: Props) {
     const totalRevenue = stats?.totalRevenue ?? 12_850_000;
     const totalTransactions = stats?.totalTransactions ?? 248;
     const totalUsers = stats?.totalUsers ?? 1_432;
@@ -113,6 +158,25 @@ export default function AdminDashboard({ stats }: Props) {
             <Head title="Admin Dashboard" />
 
             <div className="space-y-6">
+                {/* Balance Cards */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <BalanceCard
+                        title="Saldo IAK"
+                        subtitle="Saldo prabayar untuk layanan PPOB"
+                        balance={iakBalance}
+                        gradient="bg-gradient-to-br from-teal-400 via-teal-500 to-emerald-600"
+                        icon={Wallet}
+                    />
+                    <BalanceCard
+                        title="Saldo Midtrans"
+                        subtitle={midtransSandbox ? 'Mode sandbox aktif' : 'Saldo payment gateway'}
+                        balance={midtransSandbox ? 0 : midtransBalance}
+                        isSandbox={midtransSandbox}
+                        gradient="bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700"
+                        icon={CreditCard}
+                    />
+                </div>
+
                 {/* Stats Grid */}
                 <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     <StatCard

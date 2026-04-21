@@ -1,12 +1,12 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
-use App\Models\PPOBServiceDetail;
-use App\Http\Requests\StorePPOBServiceDetailRequest;
-use App\Http\Requests\UpdatePPOBServiceDetailRequest;
+use App\Models\PPOBServiceCategory;
+use App\Http\Requests\StorePPOBServiceCategoryRequest;
+use App\Http\Requests\UpdatePPOBServiceCategoryRequest;
 
-class PPOBServiceDetailController extends Controller
+class PPOBServiceCategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,7 +27,7 @@ class PPOBServiceDetailController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePPOBServiceDetailRequest $request)
+    public function store(StorePPOBServiceCategoryRequest $request)
     {
         //
     }
@@ -35,7 +35,7 @@ class PPOBServiceDetailController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(PPOBServiceDetail $pPOBServiceDetail)
+    public function show(PPOBServiceCategory $PPOBServiceCategory)
     {
         //
     }
@@ -43,7 +43,7 @@ class PPOBServiceDetailController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(PPOBServiceDetail $pPOBServiceDetail)
+    public function edit(PPOBServiceCategory $PPOBServiceCategory)
     {
         //
     }
@@ -51,7 +51,7 @@ class PPOBServiceDetailController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePPOBServiceDetailRequest $request, PPOBServiceDetail $pPOBServiceDetail)
+    public function update(UpdatePPOBServiceCategoryRequest $request, PPOBServiceCategory $PPOBServiceCategory)
     {
         //
     }
@@ -59,7 +59,7 @@ class PPOBServiceDetailController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(PPOBServiceDetail $pPOBServiceDetail)
+    public function destroy(PPOBServiceCategory $PPOBServiceCategory)
     {
         //
     }

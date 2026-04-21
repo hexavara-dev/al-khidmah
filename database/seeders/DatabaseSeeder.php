@@ -8,8 +8,8 @@ use App\Models\Category;
 use App\Models\Donation;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\PPOBServiceSeeder;
 use Illuminate\Support\Facades\Hash;
-
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,6 +20,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(PPOBServiceSeeder::class);
+        $this->call(PPOBProductSeeder::class);
+
         // Admin user
         User::updateOrCreate(
             ['email' => 'admin@example.com'],
@@ -38,7 +41,7 @@ class DatabaseSeeder extends Seeder
                 'name'     => 'Test User',
                 'password' => bcrypt('12345678'),
                 'is_admin' => false,
-                'role'     => 'user',
+                'role'     => 'admin',
             ]
         );
 

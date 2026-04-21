@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ppob_service_details', function (Blueprint $table) {
-            $table->id();
+        Schema::create('ppob_service_categories', function (Blueprint $table) {
+            $table->uuid('id')->primary();
             $table->timestamps();
         });
     }
@@ -22,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ppob_service_details');
+        Schema::dropIfExists('ppob_service_categories');
     }
 };

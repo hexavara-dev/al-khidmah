@@ -8,11 +8,13 @@ use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\MobileAuthController;
 use App\Http\Controllers\Auth\JemaahController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DonasiController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PPOBController;
+use App\Http\Controllers\PPOBServiceController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -83,26 +85,32 @@ Route::prefix('api')->group(function () {
 
 // ─── Admin dashboard ─────────────────────────────────────────────
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Admin/Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/donations', function () {
+    Route::prefix('/donations')->group(function () {
+    Route::get('/', function () {
         return Inertia::render('Admin/Donations');
     })->name('donations');
 
-    Route::get('/donations/overview', function () {
+    Route::get('/overview', function () {
         return Inertia::render('dashboard/DashboardOverviewDonationPage');
     })->name('donations.overview');
 
-    Route::get('/donations/campaigns', function () {
+    Route::get('/campaigns', function () {
         return Inertia::render('dashboard/DashboardCampaignsDonasiPage');
     })->name('donations.campaigns');
 
-    Route::get('/donations/categories', function () {
+    Route::get('/categories', function () {
         return Inertia::render('dashboard/DashboardCategoriesDonasiPage');
     })->name('donations.categories');
+    });
 
+    // -- PPOB product sync (prepaid only) -------------------------
+    Route::prefix('ppob')->name('ppob.')->group(function () {
+        Route::get('/{code}',       [PPOBServiceController::class, 'show'])->name('page');
+        Route::get('/{code}/sync',  [PPOBController::class, 'sync'])->name('sync');
+        Route::post('/{code}/save', [PPOBController::class, 'store'])->name('save');
+    });
 });
 
 Route::get('/dashboard', function () {

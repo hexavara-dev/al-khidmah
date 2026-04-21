@@ -1,14 +1,14 @@
-<?php
+﻿<?php
 
 namespace Database\Factories;
 
-use App\Models\PPOBServiceDetail;
+use App\Models\PPOBServiceCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<PPOBServiceDetail>
+ * @extends Factory<PPOBServiceCategory>
  */
-class PPOBServiceDetailFactory extends Factory
+class PPOBServiceCategoryFactory extends Factory
 {
     /**
      * Define the model's default state.
