@@ -49,11 +49,16 @@ class GoogleController extends Controller
             // FLOW MOBILE
             // =========================
             if ($state === 'mobile') {
-                // Redirect ke deep link app dengan token + return_url
-                $returnUrl = urlencode(url('/donasi?mobile=1'));
-                $deepLink = "ekhidmah://callback?token={$token}&return_url={$returnUrl}";
+                // Tampilkan halaman perantara untuk membuka deep link.
+                // Beberapa browser mobile memblokir custom scheme pada 302 redirect.
+                $returnUrl = url('/donasi?mobile=1');
+                $callbackBase = config('services.mobile.deep_link_callback', 'ekhidmah://callback');
+                $deepLink = $callbackBase . '?token=' . rawurlencode($token) . '&return_url=' . rawurlencode($returnUrl);
 
-                return redirect($deepLink);
+                return response()->view('auth.mobile-callback', [
+                    'deepLink' => $deepLink,
+                    'returnUrl' => $returnUrl,
+                ]);
             }
 
             // =========================
