@@ -7,7 +7,8 @@ interface CampaignCardProps {
 }
 
 export default function CampaignCard({ campaign }: CampaignCardProps) {
-    const progress = campaign.target_amount > 0
+    const hasTarget = campaign.target_amount != null && Number(campaign.target_amount) > 0;
+    const progress = hasTarget
         ? Math.min(100, (campaign.collected_amount / campaign.target_amount) * 100)
         : 0;
 
@@ -17,7 +18,8 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
     );
 
     const isNearDeadline = daysLeft > 0 && daysLeft <= 7;
-    const isFull = progress >= 100;
+    // Campaign dianggap tutup HANYA karena deadline habis, bukan karena target tercapai
+    const isClosed = daysLeft === 0;
 
     return (
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col border border-gray-100">
@@ -61,14 +63,16 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
                     {campaign.title}
                 </h3>
 
-                {/* Progress bar */}
+                {/* Progress bar — hanya ditampilkan jika ada target */}
                 <div className="w-full bg-gray-100 rounded-full h-2 mb-3 overflow-hidden">
-                    <div
-                        className={`h-2 rounded-full transition-all ${
-                            isFull ? 'bg-emerald-500' : 'bg-[#00cacd]'
-                        }`}
-                        style={{ width: `${progress}%` }}
-                    />
+                    {hasTarget && (
+                        <div
+                            className={`h-2 rounded-full transition-all ${
+                                progress >= 100 ? 'bg-emerald-500' : 'bg-[#00cacd]'
+                            }`}
+                            style={{ width: `${progress}%` }}
+                        />
+                    )}
                 </div>
 
                 {/* Amounts */}
@@ -79,20 +83,22 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
                     </div>
                     <div className="text-right">
                         <p className="text-gray-400 uppercase font-semibold tracking-wide text-[10px]">Target</p>
-                        <p className="text-gray-600 font-semibold text-sm">Rp {fmt(campaign.target_amount)}</p>
+                        <p className="text-gray-600 font-semibold text-sm">
+                            {hasTarget ? `Rp ${fmt(campaign.target_amount)}` : 'Tak Terbatas'}
+                        </p>
                     </div>
                 </div>
 
                 {/* Donate Button */}
              <button
                 className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                    isFull
+                    isClosed
                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                         : 'bg-[#00cacd] hover:bg-[#00b8bb] text-white shadow-sm hover:shadow-md'
                 }`}
-                disabled={isFull}
+                disabled={isClosed}
             >
-                {isFull ? 'Target Tercapai' : 'Donasi Sekarang'}
+                {isClosed ? 'Berakhir' : 'Donasi Sekarang'}
             </button>
             </div>
         </div>

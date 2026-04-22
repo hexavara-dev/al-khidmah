@@ -10,6 +10,11 @@ const EMPTY_FORM = {
     title: '', description: '', target_amount: '', category_id: '', deadline: '', is_active: true,
 };
 
+const fmtTarget = (v) => {
+    const n = Number(v);
+    return (!v || n <= 0) ? 'Tak Terbatas' : `Rp ${n.toLocaleString('id-ID')}`;
+};
+
 export default function DashboardCampaignsPage() {
     const [campaigns,   setCampaigns]   = useState([]);
     const [categories,  setCategories]  = useState([]);
@@ -239,7 +244,8 @@ export default function DashboardCampaignsPage() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Target Donasi (Rp) <span className="text-red-500">*</span>
+                                        Target Donasi (Rp)
+                                        <span className="ml-1 text-xs font-normal text-gray-400">(opsional)</span>
                                     </label>
                                     <input
                                         type="number"
@@ -247,9 +253,10 @@ export default function DashboardCampaignsPage() {
                                         value={form.target_amount}
                                         onChange={handleChange}
                                         className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="1000000"
-                                        required
+                                        placeholder="Kosongkan jika tidak ada batas"
+                                        min="1"
                                     />
+                                    <p className="text-xs text-gray-400 mt-1">Kosongkan untuk donasi tak terbatas — campaign tutup otomatis saat tenggat waktu habis.</p>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -408,19 +415,21 @@ export default function DashboardCampaignsPage() {
                                             </span>
                                         </td>
                                         <td className="px-4 py-3 font-medium text-gray-700">
-                                            Rp {Number(c.target_amount).toLocaleString('id-ID')}
+                                            {fmtTarget(c.target_amount)}
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex flex-col gap-1">
                                                 <span className="font-semibold text-blue-700">
                                                     Rp {Number(c.collected_amount).toLocaleString('id-ID')}
                                                 </span>
-                                                <div className="w-24 bg-gray-200 rounded-full h-1.5">
-                                                    <div 
-                                                        className="bg-blue-500 h-1.5 rounded-full" 
-                                                        style={{ width: `${Math.min((c.collected_amount / c.target_amount) * 100, 100)}%` }}
-                                                    ></div>
-                                                </div>
+                                                {c.target_amount > 0 && (
+                                                    <div className="w-24 bg-gray-200 rounded-full h-1.5">
+                                                        <div
+                                                            className="bg-blue-500 h-1.5 rounded-full"
+                                                            style={{ width: `${Math.min((c.collected_amount / c.target_amount) * 100, 100)}%` }}
+                                                        />
+                                                    </div>
+                                                )}
                                             </div>
                                         </td>
                                         <td className="px-4 py-3">

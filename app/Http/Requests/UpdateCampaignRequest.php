@@ -17,7 +17,7 @@ class UpdateCampaignRequest extends FormRequest
             'title' => 'sometimes|required|string|max:255',
             'description' => 'sometimes|required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'target_amount' => 'sometimes|required|numeric|min:1',
+            'target_amount' => 'sometimes|nullable|numeric|min:1',
             'category_id' => 'sometimes|required|exists:categories,id',
             'deadline' => 'sometimes|required|date',
             'is_active' => 'boolean',

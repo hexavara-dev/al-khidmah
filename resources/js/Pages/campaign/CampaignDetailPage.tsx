@@ -67,7 +67,8 @@ export default function CampaignDetailPage() {
 
     if (!campaign) return null;
 
-    const progress = campaign.target_amount > 0
+    const hasTarget = campaign.target_amount != null && Number(campaign.target_amount) > 0;
+    const progress = hasTarget
         ? Math.min(100, (campaign.collected_amount / campaign.target_amount) * 100)
         : 0;
     const daysLeft = Math.max(0, Math.ceil((new Date(campaign.deadline).getTime() - Date.now()) / 86400000));
@@ -574,7 +575,9 @@ export default function CampaignDetailPage() {
                             </div>
                             <div className="text-right">
                                 <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Target</p>
-                                <p className="text-sm font-semibold text-gray-600">Rp {fmt(campaign.target_amount)}</p>
+                                <p className="text-sm font-semibold text-gray-600">
+                                    {hasTarget ? `Rp ${fmt(campaign.target_amount)}` : 'Tak Terbatas'}
+                                </p>
                             </div>
                         </div>
                         <div className="w-full bg-gray-100 rounded-full h-2.5 mb-4">
