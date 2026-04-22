@@ -40,33 +40,29 @@ class GoogleController extends Controller
 
             Auth::login($user, true);
 
-            // token untuk mobile
-            $token = $user->createToken('mobile')->plainTextToken;
-
             $state = $request->get('state');
 
-            // =========================
+            // =========================================================
             // FLOW MOBILE
-            // =========================
+            // =========================================================
             if ($state === 'mobile') {
-                // Tampilkan halaman perantara untuk membuka deep link.
-                // Beberapa browser mobile memblokir custom scheme pada 302 redirect.
-                $returnUrl = url('/donasi?mobile=1');
-                $callbackBase = config('services.mobile.deep_link_callback', 'ekhidmah://callback');
-                $deepLink = $callbackBase . '?token=' . rawurlencode($token) . '&return_url=' . rawurlencode($returnUrl);
+                $token = $user->createToken('mobile')->plainTextToken;
+                $returnUrl = '/donasi?mobile=1';
 
-                return response()->view('auth.mobile-callback', [
-                    'deepLink' => $deepLink,
-                    'returnUrl' => $returnUrl,
-                ]);
+                return redirect(
+                    url('/mobile-auth/consume')
+                    . '?token=' . rawurlencode($token)
+                    . '&return_url=' . rawurlencode($returnUrl)
+                );
             }
 
-            // =========================
+            // =========================================================
             // FLOW WEB
-            // =========================
+            // =========================================================
             return redirect()->intended(route('home'));
 
         } catch (\Exception $e) {
+            report($e);
             return redirect()->route('login')->with('error', 'Login Google gagal');
         }
     }
