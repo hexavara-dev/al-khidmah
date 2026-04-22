@@ -87,6 +87,24 @@ Route::prefix('api')->group(function () {
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    Route::prefix('/donations')->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('Admin/Donations');
+    })->name('donations');
+
+    Route::get('/overview', function () {
+        return Inertia::render('dashboard/DashboardOverviewDonationPage');
+    })->name('donations.overview');
+
+    Route::get('/campaigns', function () {
+        return Inertia::render('dashboard/DashboardCampaignsDonasiPage');
+    })->name('donations.campaigns');
+
+    Route::get('/categories', function () {
+        return Inertia::render('dashboard/DashboardDonationCategoriesPage');
+    })->name('donations.categories');
+    });
+
     // -- PPOB product sync (prepaid only) -------------------------
     Route::prefix('ppob')->name('ppob.')->group(function () {
         Route::get('/{code}',       [PPOBServiceController::class, 'show'])->name('page');
