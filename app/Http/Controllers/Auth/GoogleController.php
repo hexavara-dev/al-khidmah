@@ -71,13 +71,11 @@ class GoogleController extends Controller
 
             Auth::login($user, true);
 
-            // token untuk mobile
-            $token = $user->createToken('mobile')->plainTextToken;
-
             // =========================
             // FLOW MOBILE
             // =========================
             if ($state === 'mobile') {
+                $token        = $user->createToken('mobile')->plainTextToken;
                 $returnUrl    = url('/mobile-auth/consume?return_url=' . urlencode('/donasi?mobile=1'));
                 $callbackBase = config('services.mobile.deep_link_callback', 'ekhidmah://callback');
                 $deepLink     = $callbackBase . '?token=' . rawurlencode($token) . '&return_url=' . rawurlencode(url('/donasi?mobile=1'));
@@ -93,7 +91,7 @@ class GoogleController extends Controller
                 return response()->view('auth.mobile-callback', [
                     'deepLink'  => $deepLink,
                     'returnUrl' => $returnUrl,
-                    'token'     => $token, // dikirim ke view untuk fallback
+                    'token'     => $token,
                 ]);
             }
 
