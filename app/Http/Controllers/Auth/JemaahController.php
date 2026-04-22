@@ -12,13 +12,61 @@ class JemaahController extends Controller
 {
     private string $authServerUrl;
     private string $clientId;
+    private string $clientSecret;
     private string $redirectUri;
 
     public function __construct()
     {
         $this->authServerUrl = config('services.jemaah.auth_server_url');
         $this->clientId      = config('services.jemaah.client_id');
+        $this->clientSecret  = config('services.jemaah.client_secret');
         $this->redirectUri   = config('services.jemaah.redirect_uri');
+    }
+
+    public function loginWithPassword(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $tokenResponse = Http::asForm()->post("{$this->authServerUrl}/oauth/token", [
+            'grant_type'    => 'password',
+            'client_id'     => $this->clientId,
+            'client_secret' => $this->clientSecret,
+            'username'      => $request->username,
+            'password'      => $request->password,
+            'scope'         => '*',
+        ]);
+
+        if (!$tokenResponse->successful()) {
+            return back()->withErrors(['username' => 'Username atau password salah.'])->withInput(['username' => $request->username]);
+        }
+
+        $accessToken = $tokenResponse->json('access_token');
+
+        $profileResponse = Http::withToken($accessToken)
+            ->get("{$this->authServerUrl}/api/v1/user");
+
+        if (!$profileResponse->successful()) {
+            return back()->withErrors(['username' => 'Gagal mengambil data profil. Silakan coba lagi.'])->withInput(['username' => $request->username]);
+        }
+
+        $raw     = $profileResponse->json();
+        $profile = $raw['data'] ?? $raw;
+
+        $user = User::updateOrCreate(
+            ['email' => $profile['email']],
+            [
+                'name'              => $profile['name'],
+                'avatar'            => $profile['avatar'] ?? $profile['photo'] ?? null,
+                'email_verified_at' => now(),
+            ]
+        );
+
+        Auth::login($user, remember: true);
+
+        return redirect()->intended(route('home'));
     }
 
     public function redirect(Request $request)

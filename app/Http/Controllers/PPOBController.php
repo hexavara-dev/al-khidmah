@@ -7,15 +7,25 @@ use App\Http\Requests\PPOB\PostpaidCheckoutRequest;
 use App\Http\Requests\PPOB\PostpaidPriceListRequest;
 use App\Http\Requests\PPOB\PriceListRequest;
 use App\Http\Requests\PPOB\TopUpRequest;
+use App\Models\PPOBService;
+use App\Models\PPOBServiceProduct;
 use App\Services\IAKService;
 use App\Services\TransactionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class PPOBController extends Controller
 {
+    private const IAK_CONFIG = [
+        'pulsa'  => ['iak_type' => 'pulsa', 'name_from' => 'details_or_nominal'],
+        'data'   => ['iak_type' => 'data',  'name_from' => 'nominal'],
+        'pln'    => ['iak_type' => 'pln',   'name_from' => 'nominal'],
+        'emoney' => ['iak_type' => 'etoll', 'name_from' => 'nominal'],
+    ];
+
     public function __construct(
         private IAKService $iakService,
         private TransactionService $transactionService,
@@ -43,10 +53,33 @@ class PPOBController extends Controller
         return response()->json($result);
     }
 
-    public function priceList(PriceListRequest $request) {
-        $type   = (string) $request->validated('type');
-        $result = $this->iakService->priceList($type);
-        return response()->json($result);
+    public function priceList(PriceListRequest $request): JsonResponse
+    {
+        $type    = (string) $request->validated('type');
+        $service = PPOBService::where('code', $type)->first();
+
+        if (! $service) {
+            return response()->json(['data' => ['pricelist' => []]]);
+        }
+
+        $products = PPOBServiceProduct::where('ppob_service_id', $service->id)
+            ->where('status', true)
+            ->orderBy('price')
+            ->get()
+            ->map(fn ($p) => [
+                'product_code'        => $p->code,
+                'product_description' => $p->label,
+                'product_nominal'     => $p->name,
+                'product_details'     => $p->period ?? '',
+                'product_price'       => (int) $p->price,
+                'provider_code'       => '',
+                'provider_name'       => '',
+                'type'                => $p->type ?? $type,
+                'category'            => '',
+                'icon_url'            => '',
+            ]);
+
+        return response()->json(['data' => ['pricelist' => $products]]);
     }
 
     public function priceListPasca(PostpaidPriceListRequest $request) {
@@ -131,6 +164,152 @@ class PPOBController extends Controller
 
         Log::info('IAK callback processed successfully', ['ref_id' => $data['ref_id'] ?? null]);
         return response('OK', 200);
+    }
+
+    // ── Admin: product sync ──────────────────────────────────────────
+
+    public function sync(string $code): JsonResponse
+    {
+        $config = self::IAK_CONFIG[$code] ?? null;
+
+        if (! $config) {
+            return response()->json(['error' => 'Layanan ini tidak mendukung sinkronisasi produk.'], 422);
+        }
+
+        $response = $this->iakService->priceList($config['iak_type']);
+        $rawList  = $response['data']['pricelist'] ?? [];
+
+        $items = collect($rawList)
+            ->filter(fn ($item) => is_array($item) && ($item['status'] ?? '') === 'active')
+            ->values()
+            ->map(fn ($item) => $this->transform($item, $code, $config['name_from']))
+            ->values();
+
+        return response()->json(['data' => $items]);
+    }
+
+    public function store(Request $request, string $code): JsonResponse
+    {
+        $service = PPOBService::where('code', $code)->firstOrFail();
+
+        $validated = $request->validate([
+            'items'          => ['required', 'array', 'min:1'],
+            'items.*.code'   => ['required', 'string', 'max:100'],
+            'items.*.label'  => ['required', 'string', 'max:255'],
+            'items.*.name'   => ['required', 'string'],
+            'items.*.price'  => ['required', 'integer', 'min:0'],
+            'items.*.period' => ['required', 'string', 'max:50'],
+            'items.*.type'   => ['required', 'string', 'max:50'],
+            'items.*.fee'    => ['nullable', 'integer', 'min:0'],
+        ]);
+
+        $saved = $this->upsert($service, $validated['items']);
+
+        return response()->json([
+            'saved'   => $saved,
+            'message' => $saved . ' produk berhasil disimpan.',
+        ]);
+    }
+
+    private function upsert(PPOBService $service, array $items): int
+    {
+        $now   = now();
+        $codes = collect($items)->pluck('code')->all();
+
+        $rows = collect($items)->map(fn ($item) => [
+            'id'              => (string) Str::uuid(),
+            'ppob_service_id' => $service->id,
+            'code'            => $item['code'],
+            'label'           => $item['label'],
+            'name'            => $item['name'],
+            'price'           => $item['price'],
+            'base_price'      => $item['price'],   // harga asli IAK — hanya set saat insert
+            'period'          => $item['period'],
+            'type'            => $item['type'],
+            'status'          => 1,
+            'fee'             => $item['fee'] ?? null,
+            'created_at'      => $now,
+            'updated_at'      => $now,
+        ])->toArray();
+
+        PPOBServiceProduct::upsert(
+            $rows,
+            ['code'],
+            ['label', 'name', 'price', 'period', 'type', 'fee', 'status', 'updated_at']
+        );
+
+        // Set base_price only for rows being inserted for the first time (base_price still 0)
+        PPOBServiceProduct::where('ppob_service_id', $service->id)
+            ->whereIn('code', $codes)
+            ->where('base_price', 0)
+            ->each(function ($p) {
+                $p->update(['base_price' => $p->price]);
+            });
+
+        // Deactivate products that exist in DB for this service but were NOT submitted
+        PPOBServiceProduct::where('ppob_service_id', $service->id)
+            ->whereNotIn('code', $codes)
+            ->update(['status' => 0, 'updated_at' => $now]);
+
+        return count($rows);
+    }
+
+    // ── Admin: inline product update ────────────────────────────────
+
+    public function updateProduct(Request $request, string $productId): JsonResponse
+    {
+        $product = PPOBServiceProduct::findOrFail($productId);
+
+        $validated = $request->validate([
+            'label' => ['required', 'string', 'max:255'],
+            'name'  => ['required', 'string'],
+            'price' => ['required', 'integer', 'min:0'],
+        ]);
+
+        if ((int) $validated['price'] < (int) $product->base_price) {
+            return response()->json([
+                'message' => 'Harga jual tidak boleh di bawah harga dasar (Rp ' .
+                    number_format($product->base_price, 0, ',', '.') . ').',
+            ], 422);
+        }
+
+        $product->update($validated);
+
+        return response()->json(['message' => 'Produk berhasil diperbarui.']);
+    }
+
+    public function toggleProductStatus(string $productId): JsonResponse
+    {
+        $product   = PPOBServiceProduct::findOrFail($productId);
+        $newStatus = $product->status ? 0 : 1;
+        $product->update(['status' => $newStatus]);
+
+        return response()->json([
+            'message' => 'Status produk berhasil diperbarui.',
+            'status'  => $newStatus,
+        ]);
+    }
+
+    private function transform(array $item, string $code, string $nameFrom): array
+    {
+        if ($nameFrom === 'details_or_nominal') {
+            $details = trim((string) ($item['product_details'] ?? '-'));
+            $name    = ($details !== '' && $details !== '-')
+                ? $details
+                : ($item['product_nominal'] ?? '');
+        } else {
+            $name = $item['product_nominal'] ?? '';
+        }
+
+        return [
+            'code'   => $item['product_code']        ?? '',
+            'label'  => $item['product_description'] ?? '',
+            'name'   => $name,
+            'price'  => (int) ($item['product_price']  ?? 0),
+            'period' => (string) ($item['active_period'] ?? '0'),
+            'type'   => $item['product_type']        ?? '',
+            'fee'    => null,
+        ];
     }
 }
 
