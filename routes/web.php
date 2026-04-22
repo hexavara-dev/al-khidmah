@@ -35,6 +35,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/checkout', [PPOBController::class, 'checkout'])->name('ppob.checkout');
         Route::post('/checkout-pasca', [PPOBController::class, 'checkoutPasca'])->name('ppob.checkout.pasca');
         Route::post('/inquiry', [PPOBController::class, 'inquiry'])->name('ppob.inquiry');
+        Route::post('/inquiry-emoney', [PPOBController::class, 'inquiryEmoney'])->name('ppob.inquiry-emoney');
         Route::post('/callback', [PPOBController::class, 'callback'])->name('ppob.callback');
     });
 });

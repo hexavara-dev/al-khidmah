@@ -36,35 +36,6 @@ const cardLabels: Record<string, string> = {
     etoll: "Top-up",
 };
 
-// ── Tab definitions for data packages ──────────────────────────────────────
-const DATA_TABS = [
-    { key: "all", label: "Semua" },
-    { key: "internet", label: "Internet" },
-    { key: "roaming", label: "Roaming" },
-    { key: "entertainment", label: "Entertainment" },
-    { key: "combo", label: "Combo" },
-    { key: "harian", label: "Harian" },
-];
-
-function getDataTab(item: PricelistItem): string {
-    const desc = (
-        item.product_description +
-        " " +
-        item.product_nominal +
-        " " +
-        item.product_details
-    ).toLowerCase();
-    if (/roaming|internasional|luar negeri/i.test(desc)) return "roaming";
-    if (
-        /youtube|spotify|tiktok|entertainment|streaming|vidio|disney/i.test(
-            desc,
-        )
-    )
-        return "entertainment";
-    if (/combo|telepon|nelpon|sms|menit|nelp/i.test(desc)) return "combo";
-    if (/harian|1 hari|sehari/i.test(desc)) return "harian";
-    return "internet";
-}
 
 // ── Badge logic ──────────────────────────────────────────────────────────────
 type BadgeType = "paling_laris" | "promo_terbatas" | "hemat" | "baru" | null;
@@ -459,8 +430,6 @@ export default function ProductList({
     const [inspecting, setInspecting] = useState<PricelistItem | null>(null);
     const [internalSelected, setInternalSelected] =
         useState<PricelistItem | null>(null);
-    const [activeTab, setActiveTab] = useState<string>("all");
-
     const isPageMode = !!onSelectItem;
     const selectedItem = isPageMode
         ? (externalSelected ?? null)
@@ -477,106 +446,13 @@ export default function ProductList({
 
     const cardLabel = cardLabels[selected?.type ?? ""] ?? selected?.label ?? "";
 
-    // Filter for data tabs
-    const filteredItems =
-        isDataService && activeTab !== "all"
-            ? items.filter((item) => getDataTab(item) === activeTab)
-            : items;
-
-    // Compute which tabs actually have items (to show counts)
-    const tabCounts = isDataService
-        ? Object.fromEntries(
-              DATA_TABS.map((t) => [
-                  t.key,
-                  t.key === "all"
-                      ? items.length
-                      : items.filter((i) => getDataTab(i) === t.key).length,
-              ]),
-          )
-        : {};
+    const filteredItems = items;
 
     return (
         <>
-            {/* PLN customer info */}
-            {selected?.type === "pln" && plnCustomer && (
-                <div className="mb-4 rounded-2xl border border-primary/20 bg-primary-container/30 px-4 py-3 text-xs text-on-surface space-y-1">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-primary mb-1">
-                        Informasi Pelanggan
-                    </p>
-                    {plnCustomer.name && (
-                        <p>
-                            <span className="text-on-surface-variant">
-                                Nama:
-                            </span>{" "}
-                            <span className="font-semibold">
-                                {plnCustomer.name}
-                            </span>
-                        </p>
-                    )}
-                    {plnCustomer.meter_no && (
-                        <p>
-                            <span className="text-on-surface-variant">
-                                No. Meter:
-                            </span>{" "}
-                            <span className="font-semibold">
-                                {plnCustomer.meter_no}
-                            </span>
-                        </p>
-                    )}
-                    {plnCustomer.segment_power && (
-                        <p>
-                            <span className="text-on-surface-variant">
-                                Tarif / Daya:
-                            </span>{" "}
-                            <span className="font-semibold">
-                                {plnCustomer.segment_power}
-                            </span>
-                        </p>
-                    )}
-                </div>
-            )}
-            {selected?.type === "pln" && customerNumber && !plnCustomer && (
-                <p className="mb-3 text-xs text-on-surface-variant">
-                    ID Pelanggan:{" "}
-                    <span className="font-semibold text-on-surface">
-                        {customerNumber}
-                    </span>
-                </p>
-            )}
 
-            {/* ── Data tabs ── */}
-            {isDataService && items.length > 0 && (
-                <div className="mb-5 -mx-0.5">
-                    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-                        {DATA_TABS.filter(
-                            (t) =>
-                                t.key === "all" || (tabCounts[t.key] ?? 0) > 0,
-                        ).map((tab) => (
-                            <button
-                                key={tab.key}
-                                onClick={() => setActiveTab(tab.key)}
-                                className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-bold transition-all ${
-                                    activeTab === tab.key
-                                        ? "bg-primary text-on-primary shadow-sm"
-                                        : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
-                                }`}
-                            >
-                                {tab.label}
-                                {tab.key !== "all" &&
-                                    tabCounts[tab.key] > 0 && (
-                                        <span
-                                            className={`ml-1.5 text-[10px] ${activeTab === tab.key ? "opacity-70" : "opacity-50"}`}
-                                        >
-                                            {tabCounts[tab.key]}
-                                        </span>
-                                    )}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
 
-       
+
 
             {/* ── Product list ── */}
             {filteredItems.length > 0 ? (

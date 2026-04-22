@@ -39,16 +39,11 @@ export function getItemTitle(item: PricelistItem, serviceType: string): string {
         return idr.format(num);
     }
     if (serviceType === 'etoll') {
-        // product_details: "Masuk ke pelanggan 79.000" — ambil angkanya
-        const detailMatch = item.product_details?.match(/([\d.]+)\s*$/);
-        if (detailMatch) {
-            const num = parseInt(detailMatch[1].replace(/\./g, ''));
-            if (!isNaN(num)) return `Saldo ${idr.format(num)}`;
-        }
-        // fallback ke parsing nominal
         const parsed = parseEtollNominal(item.product_nominal ?? '');
-        if (!parsed) return item.product_nominal ?? item.product_code;
-        return `Saldo ${idr.format(parsed.nominalNum - parsed.adminNum)}`;
+        if (parsed && parsed.nominalNum >= 1000) {
+            return `Saldo ${idr.format(parsed.nominalNum - parsed.adminNum)}`;
+        }
+        return item.product_description ?? item.product_nominal ?? item.product_code;
     }
     if (serviceType === 'pln') {
         return item.product_description ?? item.product_nominal ?? item.product_code;
@@ -84,24 +79,16 @@ export function getItemSubtitle(item: PricelistItem, serviceType: string): strin
     }
     if (serviceType === 'etoll') {
         const parsed = parseEtollNominal(item.product_nominal ?? '');
-        if (!parsed) return '';
+        if (!parsed || parsed.nominalNum < 1000) return `Bayar ${idr.format(item.product_price)}`;
 
-        // Tentukan saldo_masuk
-        let saldoMasuk: number;
-        const detailMatch = item.product_details?.match(/([\d.]+)\s*$/);
-        if (detailMatch) {
-            saldoMasuk = parseInt(detailMatch[1].replace(/\./g, ''));
-        } else {
-            saldoMasuk = parsed.nominalNum - parsed.adminNum;
-        }
-
+        const saldoMasuk   = parsed.nominalNum - parsed.adminNum;
         const adminFee     = parsed.adminNum;
         const biayaLayanan = item.product_price - saldoMasuk - adminFee;
 
         const parts: string[] = [];
-        if (adminFee > 0)      parts.push(`Admin e-wallet ${idr.format(adminFee)}`);
-        if (biayaLayanan > 0)  parts.push(`Biaya layanan ${idr.format(biayaLayanan)}`);
-        if (parts.length === 0) parts.push('Saldo masuk penuh');
+        if (adminFee > 0)     parts.push(`Admin e-wallet ${idr.format(adminFee)}`);
+        if (biayaLayanan > 0) parts.push(`Biaya layanan ${idr.format(biayaLayanan)}`);
+        if (parts.length === 0) return `Bayar ${idr.format(item.product_price)}`;
 
         return `${parts.join(' + ')} · bayar ${idr.format(item.product_price)}`;
     }

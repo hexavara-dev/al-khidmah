@@ -62,7 +62,7 @@ export default function Navbar({ balance, appName = "eKhidmah" }: Props) {
                             {appName}
                         </p>
                         <p className="text-[10px] leading-tight text-on-surface-variant">
-                            Payment Point
+                            Mudah dan berkah
                         </p>
                     </div>
                 </Link>
@@ -82,35 +82,7 @@ export default function Navbar({ balance, appName = "eKhidmah" }: Props) {
                     </div>
                 </div>
 
-                {/* Nav Links */}
-                <div className="hidden items-center gap-1 lg:flex">
-                    <Link
-                        href="/"
-                        className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all ${currentPath === "/" ? "bg-primary-container text-primary" : "text-on-surface-variant hover:bg-surface-container-low"}`}
-                    >
-                        Dashboard
-                    </Link>
-
-                    <a
-                        href="#"
-                        className="rounded-xl px-4 py-2 text-sm font-medium text-on-surface-variant transition-all hover:bg-surface-container-low"
-                    >
-                        Services
-                    </a>
-                    <Link
-                        href="/history"
-                        className={`rounded-xl px-4 py-2 text-sm font-medium transition-all ${currentPath === "/history" ? "bg-primary-container text-primary" : "text-on-surface-variant hover:bg-surface-container-low"}`}
-                    >
-                        History
-                    </Link>
-                    <a
-                        href="#"
-                        className="rounded-xl px-4 py-2 text-sm font-medium text-on-surface-variant transition-all hover:bg-surface-container-low"
-                    >
-                        Analitics
-                    </a>
-                </div>
-
+       
                 {/* Right Actions */}
                 <div className="flex items-center gap-3">
                     {/* Balance */}

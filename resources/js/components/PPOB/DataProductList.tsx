@@ -1,10 +1,6 @@
-import { useState, useMemo } from 'react';
 import { Clock, Database, Moon, Phone, Wifi, Zap } from 'lucide-react';
 import type { PricelistItem } from '@/types/PPOB';
 import { idr } from '@/lib/PPOB';
-
-type Category = 'Internet' | 'Roaming' | 'Entertainment';
-const CATEGORIES: Category[] = ['Internet', 'Roaming', 'Entertainment'];
 
 function parseDuration(item: PricelistItem): string {
     const combined = `${item.product_details ?? ''} ${item.product_nominal ?? ''}`;
@@ -58,23 +54,6 @@ function getBadge(item: PricelistItem, allItems: PricelistItem[]): { label: stri
     return null;
 }
 
-function filterByCategory(items: PricelistItem[], cat: Category): PricelistItem[] {
-    if (cat === 'Roaming') {
-        return items.filter(i => /roaming/i.test(`${i.product_description} ${i.product_details}`));
-    }
-    if (cat === 'Entertainment') {
-        return items.filter(i =>
-            /youtube|netflix|tiktok|disney|maxstream|vidio|games|hiburan|sosial|social/i.test(`${i.product_description} ${i.product_details}`)
-        );
-    }
-    return items.filter(i => {
-        const c = `${i.product_description} ${i.product_details}`.toLowerCase();
-        return (
-            !/roaming/i.test(c) &&
-            !/youtube|netflix|tiktok|disney|maxstream|vidio|games|hiburan/i.test(c)
-        );
-    });
-}
 
 type Props = {
     items: PricelistItem[];
@@ -83,46 +62,20 @@ type Props = {
 };
 
 export default function DataProductList({ items, selectedItem, onSelectItem }: Props) {
-    const [category, setCategory] = useState<Category>('Internet');
-
-    const filtered = useMemo(() => filterByCategory(items, category), [items, category]);
-
-    const visibleCategories = useMemo(
-        () => CATEGORIES.filter(cat => cat === 'Internet' || filterByCategory(items, cat).length > 0),
-        [items]
-    );
-
     return (
         <div>
-            {/* Category tabs */}
-            <div className="mb-5 flex gap-2 overflow-x-auto pb-1">
-                {visibleCategories.map(cat => (
-                    <button
-                        key={cat}
-                        onClick={() => setCategory(cat)}
-                        className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
-                            category === cat
-                                ? 'bg-primary text-on-primary shadow-sm'
-                                : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
-                        }`}
-                    >
-                        {cat}
-                    </button>
-                ))}
-            </div>
-
             {/* Section header */}
             <h3 className="mb-4 font-headline text-lg font-bold text-on-surface">
                 Pilihan Terbaik Untukmu
             </h3>
 
-            {filtered.length === 0 ? (
+            {items.length === 0 ? (
                 <div className="flex items-center justify-center rounded-2xl border border-dashed border-outline-variant/30 py-10">
-                    <p className="text-sm text-on-surface-variant">Tidak ada produk di kategori ini.</p>
+                    <p className="text-sm text-on-surface-variant">Tidak ada produk tersedia.</p>
                 </div>
             ) : (
                 <div className="space-y-3">
-                    {filtered.map(item => {
+                    {items.map(item => {
                         const badge    = getBadge(item, items);
                         const duration = parseDuration(item);
                         const { text: featureText, Icon: FeatureIcon } = parseFeature(item);
