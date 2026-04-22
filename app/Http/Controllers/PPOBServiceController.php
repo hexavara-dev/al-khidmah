@@ -19,7 +19,7 @@ class PPOBServiceController extends Controller
         $supported = in_array($code, self::IAK_SUPPORTED);
 
         $products = PPOBServiceProduct::where('ppob_service_id', $service->id)
-            ->select(['id', 'name', 'label', 'price', 'period', 'status', 'fee'])
+            ->select(['id', 'code', 'name', 'label', 'price', 'base_price', 'period', 'status', 'fee'])
             ->orderBy('name')
             ->get();
 

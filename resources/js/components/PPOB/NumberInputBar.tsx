@@ -15,16 +15,17 @@ function getEmoneyProviders(items: PricelistItem[]) {
     const seen = new Set<string>();
     const providers: { label: string; value: string; icon: string }[] = [];
     for (const item of items) {
-        const key = item.product_description.toLowerCase();
-        const isAllowed = ALLOWED_EWALLET.some((w) => key.includes(w));
-        if (!seen.has(key) && item.icon_url && isAllowed) {
-            seen.add(key);
-            providers.push({
-                label: item.product_description,
-                value: key,
-                icon: item.icon_url,
-            });
-        }
+        const matched = ALLOWED_EWALLET.find((w) =>
+            item.product_description.toLowerCase().includes(w) ||
+            item.product_code.toLowerCase().includes(w)
+        );
+        if (!matched || seen.has(matched)) continue;
+        seen.add(matched);
+        providers.push({
+            label: item.product_description,
+            value: matched,
+            icon: item.icon_url ?? '',
+        });
     }
     return providers;
 }

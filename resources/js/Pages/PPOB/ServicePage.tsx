@@ -368,41 +368,21 @@ export default function ServicePage({
                     isEmoney ? emoneyProvider : (operator?.apiName ?? "")
                 ).toLowerCase();
 
-                const PULSA_ALLOWED = new Set([5000, 10000, 15000, 20000, 25000, 50000, 100000, 150000]);
-                const PLN_ALLOWED   = new Set([20000, 50000, 100000, 150000, 200000, 250000, 500000, 1000000]);
-
-                if (key) {
-                    const isPulsa = service.type === "pulsa";
+                if (key && (service.type === "pulsa" || service.type === "data" || service.type === "etoll")) {
+                    // Filter by operator/provider name — DB products have provider in label/code
                     const filtered = all
                         .filter((item) => {
                             const d = item.product_description.toLowerCase();
                             const c = item.product_code.toLowerCase();
-                            if (!d.includes(key) && !c.includes(key))
-                                return false;
-                            if (isPulsa) {
-                                const n = parseInt(
-                                    item.product_nominal?.replace(/\D/g, "") ??
-                                        "",
-                                );
-                                if (isNaN(n) || !PULSA_ALLOWED.has(n)) return false;
-                            }
-                            return true;
-                        })
-                        .sort((a, b) => a.product_price - b.product_price);
+                            return d.includes(key) || c.includes(key);
+                        });
                     setPrepaidService(filtered);
                 } else if (
                     service.type === "pln" &&
                     service.endpoint === "prepaid"
                 ) {
-                    const sorted = [...all]
-                        .filter((item) => {
-                            const n = parseInt(
-                                (item.product_nominal ?? "").replace(/\D/g, ""),
-                            );
-                            return !isNaN(n) && PLN_ALLOWED.has(n);
-                        })
-                        .sort((a, b) => a.product_price - b.product_price);
-                    setPrepaidService(phoneNumber ? sorted : []);
+                    // DB already contains only curated PLN products
+                    setPrepaidService(phoneNumber ? all : []);
                     if (phoneNumber) {
                         try {
                             const r = await fetch(
@@ -414,7 +394,7 @@ export default function ServicePage({
                         }
                     }
                 } else {
-                    setPrepaidService([]);
+                    setPrepaidService(all);
                 }
             }
         } finally {
@@ -517,7 +497,7 @@ export default function ServicePage({
 
                 {/* ── Content wrapper ── */}
                 <div className="mx-auto w-full max-w-screen-xl px-4 py-6 pb-64 sm:pb-40 sm:px-6 lg:px-8">
-                 
+
                     {isTv ? (
                         <div className="sm:grid sm:grid-cols-[1fr_1.2fr] sm:gap-6 sm:items-start">
                             <div className="mb-5 sm:mb-0">

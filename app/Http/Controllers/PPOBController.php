@@ -53,10 +53,33 @@ class PPOBController extends Controller
         return response()->json($result);
     }
 
-    public function priceList(PriceListRequest $request) {
-        $type   = (string) $request->validated('type');
-        $result = $this->iakService->priceList($type);
-        return response()->json($result);
+    public function priceList(PriceListRequest $request): JsonResponse
+    {
+        $type    = (string) $request->validated('type');
+        $service = PPOBService::where('code', $type)->first();
+
+        if (! $service) {
+            return response()->json(['data' => ['pricelist' => []]]);
+        }
+
+        $products = PPOBServiceProduct::where('ppob_service_id', $service->id)
+            ->where('status', true)
+            ->orderBy('price')
+            ->get()
+            ->map(fn ($p) => [
+                'product_code'        => $p->code,
+                'product_description' => $p->label,
+                'product_nominal'     => $p->name,
+                'product_details'     => $p->period ?? '',
+                'product_price'       => (int) $p->price,
+                'provider_code'       => '',
+                'provider_name'       => '',
+                'type'                => $p->type ?? $type,
+                'category'            => '',
+                'icon_url'            => '',
+            ]);
+
+        return response()->json(['data' => ['pricelist' => $products]]);
     }
 
     public function priceListPasca(PostpaidPriceListRequest $request) {
@@ -190,7 +213,9 @@ class PPOBController extends Controller
 
     private function upsert(PPOBService $service, array $items): int
     {
-        $now  = now();
+        $now   = now();
+        $codes = collect($items)->pluck('code')->all();
+
         $rows = collect($items)->map(fn ($item) => [
             'id'              => (string) Str::uuid(),
             'ppob_service_id' => $service->id,
@@ -198,6 +223,7 @@ class PPOBController extends Controller
             'label'           => $item['label'],
             'name'            => $item['name'],
             'price'           => $item['price'],
+            'base_price'      => $item['price'],   // harga asli IAK — hanya set saat insert
             'period'          => $item['period'],
             'type'            => $item['type'],
             'status'          => 1,
@@ -212,7 +238,56 @@ class PPOBController extends Controller
             ['label', 'name', 'price', 'period', 'type', 'fee', 'status', 'updated_at']
         );
 
+        // Set base_price only for rows being inserted for the first time (base_price still 0)
+        PPOBServiceProduct::where('ppob_service_id', $service->id)
+            ->whereIn('code', $codes)
+            ->where('base_price', 0)
+            ->each(function ($p) {
+                $p->update(['base_price' => $p->price]);
+            });
+
+        // Deactivate products that exist in DB for this service but were NOT submitted
+        PPOBServiceProduct::where('ppob_service_id', $service->id)
+            ->whereNotIn('code', $codes)
+            ->update(['status' => 0, 'updated_at' => $now]);
+
         return count($rows);
+    }
+
+    // ── Admin: inline product update ────────────────────────────────
+
+    public function updateProduct(Request $request, string $productId): JsonResponse
+    {
+        $product = PPOBServiceProduct::findOrFail($productId);
+
+        $validated = $request->validate([
+            'label' => ['required', 'string', 'max:255'],
+            'name'  => ['required', 'string'],
+            'price' => ['required', 'integer', 'min:0'],
+        ]);
+
+        if ((int) $validated['price'] < (int) $product->base_price) {
+            return response()->json([
+                'message' => 'Harga jual tidak boleh di bawah harga dasar (Rp ' .
+                    number_format($product->base_price, 0, ',', '.') . ').',
+            ], 422);
+        }
+
+        $product->update($validated);
+
+        return response()->json(['message' => 'Produk berhasil diperbarui.']);
+    }
+
+    public function toggleProductStatus(string $productId): JsonResponse
+    {
+        $product   = PPOBServiceProduct::findOrFail($productId);
+        $newStatus = $product->status ? 0 : 1;
+        $product->update(['status' => $newStatus]);
+
+        return response()->json([
+            'message' => 'Status produk berhasil diperbarui.',
+            'status'  => $newStatus,
+        ]);
     }
 
     private function transform(array $item, string $code, string $nameFrom): array

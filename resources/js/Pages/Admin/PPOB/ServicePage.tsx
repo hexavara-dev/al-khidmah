@@ -12,8 +12,8 @@ import AdminLayout from '@/Layouts/AdminLayout'
 import { Head, router } from '@inertiajs/react'
 import { ColumnDef } from '@tanstack/react-table'
 import axios from 'axios'
-import { Check, Loader2, Minus, RefreshCw, Save, Search } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { Check, Loader2, Minus, Pencil, PowerOff, RefreshCw, Save, Search } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 
 interface PPOBService {
@@ -34,9 +34,11 @@ interface ProductItem {
 
 interface SavedProduct {
     id: string
+    code: string
     label: string
     name: string
     price: number
+    base_price: number
     period: string
     status: number
     fee: number | null
@@ -71,7 +73,11 @@ const KNOWN_PROVIDERS = [
     { key: 'smartfren', label: 'Smartfren' },
 ] as const
 
-function makeColumns(supported: boolean): ColumnDef<SavedProduct>[] {
+function makeColumns(
+    supported: boolean,
+    onEdit: (product: SavedProduct) => void,
+    onToggle: (product: SavedProduct) => void,
+): ColumnDef<SavedProduct>[] {
     return [
         {
             id: 'no',
@@ -84,7 +90,7 @@ function makeColumns(supported: boolean): ColumnDef<SavedProduct>[] {
             header: 'Nama Produk',
             cell: ({ row }) => (
                 <div>
-                    <div className="font-medium">{row.original.name}</div>
+                    <div className="w-72 truncate font-medium" title={row.original.name}>{row.original.name}</div>
                     <div className="text-xs text-muted-foreground">{row.original.label}</div>
                 </div>
             ),
@@ -104,8 +110,8 @@ function makeColumns(supported: boolean): ColumnDef<SavedProduct>[] {
         {
             accessorKey: 'status',
             header: 'Status',
-            cell: ({ getValue }) => {
-                const v = getValue() as number
+            cell: ({ row }) => {
+                const v = row.original.status
                 return (
                     <Badge variant={v === 1 ? 'default' : 'secondary'}>
                         {v === 1 ? 'Aktif' : 'Nonaktif'}
@@ -113,11 +119,99 @@ function makeColumns(supported: boolean): ColumnDef<SavedProduct>[] {
                 )
             },
         },
+        {
+            id: 'aksi',
+            header: 'Aksi',
+            enableSorting: false,
+            cell: ({ row }) => {
+                const product = row.original
+                return (
+                    <div className="flex items-center gap-2">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 gap-1.5 px-2.5 text-xs"
+                            onClick={() => onEdit(product)}
+                        >
+                            <Pencil className="size-3" />
+                            Edit
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant={product.status === 1 ? 'destructive' : 'secondary'}
+                            className="h-7 gap-1.5 px-2.5 text-xs"
+                            onClick={() => onToggle(product)}
+                        >
+                            <PowerOff className="size-3" />
+                            {product.status === 1 ? 'Nonaktifkan' : 'Aktifkan'}
+                        </Button>
+                    </div>
+                )
+            },
+        },
     ]
 }
 
 export default function ServicePage({ service, supported, products }: Props) {
-    const columns = useMemo(() => makeColumns(supported), [supported])
+    // ── Local products state (for optimistic updates) ───────────────
+    const [localProducts, setLocalProducts] = useState<SavedProduct[]>(products)
+    useEffect(() => { setLocalProducts(products) }, [products])
+
+    // ── Edit dialog state ───────────────────────────────────────────
+    const [editOpen, setEditOpen]       = useState(false)
+    const [editProduct, setEditProduct] = useState<SavedProduct | null>(null)
+    const [editForm, setEditForm]       = useState({ label: '', name: '', price: 0 })
+    const [editSaving, setEditSaving]   = useState(false)
+
+    const handleEdit = useCallback((product: SavedProduct) => {
+        setEditProduct(product)
+        setEditForm({ label: product.label, name: product.name, price: product.price })
+        setEditOpen(true)
+    }, [])
+
+    const handleEditSave = async () => {
+        if (!editProduct) return
+        setEditSaving(true)
+        try {
+            await axios.patch(`/admin/ppob/products/${editProduct.id}`, editForm)
+            toast.success('Produk berhasil diperbarui.')
+            setEditOpen(false)
+            router.reload({ only: ['products'] })
+        } catch (err: any) {
+            toast.error(err?.response?.data?.message ?? 'Gagal memperbarui produk.')
+        } finally {
+            setEditSaving(false)
+        }
+    }
+
+    const handleToggle = useCallback(async (product: SavedProduct) => {
+        const newStatus = product.status === 1 ? 0 : 1
+        const label     = newStatus === 0 ? 'nonaktifkan' : 'aktifkan'
+
+        // Optimistic update — langsung update data
+        setLocalProducts(prev =>
+            prev.map(p => p.id === product.id ? { ...p, status: newStatus } : p)
+        )
+
+        try {
+            await axios.patch(`/admin/ppob/products/${product.id}/toggle`)
+            toast.success(`Produk berhasil di${label}.`)
+            router.reload({ only: ['products'] })
+        } catch (err: any) {
+            // Revert jika gagal
+            setLocalProducts(prev =>
+                prev.map(p => p.id === product.id ? { ...p, status: product.status } : p)
+            )
+            toast.error(err?.response?.data?.message ?? 'Gagal mengubah status produk.')
+        }
+    }, [])
+
+    const columns = useMemo(
+        () => makeColumns(supported, handleEdit, handleToggle),
+        [supported, handleEdit, handleToggle],
+    )
+
+    // ── Sync dialog state ───────────────────────────────────────────
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [saving, setSaving] = useState(false)
@@ -167,6 +261,11 @@ export default function ServicePage({ service, supported, products }: Props) {
             const { data } = await axios.get(`/admin/ppob/${service.code}/sync`)
             const newItems: ProductItem[] = data.data ?? []
             setItems(newItems)
+            // Pre-select produk yang sudah aktif di DB
+            const activeCodes = new Set(
+                products.filter(p => p.status === 1).map(p => p.code)
+            )
+            setSelected(activeCodes)
             // Auto-select first detected provider
             for (const p of KNOWN_PROVIDERS) {
                 if (newItems.some(i => i.label.toLowerCase().includes(p.key))) {
@@ -180,7 +279,7 @@ export default function ServicePage({ service, supported, products }: Props) {
         } finally {
             setLoading(false)
         }
-    }, [service.code])
+    }, [service.code, products])
 
     const toggleItem = (code: string) => {
         setSelected(prev => {
@@ -266,7 +365,7 @@ export default function ServicePage({ service, supported, products }: Props) {
                 {/* Data table */}
                 <DataTable
                     columns={columns}
-                    data={products}
+                    data={localProducts}
                     pagination
                     search={{
                         mode: 'multiple',
@@ -276,10 +375,96 @@ export default function ServicePage({ service, supported, products }: Props) {
                 />
             </div>
 
+            {/* Edit product modal */}
+            <Dialog open={editOpen} onOpenChange={setEditOpen}>
+                <DialogContent className="max-w-md" showCloseButton={!editSaving}>
+                    <DialogHeader>
+                        <DialogTitle>Edit Produk</DialogTitle>
+                    </DialogHeader>
+
+                    <div className="flex flex-col gap-4 px-6 py-2">
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-sm font-medium">Label / Operator</label>
+                            <input
+                                type="text"
+                                value={editForm.label}
+                                onChange={e => setEditForm(f => ({ ...f, label: e.target.value }))}
+                                className="rounded-lg border bg-background px-3 py-2 text-sm outline-none ring-inset focus:ring-2 focus:ring-primary/30"
+                                placeholder="Contoh: Telkomsel"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-sm font-medium">Nama Produk</label>
+                            <input
+                                type="text"
+                                value={editForm.name}
+                                onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
+                                className="rounded-lg border bg-background px-3 py-2 text-sm outline-none ring-inset focus:ring-2 focus:ring-primary/30"
+                                placeholder="Contoh: Pulsa 50.000"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-sm font-medium">Harga</label>
+                            <div
+                                className={[
+                                    'flex overflow-hidden rounded-lg border bg-background text-sm transition-colors',
+                                    'focus-within:ring-2 focus-within:ring-inset',
+                                    editProduct && editForm.price < editProduct.base_price
+                                        ? 'border-destructive focus-within:ring-destructive/30'
+                                        : 'focus-within:ring-primary/30',
+                                ].join(' ')}
+                            >
+                                <span className="flex select-none items-center border-r bg-muted px-3 text-muted-foreground">
+                                    Rp
+                                </span>
+                                <input
+                                    type="text"
+                                    inputMode="numeric"
+                                    value={editForm.price === 0 ? '' : editForm.price.toLocaleString('id-ID')}
+                                    onChange={e => {
+                                        const raw = e.target.value.replace(/\D/g, '')
+                                        setEditForm(f => ({ ...f, price: raw === '' ? 0 : parseInt(raw, 10) }))
+                                    }}
+                                    className="flex-1 bg-transparent px-3 py-2 outline-none placeholder:text-muted-foreground"
+                                    placeholder="0"
+                                />
+                            </div>
+                            {editProduct && editForm.price < editProduct.base_price ? (
+                                <p className="text-xs text-destructive">
+                                    Harga tidak boleh di bawah harga dasar {formatRupiah(editProduct.base_price)}
+                                </p>
+                            ) : editProduct && editProduct.base_price > 0 ? (
+                                <p className="text-xs text-muted-foreground">
+                                    Harga dasar: {formatRupiah(editProduct.base_price)}
+                                </p>
+                            ) : null}
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setEditOpen(false)} disabled={editSaving}>
+                            Batal
+                        </Button>
+                        <Button
+                            onClick={handleEditSave}
+                            disabled={
+                                editSaving ||
+                                !editForm.label.trim() ||
+                                !editForm.name.trim() ||
+                                (editProduct !== null && editForm.price < editProduct.base_price)
+                            }
+                        >
+                            {editSaving ? <Loader2 className="animate-spin" /> : <Save />}
+                            Simpan Perubahan
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
             {/* Sync result modal */}
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent
-                    className="max-w-6xl"
+                    className={isThreeCol ? 'max-w-6xl' : 'max-w-lg'}
                     showCloseButton={!saving}
                 >
                     <DialogHeader>

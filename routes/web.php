@@ -110,9 +110,11 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
     // -- PPOB product sync (prepaid only) -------------------------
     Route::prefix('ppob')->name('ppob.')->group(function () {
-        Route::get('/{code}',       [PPOBServiceController::class, 'show'])->name('page');
-        Route::get('/{code}/sync',  [PPOBController::class, 'sync'])->name('sync');
-        Route::post('/{code}/save', [PPOBController::class, 'store'])->name('save');
+        Route::get('/{code}',                    [PPOBServiceController::class, 'show'])->name('page');
+        Route::get('/{code}/sync',               [PPOBController::class, 'sync'])->name('sync');
+        Route::post('/{code}/save',              [PPOBController::class, 'store'])->name('save');
+        Route::patch('/products/{productId}',        [PPOBController::class, 'updateProduct'])->name('product.update');
+        Route::patch('/products/{productId}/toggle', [PPOBController::class, 'toggleProductStatus'])->name('product.toggle');
     });
 });
 
