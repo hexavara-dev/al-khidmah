@@ -5,29 +5,39 @@ import { campaignService } from '../../services/campaignService';
 import { donationCategoryService } from '../../services/donationCategoryService';
 import { reportService } from '../../services/reportService';
 import toast from 'react-hot-toast';
+import type { Campaign, Category, PaginationMeta } from '@/types';
+
+type CampaignForm = {
+    title: string;
+    description: string;
+    target_amount: string;
+    category_id: string;
+    deadline: string;
+    is_active: boolean;
+};
 
 const EMPTY_FORM = {
     title: '', description: '', target_amount: '', category_id: '', deadline: '', is_active: true,
 };
 
 export default function DashboardCampaignsPage() {
-    const [campaigns,   setCampaigns]   = useState([]);
-    const [categories,  setCategories]  = useState([]);
-    const [meta,        setMeta]        = useState(null);
+    const [campaigns,   setCampaigns]   = useState<Campaign[]>([]);
+    const [categories,  setCategories]  = useState<Category[]>([]);
+    const [meta,        setMeta]        = useState<PaginationMeta | null>(null);
     const [page,        setPage]        = useState(1);
     const [search,      setSearch]      = useState('');
     const [filterCat,   setFilterCat]   = useState('');
     const [loading,     setLoading]     = useState(true);
     const [showForm,    setShowForm]    = useState(false);
-    const [form,        setForm]        = useState(EMPTY_FORM);
-    const [editing,     setEditing]     = useState(null);
+    const [form,        setForm]        = useState<CampaignForm>(EMPTY_FORM);
+    const [editing,     setEditing]     = useState<Campaign | null>(null);
     const [submitting,  setSubmitting]  = useState(false);
-    const [imageFile,   setImageFile]   = useState(null);
-    const [imagePreview, setImagePreview] = useState(null);
+    const [imageFile,   setImageFile]   = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [downloading, setDownloading] = useState(false);
-    const fileRef = useRef();
+    const fileRef = useRef<HTMLInputElement>(null);
 
-    const load = (p, s, cat) => {
+    const load = (p: number, s: string, cat: string) => {
         setLoading(true);
         campaignService.getAll({
             page: p,
@@ -50,13 +60,13 @@ export default function DashboardCampaignsPage() {
         setShowForm(true); 
     };
     
-    const openEdit = (c) => {
+    const openEdit = (c: Campaign) => {
         setEditing(c);
         setForm({
             title:         c.title,
             description:   c.description,
-            target_amount: c.target_amount,
-            category_id:   c.category_id,
+            target_amount: String(c.target_amount),
+            category_id:   String(c.category_id),
             deadline:      c.deadline?.split('T')[0] ?? c.deadline,
             is_active:     c.is_active,
         });
@@ -65,17 +75,18 @@ export default function DashboardCampaignsPage() {
         setShowForm(true);
     };
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const target = e.target as HTMLInputElement;
+        const { name, value, type, checked } = target;
         setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     };
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
         if (file) {
             setImageFile(file);
             const reader = new FileReader();
-            reader.onloadend = () => setImagePreview(reader.result);
+            reader.onloadend = () => setImagePreview(reader.result as string);
             reader.readAsDataURL(file);
         } else {
             setImageFile(null);
@@ -83,16 +94,16 @@ export default function DashboardCampaignsPage() {
         }
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setSubmitting(true);
         try {
             const fd = new FormData();
             Object.entries(form).forEach(([k, v]) => {
                 if (k === 'is_active') {
-                    fd.append(k, v ? 1 : 0);
+                    fd.append(k, v ? '1' : '0');
                 } else {
-                    fd.append(k, v);
+                    fd.append(k, v as string);
                 }
             });
             if (imageFile) fd.append('image', imageFile);
@@ -107,16 +118,17 @@ export default function DashboardCampaignsPage() {
             setShowForm(false);
             load(page, search, filterCat);
         } catch (err) {
-            toast.error(err.response?.data?.message ?? 'Gagal menyimpan campaign.');
+            const axiosErr = err as { response?: { data?: { message?: string } } };
+            toast.error(axiosErr.response?.data?.message ?? 'Gagal menyimpan campaign.');
         } finally {
             setSubmitting(false);
         }
     };
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (id: number) => {
         if (!confirm('Yakin ingin menghapus campaign ini? Tindakan ini tidak dapat dibatalkan.')) return;
         try {
-            await campaignService.delete(id);
+            await campaignService.destroy(id);
             toast.success('Campaign berhasil dihapus.');
             load(page, search, filterCat);
         } catch {

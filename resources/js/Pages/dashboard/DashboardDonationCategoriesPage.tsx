@@ -3,12 +3,13 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import Pagination from '../../components/Pagination';
 import { donationCategoryService } from '../../services/donationCategoryService';
 import toast from 'react-hot-toast';
+import type { Category } from '@/types';
 
 export default function DashboardDonationCategoriesPage() {
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading]       = useState(true);
     const [form, setForm]             = useState({ name: '' });
-    const [editing, setEditing]       = useState(null);
+    const [editing, setEditing]       = useState<Category | null>(null);
     const [submitting, setSubmitting] = useState(false);
 
     const load = () => {
@@ -20,7 +21,7 @@ export default function DashboardDonationCategoriesPage() {
 
     useEffect(() => { load(); }, []);
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setSubmitting(true);
         try {
@@ -35,18 +36,18 @@ export default function DashboardDonationCategoriesPage() {
             setEditing(null);
             load();
         } catch (err) {
-            toast.error(err.response?.data?.message ?? 'Gagal menyimpan.');
+            toast.error((err as { response?: { data?: { message?: string } } }).response?.data?.message ?? 'Gagal menyimpan.');
         } finally {
             setSubmitting(false);
         }
     };
 
-    const handleEdit = (cat) => {
+    const handleEdit = (cat: Category) => {
         setEditing(cat);
         setForm({ name: cat.name });
     };
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (id: number) => {
         if (!confirm('Hapus kategori ini?')) return;
         try {
             await donationCategoryService.destroy(id);

@@ -4,12 +4,13 @@ import Pagination from '../../components/Pagination';
 import { donationService } from '../../services/donationService';
 import { reportService } from '../../services/reportService';
 import toast from 'react-hot-toast';
+import type { Donation, PaginationMeta } from '@/types';
 
 const STATUSES = ['pending', 'success', 'failed'];
 
-const formatPaymentMethod = (method) => {
+const formatPaymentMethod = (method: string | null | undefined): string => {
     if (!method || method === '-') return '-';
-    const map = {
+    const map: Record<string, string> = {
         bca_va:       'Transfer BCA',
         bni_va:       'Transfer BNI',
         bri_va:       'Transfer BRI',
@@ -27,21 +28,21 @@ const formatPaymentMethod = (method) => {
         echannel:     'Mandiri Bill',
         cstore:       'Minimarket',
     };
-    return map[method.toLowerCase()] ?? method.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    return map[method.toLowerCase()] ?? method.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
 };
 
 export default function DashboardDonationsPage() {
-    const [donations, setDonations] = useState([]);
-    const [meta, setMeta]           = useState(null);
+    const [donations, setDonations] = useState<Donation[]>([]);
+    const [meta, setMeta]           = useState<PaginationMeta | null>(null);
     const [page, setPage]           = useState(1);
     const [search, setSearch]       = useState('');
     const [filterStatus, setFilterStatus] = useState('');
     const [filterMonth, setFilterMonth]   = useState('');
     const [loading, setLoading]     = useState(true);
-    const [updating, setUpdating]   = useState(null);
+    const [updating, setUpdating]   = useState<number | null>(null);
     const [downloading, setDownloading] = useState(false);
 
-    const load = (p, s, status, month) => {
+    const load = (p: number, s: string, status: string, month: string) => {
         setLoading(true);
         donationService.getAll({
             page: p,
@@ -56,7 +57,7 @@ export default function DashboardDonationsPage() {
 
     useEffect(() => { load(page, search, filterStatus, filterMonth); }, [page, search, filterStatus, filterMonth]);
 
-    const handleStatusChange = async (donation, status) => {
+    const handleStatusChange = async (donation: Donation, status: string) => {
         setUpdating(donation.id);
         try {
             await donationService.updateStatus(donation.id, status);
@@ -72,7 +73,7 @@ export default function DashboardDonationsPage() {
     const handleDownloadPdf = async () => {
         setDownloading(true);
         try {
-            const params = {};
+            const params: Record<string, string> = {};
             if (filterMonth)  params.month  = filterMonth;
             if (filterStatus) params.status = filterStatus;
             await reportService.downloadDonationPdf(params);

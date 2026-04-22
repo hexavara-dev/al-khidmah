@@ -6,6 +6,7 @@ import { campaignService } from '@/services/campaignService';
 import { donationCategoryService } from '@/services/donationCategoryService';
 import { donationService } from '@/services/donationService';
 import { userService } from '@/services/userService';
+import type { Donation } from '@/types';
 
 const STAT_CARDS = [
     {
@@ -39,8 +40,8 @@ const STAT_CARDS = [
 ];
 
 export default function DashboardOverviewPage() {
-    const [stats, setStats] = useState({ campaigns: null, categories: null, donations: null, users: null });
-    const [recentDonations, setRecentDonations] = useState([]);
+    const [stats, setStats] = useState<{ campaigns: number | null; categories: number | null; donations: number | null; users: number | null }>({ campaigns: null, categories: null, donations: null, users: null });
+    const [recentDonations, setRecentDonations] = useState<Donation[]>([]);
 
     useEffect(() => {
         Promise.all([
@@ -101,9 +102,9 @@ export default function DashboardOverviewPage() {
                             <span className={`text-xs font-semibold ${card.text} opacity-0 group-hover:opacity-100 transition-all duration-200`}>Kelola →</span>
                         </div>
                         <p className="text-3xl font-bold text-gray-800 mb-1">
-                            {stats[card.key] === null ? (
+                            {stats[card.key as keyof typeof stats] === null ? (
                                 <span className="inline-block w-12 h-7 bg-gray-200 animate-pulse rounded" />
-                            ) : stats[card.key]}
+                            ) : stats[card.key as keyof typeof stats]}
                         </p>
                         <p className="text-sm font-semibold text-gray-700">{card.label}</p>
                         <p className="text-xs text-gray-400 mt-0.5">{card.desc}</p>

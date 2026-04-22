@@ -17,6 +17,7 @@ export interface Campaign {
     title: string;
     description: string;
     image: string | null;
+    image_url?: string | null;
     target_amount: number;
     collected_amount: number;
     deadline: string;
