@@ -51,7 +51,7 @@ class PpobPageController extends Controller
             ->values()
             ->toArray();
 
-        return Inertia::render('Ppob/ServicePage', [
+        return Inertia::render('PPOB/ServicePage', [
             'serviceType'        => $type,
             'balance'            => $balance,
             'recentTransactions' => $recentTransactions,
