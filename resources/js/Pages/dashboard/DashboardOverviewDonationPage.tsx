@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head } from '@inertiajs/react';
 import { campaignService } from '@/services/campaignService';
-import { categoryService } from '@/services/categoryService';
+import { donationCategoryService } from '@/services/donationCategoryService';
 import { donationService } from '@/services/donationService';
 import { userService } from '@/services/userService';
 
@@ -45,7 +45,7 @@ export default function DashboardOverviewPage() {
     useEffect(() => {
         Promise.all([
             campaignService.getAll({ page: 1 }),
-            categoryService.getAll(),
+            donationCategoryService.getAll(),
             donationService.getAll({ page: 1 }),
             userService.getAll({ page: 1 }),
         ]).then(([camps, cats, dons, users]) => {

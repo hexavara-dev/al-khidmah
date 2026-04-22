@@ -101,7 +101,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     })->name('donations.campaigns');
 
     Route::get('/categories', function () {
-        return Inertia::render('dashboard/DashboardCategoriesDonasiPage');
+        return Inertia::render('dashboard/DashboardDonationCategoriesPage');
     })->name('donations.categories');
     });
 

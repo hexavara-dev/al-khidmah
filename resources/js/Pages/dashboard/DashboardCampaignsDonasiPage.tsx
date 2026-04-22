@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import Pagination from '../../components/Pagination';
 import { campaignService } from '../../services/campaignService';
-import { categoryService } from '../../services/categoryService';
+import { donationCategoryService } from '../../services/donationCategoryService';
 import { reportService } from '../../services/reportService';
 import toast from 'react-hot-toast';
 
@@ -40,7 +40,7 @@ export default function DashboardCampaignsPage() {
     };
 
     useEffect(() => { load(page, search, filterCat); }, [page, search, filterCat]);
-    useEffect(() => { categoryService.getAll().then(({ data }) => setCategories(data.data)); }, []);
+    useEffect(() => { donationCategoryService.getAll().then(({ data }) => setCategories(data.data)); }, []);
 
     const openCreate = () => { 
         setEditing(null); 

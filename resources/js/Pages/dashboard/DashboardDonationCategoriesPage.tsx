@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import Pagination from '../../components/Pagination';
-import { categoryService } from '../../services/categoryService';
+import { donationCategoryService } from '../../services/donationCategoryService';
 import toast from 'react-hot-toast';
 
-export default function DashboardCategoriesPage() {
+export default function DashboardDonationCategoriesPage() {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading]       = useState(true);
     const [form, setForm]             = useState({ name: '' });
@@ -13,7 +13,7 @@ export default function DashboardCategoriesPage() {
 
     const load = () => {
         setLoading(true);
-        categoryService.getAll()
+        donationCategoryService.getAll()
             .then(({ data }) => setCategories(data.data))
             .finally(() => setLoading(false));
     };
@@ -25,10 +25,10 @@ export default function DashboardCategoriesPage() {
         setSubmitting(true);
         try {
             if (editing) {
-                await categoryService.update(editing.id, form);
+                await donationCategoryService.update(editing.id, form);
                 toast.success('Kategori diperbarui.');
             } else {
-                await categoryService.create(form);
+                await donationCategoryService.create(form);
                 toast.success('Kategori ditambahkan.');
             }
             setForm({ name: '' });
@@ -49,7 +49,7 @@ export default function DashboardCategoriesPage() {
     const handleDelete = async (id) => {
         if (!confirm('Hapus kategori ini?')) return;
         try {
-            await categoryService.delete(id);
+            await donationCategoryService.destroy(id);
             toast.success('Kategori dihapus.');
             load();
         } catch {
