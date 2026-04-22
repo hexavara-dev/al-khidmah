@@ -37,17 +37,17 @@ export default function Navbar() {
     return (
         <nav className="bg-gradient-to-r from-[#006669] via-[#008f92] to-[#00cacd] text-white shadow-lg sticky top-0 z-40">
             {/* Top accent line */}
-            <div className="h-1 bg-gradient-to-r from-emerald-400 via-[#00cacd] to-teal-300" />
+            <div className="h-1 bg-gradient-to-r from-[#1d6e6a] via-[#258d88] to-[#37b5af]" />
 
             <div className="max-w-5xl mx-auto px-4 sm:px-6">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link href="/donasi" className="flex items-center gap-2.5 group">
-                        <div className="w-9 h-9 bg-white/20 group-hover:bg-white/30 rounded-xl flex items-center justify-center text-xl transition">
-                            🕌
+                        <div className="flex h-9 w-9 items-center justify-center transition">
+                            <img src="/images/assets/eKhidmah_logo.png" alt="eKhidmah" className="w-9 h-9 object-contain" />
                         </div>
                         <div className="leading-none">
-                            <span className="font-bold text-base tracking-wide block">Al-Khidmah</span>
+                            <span className="font-bold text-base tracking-wide block">eKhidmah</span>
                             <span className="text-[10px] text-[#c0f0f0] tracking-wider block">Platform Donasi</span>
                         </div>
                     </Link>

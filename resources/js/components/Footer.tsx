@@ -7,9 +7,11 @@ export default function Footer() {
                     {/* Brand */}
                     <div>
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-2xl">🕌</div>
+                            <div className="flex h-10 w-10 items-center justify-center">
+                                <img src="/images/assets/eKhidmah_logo.png" alt="eKhidmah" className="w-10 h-10 object-contain" />
+                            </div>
                             <div>
-                                <p className="font-bold text-lg leading-none">Al-Khidmah</p>
+                                <p className="font-bold text-lg leading-none">eKhidmah</p>
                                 <p className="text-[#a8ecee] text-xs">Platform Donasi Terpercaya</p>
                             </div>
                         </div>
@@ -53,7 +55,7 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Contact */}
+                    {/* Contact
                     <div>
                         <h3 className="font-bold text-sm uppercase tracking-widest mb-4 text-[#e0fafa]">Kontak Kami</h3>
                         <ul className="space-y-3">
@@ -79,12 +81,12 @@ export default function Footer() {
                                 </div>
                             </li>
                         </ul>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Bottom bar */}
                 <div className="border-t border-white/20 pt-6 flex flex-col md:flex-row items-center justify-between gap-2">
-                    <p className="text-[#a8ecee] text-xs">&copy; {year} Al-Khidmah. Hak cipta dilindungi undang-undang.</p>
+                    <p className="text-[#a8ecee] text-xs">&copy; {year} eKhidmah. Hak cipta dilindungi undang-undang.</p>
                     <p className="text-[#a8ecee] text-xs">Dibuat dengan ❤️ untuk kebaikan umat</p>
                 </div>
             </div>

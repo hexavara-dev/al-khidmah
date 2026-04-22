@@ -43,7 +43,7 @@ export default function Finish({ orderId, transactionStatus, statusCode, transac
                 state === 'pending' ? 'Memproses Pembayaran' : 'Pembayaran Gagal'
             } />
 
-            <Navbar balance={0} appName="Al-Khidmah" />
+            <Navbar balance={0} appName="eKhidmah" />
 
             <div className="min-h-screen bg-surface-bright pt-[68px] pb-48">
                 <div className="mx-auto max-w-lg px-6 py-10">
@@ -106,7 +106,7 @@ export default function Finish({ orderId, transactionStatus, statusCode, transac
                                 <div className="space-y-2.5 border-t border-outline-variant/10 pt-4 text-sm">
                                     <div className="flex items-center justify-between">
                                         <span className="text-on-surface-variant">Merchant</span>
-                                        <span className="font-bold text-on-surface">Al-Khidmah</span>
+                                        <span className="font-bold text-on-surface">eKhidmah</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-on-surface-variant">Transaction ID</span>

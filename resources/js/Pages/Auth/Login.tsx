@@ -41,7 +41,7 @@ function SsoCard({ status }: { status?: string }) {
                     </span>
                 </div>
                 <h2 className="font-headline text-2xl font-extrabold text-foreground">
-                    Masuk ke Al-Khidmah
+                    Masuk ke eKhidmah
                 </h2>
                 <p className="mt-1.5 max-w-xs text-sm text-muted-foreground">
                     Pilih metode masuk yang Anda gunakan.
@@ -50,7 +50,7 @@ function SsoCard({ status }: { status?: string }) {
 
             {/* SSO Buttons */}
             <div className="space-y-3">
-                {/* Jemaah Al-Khidmah */}
+                {/* Jemaah eKhidmah */}
                 <a
                     href="/auth/jemaah"
                     className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-primary/20 bg-primary/[0.06] px-5 py-4 transition hover:bg-primary/10 hover:shadow-md active:scale-[0.98]"
@@ -60,7 +60,7 @@ function SsoCard({ status }: { status?: string }) {
                     </div>
                     <div className="flex-1">
                         <p className="text-sm font-bold text-primary">
-                            Jemaah Al-Khidmah
+                            Jemaah eKhidmah
                         </p>
                         <p className="text-xs text-primary/60">
                             Masuk sebagai jemaah
@@ -133,7 +133,7 @@ export default function Login({ status }: { status?: string; canResetPassword: b
                     <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-surface-container-lowest shadow-md">
                         <Zap className="size-9 text-primary" strokeWidth={2.5} />
                     </div>
-                    <h1 className="font-headline text-3xl font-extrabold text-primary">Al-Khidmah</h1>
+                    <h1 className="font-headline text-3xl font-extrabold text-primary">eKhidmah</h1>
                     <p className="mt-1 max-w-xs text-sm text-muted-foreground">Kelola finansial Anda dengan tenang dan berkah.</p>
                 </div>
 
@@ -157,7 +157,7 @@ export default function Login({ status }: { status?: string; canResetPassword: b
                         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15">
                             <Zap className="size-5 text-white" />
                         </div>
-                        <span className="font-headline text-xl font-extrabold tracking-tight text-white">Al-Khidmah</span>
+                        <span className="font-headline text-xl font-extrabold tracking-tight text-white">eKhidmah</span>
                     </div>
 
                     {/* Center copy */}
@@ -176,7 +176,7 @@ export default function Login({ status }: { status?: string; canResetPassword: b
                     </div>
 
                     <p className="relative text-xs text-white/40">
-                        © {new Date().getFullYear()} Al-Khidmah. All rights reserved.
+                        © {new Date().getFullYear()} eKhidmah. All rights reserved.
                     </p>
                 </div>
 

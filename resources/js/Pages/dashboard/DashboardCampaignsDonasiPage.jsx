@@ -73,6 +73,11 @@ export default function DashboardCampaignsPage() {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                toast.error('Ukuran gambar maksimal 2 MB.');
+                e.target.value = '';
+                return;
+            }
             setImageFile(file);
             const reader = new FileReader();
             reader.onloadend = () => setImagePreview(reader.result);
@@ -299,7 +304,7 @@ export default function DashboardCampaignsPage() {
                                         </div>
                                     )}
                                 </div>
-                                <p className="text-xs text-gray-400 mt-1">Format: JPG, PNG. Maksimal 2MB</p>
+                                <p className="text-xs text-gray-400 mt-1">Format: JPG, PNG, WebP · Resolusi ideal 1200×675 px (16:9) · Maks. 2 MB</p>
                             </div>
                             
                             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">

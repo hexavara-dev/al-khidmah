@@ -44,6 +44,7 @@ interface Donation {
 interface PaginationMeta {
     current_page: number;
     last_page: number;
+    per_page: number;
     total: number;
     from: number | null;
     to: number | null;
@@ -196,7 +197,7 @@ export default function AdminDonationsPage() {
                                         <tr key={d.id} className="hover:bg-muted/30 transition-colors">
                                             <td className="px-6 py-3 font-medium">{d.user?.name ?? 'Anonim'}</td>
                                             <td className="px-6 py-3 text-muted-foreground max-w-[180px] truncate">{d.campaign?.title ?? '-'}</td>
-                                            <td className="px-6 py-3 font-semibold text-emerald-600">
+                                            <td className="px-6 py-3 font-semibold text-[#258d88]">
                                                 Rp {Number(d.amount).toLocaleString('id-ID')}
                                             </td>
                                             <td className="px-6 py-3 text-muted-foreground">
@@ -210,7 +211,7 @@ export default function AdminDonationsPage() {
                                             <td className="px-6 py-3">
                                                 <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
                                                     d.status === 'success'
-                                                        ? 'bg-green-100 text-green-700'
+                                                        ? 'bg-[#e6f5f4] text-[#1d6e6a]'
                                                         : d.status === 'failed'
                                                         ? 'bg-red-100 text-red-700'
                                                         : 'bg-yellow-100 text-yellow-700'

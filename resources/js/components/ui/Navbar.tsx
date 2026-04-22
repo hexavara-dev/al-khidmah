@@ -10,7 +10,7 @@ type Props = {
     appName?: string;
 };
 
-export default function Navbar({ balance, appName = 'Al-Khidmah' }: Props) {
+export default function Navbar({ balance, appName = 'eKhidmah' }: Props) {
     const page = usePage<PageProps<{ balance: number }>>();
     const { auth } = page.props as any;
     const user = auth?.user;

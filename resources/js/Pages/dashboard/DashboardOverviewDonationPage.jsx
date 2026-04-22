@@ -25,8 +25,8 @@ const STAT_CARDS = [
     {
         label: 'Total Donasi', icon: '💳', key: 'donations',
         link: '/admin/donations',
-        color: 'from-emerald-500 to-blue-600',
-        bg: 'bg-emerald-50', text: 'text-emerald-600',
+        color: 'from-[#258d88] to-blue-600',
+        bg: 'bg-[#f2fafa]', text: 'text-[#258d88]',
         desc: 'Semua transaksi masuk',
     },
     {
@@ -62,15 +62,15 @@ export default function DashboardOverviewPage() {
     return (
         <AdminLayout breadcrumbs={[{ label: 'Overview' }]}>
             <Head title="Overview Dashboard" />
-            <div className="relative mb-8 bg-gradient-to-r from-blue-600 via-emerald-600 to-teal-500 rounded-2xl p-7 text-white overflow-hidden shadow-lg">
+            <div className="relative mb-8 bg-gradient-to-r from-blue-600 via-[#258d88] to-[#1d6e6a] rounded-2xl p-7 text-white overflow-hidden shadow-lg">
                 <div className="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full" />
                 <div className="absolute -bottom-8 -left-6 w-32 h-32 bg-white/10 rounded-full" />
                 <div className="absolute top-4 right-32 w-8 h-8 bg-white/10 rounded-full animate-pulse" />
                 <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <p className="text-emerald-100 text-xs font-semibold uppercase tracking-widest mb-1">Panel Admin · Al Khidmah</p>
+                        <p className="text-white/80 text-xs font-semibold uppercase tracking-widest mb-1">Panel Admin · Al Khidmah</p>
                         <h2 className="text-3xl font-bold">Selamat Datang! 👋</h2>
-                        <p className="text-emerald-100/80 text-sm mt-1.5 max-w-sm">Pantau dan kelola semua aktivitas platform donasi dari sini.</p>
+                        <p className="text-white/70 text-sm mt-1.5 max-w-sm">Pantau dan kelola semua aktivitas platform donasi dari sini.</p>
                     </div>
                     {/* <div className="flex gap-3 flex-shrink-0">
                         <Link to="/dashboard/campaigns" className="bg-white/20 hover:bg-white/30 transition text-white text-xs font-medium px-4 py-2 rounded-xl backdrop-blur-sm">
@@ -143,19 +143,19 @@ export default function DashboardOverviewPage() {
                             ) : recentDonations.map((d, i) => (
                                 <tr
                                     key={d.id}
-                                    className="hover:bg-emerald-50/40 transition-colors duration-150"
+                                    className="hover:bg-[#f2fafa] transition-colors duration-150"
                                     style={{ animationDelay: `${i * 50}ms` }}
                                 >
                                     <td className="px-5 py-3.5">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-emerald-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-[#258d88] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                                                 {(d.user?.name ?? 'A').charAt(0).toUpperCase()}
                                             </div>
                                             <span className="font-medium text-gray-800">{d.user?.name ?? 'Anonim'}</span>
                                         </div>
                                     </td>
                                     <td className="px-5 py-3.5 text-gray-500 max-w-[160px] truncate">{d.campaign?.title ?? '-'}</td>
-                                    <td className="px-5 py-3.5 font-semibold text-emerald-700">
+                                    <td className="px-5 py-3.5 font-semibold text-[#1d6e6a]">
                                         Rp {Number(d.amount).toLocaleString('id-ID')}
                                     </td>
                                     <td className="px-5 py-3.5">

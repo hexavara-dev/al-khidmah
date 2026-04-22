@@ -118,15 +118,5 @@ Route::get('/auth/jemaah/callback', [JemaahController::class, 'callback'])->name
 
 Route::get('/mobile-auth/consume', [MobileAuthController::class, 'consume'])
     ->name('mobile.auth.consume');
-Route::get('/mobile-auth/consume', function (Request $request) {
-    $token = $request->token;
-
-    if (!$token) {
-        return response('Token tidak ada', 400);
-    }
-
-    // simulasi login
-    return redirect('/donasi');
-});
 
 require __DIR__ . '/auth.php';
