@@ -6,8 +6,8 @@ import type {
     Operator,
     Service,
     PostpaidBill,
-} from "@/types/ppob";
-import { idr, getItemTitle } from "@/lib/ppob";
+} from "@/types/PPOB";
+import { idr, getItemTitle } from "@/lib/PPOB";
 
 type Status = "idle" | "loading" | "success" | "error";
 type InquiryState = "idle" | "loading" | "verified" | "failed";

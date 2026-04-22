@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Clock, Database, Moon, Phone, Wifi, Zap } from 'lucide-react';
-import type { PricelistItem } from '@/types/ppob';
-import { idr } from '@/lib/ppob';
+import type { PricelistItem } from '@/types/PPOB';
+import { idr } from '@/lib/PPOB';
 
 type Category = 'Internet' | 'Roaming' | 'Entertainment';
 const CATEGORIES: Category[] = ['Internet', 'Roaming', 'Entertainment'];

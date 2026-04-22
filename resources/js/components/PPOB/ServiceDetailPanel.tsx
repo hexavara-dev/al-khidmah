@@ -1,5 +1,5 @@
 import { ArrowLeft } from 'lucide-react';
-import type { Service } from '@/types/ppob';
+import type { Service } from '@/types/PPOB';
 
 type Props = {
     service: Service;

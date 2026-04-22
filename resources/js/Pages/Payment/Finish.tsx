@@ -4,7 +4,7 @@ import {
     Check, XCircle, Clock, ArrowLeft, RefreshCw,
     BarChart2, Receipt, ChevronRight, HardHat, Shield,
 } from 'lucide-react';
-import { idr } from '@/lib/ppob';
+import { idr } from '@/lib/PPOB';
 
 
 interface Props {

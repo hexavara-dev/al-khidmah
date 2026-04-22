@@ -1,6 +1,6 @@
 import { Zap, Tv2 } from "lucide-react";
-import type { PostpaidBill } from "@/types/ppob";
-import { idr } from "@/lib/ppob";
+import type { PostpaidBill } from "@/types/PPOB";
+import { idr } from "@/lib/PPOB";
 
 type Props = {
     bill: PostpaidBill;

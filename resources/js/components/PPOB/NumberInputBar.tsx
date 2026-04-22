@@ -7,7 +7,7 @@ import {
     Wallet,
     Wifi,
 } from "lucide-react";
-import type { Operator, PricelistItem } from "@/types/ppob";
+import type { Operator, PricelistItem } from "@/types/PPOB";
 
 const ALLOWED_EWALLET = ["ovo", "gopay", 'dana',"shopeepay", "linkaja"];
 
