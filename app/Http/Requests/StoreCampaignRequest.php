@@ -18,7 +18,7 @@ class StoreCampaignRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'target_amount' => 'required|numeric|min:1',
+            'target_amount' => 'nullable|numeric|min:1',
             'category_id' => 'required|exists:categories,id',
             'deadline' => 'required|date|after:today',
             'is_active' => 'boolean',

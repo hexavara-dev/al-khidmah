@@ -74,6 +74,12 @@
   --color-tertiary: var(--tertiary);
   --color-tertiary-container: var(--tertiary-container);
 
+  /* ── Donation brand color #258d88 ── */
+  --color-donation:           #258d88;
+  --color-donation-dim:       #1d6e6a;
+  --color-donation-muted:     #e6f5f4;
+  --color-donation-subtle:    #f2fafa;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

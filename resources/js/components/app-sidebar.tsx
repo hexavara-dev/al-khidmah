@@ -85,20 +85,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
                 <div className="flex items-center gap-2.5 px-2 py-2">
-                    <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                        <svg
-                            viewBox="0 0 24 24"
-                            className="size-4"
-                            fill="currentColor"
-                        >
-                            <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.91-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z" />
-                        </svg>
+                    <div className="flex size-8 shrink-0 items-center justify-center rounded-lg overflow-hidden">
+                        <img src="/images/assets/eKhidmah_logo.png" alt="eKhidmah" className="size-8 object-contain" />
                     </div>
                     <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                         <span className="truncate font-semibold">eKhidmah</span>
-                        <span className="truncate text-xs text-muted-foreground">
-                            Admin Panel
-                        </span>
+                        <span className="truncate text-xs text-muted-foreground">Admin Panel</span>
                     </div>
                 </div>
             </SidebarHeader>

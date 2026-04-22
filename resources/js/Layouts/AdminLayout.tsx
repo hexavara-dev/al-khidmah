@@ -43,7 +43,7 @@ export default function AdminLayout({
                             <BreadcrumbList>
                                 <BreadcrumbItem className="hidden md:block">
                                     <BreadcrumbLink href="/admin/dashboard">
-                                        Al-Khidmah
+                                        eKhidmah
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                                 {breadcrumbs.map((crumb, index) => (

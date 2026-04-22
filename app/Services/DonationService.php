@@ -14,7 +14,8 @@ class DonationService
 {
     public function __construct(
         private MidtransService $midtrans,
-    ) {}
+    ) {
+    }
 
     public function list(Request $request): LengthAwarePaginator
     {
@@ -70,8 +71,10 @@ class DonationService
             $bankName = $bankName ?? $bank;
             return $bankName ? strtolower($bankName) . '_va' : 'bank_transfer';
         }
-        if ($paymentType === 'echannel') return 'mandiri_bill';
-        if ($paymentType === 'cstore') return $store ? strtolower($store) : 'cstore';
+        if ($paymentType === 'echannel')
+            return 'mandiri_bill';
+        if ($paymentType === 'cstore')
+            return $store ? strtolower($store) : 'cstore';
         return $paymentType;
     }
 
@@ -157,6 +160,11 @@ class DonationService
     {
         if (!$campaign->is_active) {
             throw new \Exception('Campaign ini sudah tidak aktif.');
+        }
+
+        // Tutup donasi jika melewati deadline
+        if ($campaign->deadline && $campaign->deadline->isPast()) {
+            throw new \Exception('Campaign ini sudah melewati tenggat waktu.');
         }
 
         $orderId = 'DON-' . time() . '-' . uniqid();

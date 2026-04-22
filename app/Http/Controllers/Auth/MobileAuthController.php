@@ -18,7 +18,6 @@ class MobileAuthController extends Controller
             return response('Token tidak ada', 400);
         }
 
-        // Cari token Sanctum dari plain text token
         $accessToken = PersonalAccessToken::findToken($plainToken);
 
         if (!$accessToken || !$accessToken->tokenable) {
@@ -27,13 +26,11 @@ class MobileAuthController extends Controller
 
         $user = $accessToken->tokenable;
 
-        // Login ke session web Laravel
         Auth::login($user, true);
+        $request->session()->regenerate();
 
-        // Supaya token cuma sekali pakai
         $accessToken->delete();
 
-        // Hindari open redirect: hanya izinkan URL internal
         if (!str_starts_with($returnUrl, '/')) {
             $returnUrl = '/donasi';
         }

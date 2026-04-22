@@ -29,7 +29,7 @@ class Campaign extends Model
     protected function casts(): array
     {
         return [
-            'target_amount' => 'decimal:2',
+            'target_amount' => 'decimal:2',   // nullable — null = tidak ada batas
             'collected_amount' => 'decimal:2',
             'deadline' => 'date',
             'is_active' => 'boolean',
@@ -48,7 +48,8 @@ class Campaign extends Model
 
     public function getProgressPercentageAttribute(): float
     {
-        if ($this->target_amount <= 0) {
+        // target_amount NULL berarti tidak ada batas — progres tidak dihitung
+        if (!$this->target_amount || $this->target_amount <= 0) {
             return 0;
         }
         return min(100, ($this->collected_amount / $this->target_amount) * 100);

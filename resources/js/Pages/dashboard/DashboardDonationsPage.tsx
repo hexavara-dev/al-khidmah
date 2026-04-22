@@ -173,7 +173,7 @@ export default function DashboardDonationsPage() {
                                 <tr key={d.id} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-5 py-3 font-medium text-gray-800">{d.user?.name ?? 'Anonim'}</td>
                                     <td className="px-5 py-3 text-gray-500 max-w-[150px] truncate">{d.campaign?.title ?? '-'}</td>
-                                    <td className="px-5 py-3 font-semibold text-emerald-700">
+                                    <td className="px-5 py-3 font-semibold text-[#1d6e6a]">
                                         Rp {Number(d.amount).toLocaleString('id-ID')}
                                     </td>
                                     <td className="px-5 py-3 text-gray-500">
