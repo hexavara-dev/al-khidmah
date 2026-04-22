@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import DashboardLayout from '../../layouts/DashboardLayout';
+import AdminLayout from '@/Layouts/AdminLayout';
 import Pagination from '../../components/Pagination';
 import { donationService } from '../../services/donationService';
 import { reportService } from '../../services/reportService';
@@ -85,7 +85,7 @@ export default function DashboardDonationsPage() {
     };
 
     return (
-        <DashboardLayout>
+        <AdminLayout>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-800">Manajemen Donasi</h2>
@@ -214,6 +214,6 @@ export default function DashboardDonationsPage() {
                     <Pagination meta={meta} onPageChange={setPage} />
                 </div>
             )}
-        </DashboardLayout>
+        </AdminLayout>
     );
 }

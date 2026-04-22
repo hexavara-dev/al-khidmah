@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import DashboardLayout from '../../layouts/DashboardLayout';
+import AdminLayout from '@/Layouts/AdminLayout';
 import Pagination from '../../components/Pagination';
 import { campaignService } from '../../services/campaignService';
 import { categoryService } from '../../services/categoryService';
@@ -153,7 +153,7 @@ export default function DashboardCampaignsPage() {
     );
 
     return (
-        <DashboardLayout>
+        <AdminLayout>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-800">Manajemen Campaign</h2>
@@ -457,6 +457,6 @@ export default function DashboardCampaignsPage() {
                     <Pagination meta={meta} onPageChange={setPage} />
                 </div>
             )}
-        </DashboardLayout>
+        </AdminLayout>
     );
 }

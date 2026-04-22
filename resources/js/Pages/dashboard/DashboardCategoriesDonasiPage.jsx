@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import DashboardLayout from '../../layouts/DashboardLayout';
+import AdminLayout from '@/Layouts/AdminLayout';
 import Pagination from '../../components/Pagination';
 import { categoryService } from '../../services/categoryService';
 import toast from 'react-hot-toast';
@@ -58,7 +58,7 @@ export default function DashboardCategoriesPage() {
     };
 
     return (
-        <DashboardLayout>
+        <AdminLayout>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-800">Manajemen Kategori</h2>
@@ -172,6 +172,6 @@ export default function DashboardCategoriesPage() {
                     </div>
                 </div>
             </div>
-        </DashboardLayout>
+        </AdminLayout>
     );
 }
