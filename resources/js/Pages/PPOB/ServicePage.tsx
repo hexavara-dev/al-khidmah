@@ -2,11 +2,9 @@ import { useState, useEffect } from "react";
 import { Head, Link } from "@inertiajs/react";
 import {
     ArrowLeft,
-    User,
     CheckCircle2,
     XCircle,
     Clock,
-    History,
     ChevronRight,
 } from "lucide-react";
 import type { PageProps } from "@/types";
@@ -110,7 +108,7 @@ function DesktopPaymentSidebar({
     onConfirmItem: (item: PricelistItem) => void;
     onConfirmBill: (bill: PostpaidBill) => void;
 }) {
-    const hasPayment = selectedItem !== null || billData !== null;
+    const hasPayment = selectedItem !== null || (billData !== null && !billData.already_paid);
     const price = selectedItem?.product_price ?? billData?.price ?? 0;
     const productLabel =
         selectedItem?.product_description  ?? "-";
@@ -621,6 +619,31 @@ export default function ServicePage({
                                     />
                                 )}
 
+                                {/* PLN customer info card */}
+                                {plnCustomer?.name && (
+                                    <div className="mb-5 flex items-center gap-4 overflow-hidden rounded-2xl bg-primary px-5 py-4 shadow-md shadow-primary/20">
+                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15">
+                                            <svg className="size-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                                <circle cx="12" cy="8" r="4" />
+                                                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" strokeLinecap="round" />
+                                            </svg>
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="mb-0.5 text-[10px] font-bold uppercase tracking-widest text-white/60">
+                                                Informasi Pelanggan
+                                            </p>
+                                            <p className="font-headline text-lg font-bold leading-tight text-white">
+                                                {plnCustomer.name}
+                                            </p>
+                                            {plnCustomer.segment_power && (
+                                                <p className="mt-0.5 text-xs text-white/70">
+                                                    Tarif/Daya: {plnCustomer.segment_power}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* Prepaid product grid */}
                                 {prepaidService !== null && (
                                     <>
@@ -709,7 +732,7 @@ export default function ServicePage({
                 ══════════════════════════════════════════════════ */}
 
                 {/* Bill CTA */}
-                {billData && !selectedItem && (
+                {billData && !selectedItem && !billData.already_paid && (
                     <div className="fixed bottom-24 left-0 right-0 z-40 border-t border-outline-variant/10 bg-surface-bright/95 px-4 py-3 backdrop-blur-md md:hidden">
                         <div className="mx-auto max-w-2xl">
                             <div className="mb-2.5 flex items-center justify-between">
@@ -787,6 +810,7 @@ export default function ServicePage({
                 phoneNumber={phoneNumber}
                 operator={operator}
                 service={service}
+                emoneyProvider={service.type === "etoll" ? emoneyProvider : undefined}
                 onClose={() => setConfirmItem(null)}
             />
             <ConfirmModal

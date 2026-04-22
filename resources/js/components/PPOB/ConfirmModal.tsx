@@ -21,6 +21,7 @@ type Props = {
     bill?: PostpaidBill | null;
     serviceType?: string;
     serviceLabel?: string;
+    emoneyProvider?: string;
     onClose: () => void;
 };
 
@@ -33,6 +34,7 @@ export default function ConfirmModal({
     bill,
     serviceType,
     serviceLabel,
+    emoneyProvider,
     onClose,
 }: Props) {
     function isOvoProduct(item: PricelistItem | null): boolean {
@@ -47,16 +49,67 @@ export default function ConfirmModal({
     const [inquiryState, setInquiryState] = useState<InquiryState>("idle");
     const [ovoName, setOvoName] = useState("");
     const [inquiryError, setInquiryError] = useState("");
+    const [emoneyState, setEmoneyState] = useState<InquiryState>("idle");
+    const [emoneyName, setEmoneyName] = useState("");
+    const [emoneyError, setEmoneyError] = useState("");
 
     const needsInquiry = isOvoProduct(item ?? null);
+    const needsEmoneyInquiry = service?.type === "etoll" && !!item;
 
     useEffect(() => {
         if (!show) {
             setInquiryState("idle");
             setOvoName("");
             setInquiryError("");
+            setEmoneyState("idle");
+            setEmoneyName("");
+            setEmoneyError("");
         }
     }, [show]);
+
+    const handleEmoneyInquiry = async () => {
+        if (!item || !phoneNumber) return;
+        setEmoneyState("loading");
+        setEmoneyError("");
+        try {
+            const csrfToken =
+                (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? "";
+            const res = await fetch("/ppob/inquiry-emoney", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRF-TOKEN": csrfToken,
+                },
+                body: JSON.stringify({
+                    product_code: emoneyProvider
+                        ? emoneyProvider.toUpperCase()
+                        : item.product_code,
+                    hp: phoneNumber,
+                    amount: item.product_price,
+                }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                setEmoneyError(data.message ?? "Inquiry emoney gagal.");
+                setEmoneyState("failed");
+                return;
+            }
+            setEmoneyName(data.customer_name ?? "-");
+            setEmoneyState("verified");
+        } catch {
+            setEmoneyError("Gagal memverifikasi. Cek koneksi internet.");
+            setEmoneyState("failed");
+        }
+    };
+
+    useEffect(() => {
+        if (show && needsEmoneyInquiry && emoneyState === "idle") {
+            handleEmoneyInquiry();
+        }
+    }, [show, needsEmoneyInquiry]);
 
     const handleInquiry = async () => {
         setInquiryState("loading");
@@ -362,6 +415,26 @@ export default function ConfirmModal({
                                             {phoneNumber}
                                         </span>
                                     </div>
+                                    {needsEmoneyInquiry && (
+                                        <div className="flex items-start justify-between gap-4 px-4 py-3">
+                                            <span className="shrink-0 text-on-surface-variant">
+                                                Nama Pelanggan
+                                            </span>
+                                            <span className="text-right font-semibold text-on-surface">
+                                                {emoneyState === "loading" && (
+                                                    <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
+                                                        <span className="h-3 w-3 animate-spin rounded-full border-2 border-outline-variant border-t-primary" />
+                                                        Memeriksa...
+                                                    </span>
+                                                )}
+                                                {emoneyState === "verified" && emoneyName}
+                                                {emoneyState === "failed" && (
+                                                    <span className="text-error text-xs">Gagal</span>
+                                                )}
+                                                {emoneyState === "idle" && "—"}
+                                            </span>
+                                        </div>
+                                    )}
                                     <div className="flex items-start justify-between gap-4 px-4 py-3">
                                         <span className="shrink-0 text-on-surface-variant">
                                             Produk
@@ -388,6 +461,21 @@ export default function ConfirmModal({
                                 </>
                             )}
                         </div>
+
+                        {/* Emoney inquiry error + retry */}
+                        {needsEmoneyInquiry && emoneyState === "failed" && (
+                            <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
+                                <p className="mb-3 text-xs font-medium text-error">
+                                    {emoneyError}
+                                </p>
+                                <button
+                                    onClick={handleEmoneyInquiry}
+                                    className="w-full rounded-xl bg-primary py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-dim"
+                                >
+                                    Coba Lagi
+                                </button>
+                            </div>
+                        )}
 
                         {/* OVO Inquiry Section */}
                         {needsInquiry && inquiryState !== "verified" && (
@@ -437,8 +525,8 @@ export default function ConfirmModal({
                                 onClick={handleBuy}
                                 disabled={
                                     status === "loading" ||
-                                    (needsInquiry &&
-                                        inquiryState !== "verified")
+                                    (needsInquiry && inquiryState !== "verified") ||
+                                    (needsEmoneyInquiry && emoneyState !== "verified")
                                 }
                                 className="flex-1 rounded-xl bg-primary py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-dim disabled:opacity-50"
                             >

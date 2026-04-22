@@ -55,8 +55,10 @@ class PPOBController extends Controller
 
     public function priceList(PriceListRequest $request): JsonResponse
     {
-        $type    = (string) $request->validated('type');
-        $service = PPOBService::where('code', $type)->first();
+        $type        = (string) $request->validated('type');
+        $codeAliases = ['etoll' => 'emoney'];
+        $serviceCode = $codeAliases[$type] ?? $type;
+        $service     = PPOBService::where('code', $serviceCode)->first();
 
         if (! $service) {
             return response()->json(['data' => ['pricelist' => []]]);
@@ -76,7 +78,7 @@ class PPOBController extends Controller
                 'provider_name'       => '',
                 'type'                => $p->type ?? $type,
                 'category'            => '',
-                'icon_url'            => '',
+                'icon_url'            => $p->icon_url ?? '',
             ]);
 
         return response()->json(['data' => ['pricelist' => $products]]);
@@ -132,6 +134,38 @@ class PPOBController extends Controller
         } catch (\RuntimeException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
+    }
+
+    public function inquiryEmoney(Request $request): JsonResponse
+    {
+        $request->validate([
+            'product_code' => 'required|string',
+            'hp'           => 'required|string',
+            'amount'       => 'required|integer|min:1000',
+        ]);
+
+        $refId    = (string) \Illuminate\Support\Str::ulid();
+        $result   = $this->iakService->inquiryEmoney(
+            $refId,
+            (string) $request->input('product_code'),
+            (string) $request->input('hp'),
+            (int)    $request->input('amount'),
+        );
+
+        $payload = $result['data'] ?? $result;
+        $rc      = $payload['response_code'] ?? null;
+
+        if ($rc !== '00') {
+            $msg = $payload['message'] ?? 'Inquiry emoney gagal.';
+            return response()->json(['message' => $msg], 422);
+        }
+
+        return response()->json([
+            'customer_name' => $payload['tr_name'] ?? null,
+            'nominal'       => (int) ($payload['nominal'] ?? 0),
+            'admin'         => (int) ($payload['admin']   ?? 0),
+            'price'         => (int) ($payload['price']   ?? 0),
+        ]);
     }
 
     public function checkoutPasca(PostpaidCheckoutRequest $request): JsonResponse
@@ -223,11 +257,12 @@ class PPOBController extends Controller
             'label'           => $item['label'],
             'name'            => $item['name'],
             'price'           => $item['price'],
-            'base_price'      => $item['price'],   // harga asli IAK — hanya set saat insert
+            'base_price'      => $item['price'],
             'period'          => $item['period'],
             'type'            => $item['type'],
             'status'          => 1,
             'fee'             => $item['fee'] ?? null,
+            'icon_url'        => $item['icon_url'] ?? null,
             'created_at'      => $now,
             'updated_at'      => $now,
         ])->toArray();
@@ -235,7 +270,7 @@ class PPOBController extends Controller
         PPOBServiceProduct::upsert(
             $rows,
             ['code'],
-            ['label', 'name', 'price', 'period', 'type', 'fee', 'status', 'updated_at']
+            ['label', 'name', 'price', 'period', 'type', 'fee', 'icon_url', 'status', 'updated_at']
         );
 
         // Set base_price only for rows being inserted for the first time (base_price still 0)
@@ -302,13 +337,14 @@ class PPOBController extends Controller
         }
 
         return [
-            'code'   => $item['product_code']        ?? '',
-            'label'  => $item['product_description'] ?? '',
-            'name'   => $name,
-            'price'  => (int) ($item['product_price']  ?? 0),
-            'period' => (string) ($item['active_period'] ?? '0'),
-            'type'   => $item['product_type']        ?? '',
-            'fee'    => null,
+            'code'     => $item['product_code']        ?? '',
+            'label'    => $item['product_description'] ?? '',
+            'name'     => $name,
+            'price'    => (int) ($item['product_price']  ?? 0),
+            'period'   => (string) ($item['active_period'] ?? '0'),
+            'type'     => $item['product_type']        ?? '',
+            'fee'      => null,
+            'icon_url' => $item['icon_url']            ?? null,
         ];
     }
 }

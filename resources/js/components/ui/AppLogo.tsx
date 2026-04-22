@@ -34,12 +34,12 @@ export default function AppLogo({ size = 36, variant = 'default', className = ''
 
     return (
         <img
-            src="/images/logo.png"
+            src="/images/assets/ekhidmahlogo.png"
             alt="Al-Khidmah"
             width={size}
             height={size}
             onError={() => setFailed(true)}
-            className={`shrink-0 object-contain ${variant === 'white' ? 'brightness-0 invert' : ''} ${className}`}
+            className={`shrink-0 object-contain ${variant === "white" ? "brightness-0 invert" : ""} ${className}`}
             style={{ width: size, height: size }}
         />
     );

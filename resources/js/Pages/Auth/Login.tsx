@@ -77,7 +77,7 @@ function LoginCard({ status }: { status?: string }) {
                             value={data.username}
                             onChange={e => setData('username', e.target.value)}
                             autoComplete="username"
-                            className="flex-1 bg-transparent text-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none"
+                            className="flex-1 border-0 bg-transparent text-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none"
                         />
                     </div>
                     {errors.username && (
@@ -95,7 +95,7 @@ function LoginCard({ status }: { status?: string }) {
                             value={data.password}
                             onChange={e => setData('password', e.target.value)}
                             autoComplete="current-password"
-                            className="flex-1 bg-transparent text-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none"
+                            className="flex-1 border-0 bg-transparent text-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none"
                         />
                         <button
                             type="button"
@@ -192,7 +192,9 @@ export default function Login({ status }: { status?: string; canResetPassword: b
                         eKhidmah
                     </h1>
                     <p className="mt-1 max-w-xs text-sm text-muted-foreground">
-                        Kelola finansial Anda dengan tenang dan berkah.
+                        Membawa cita-cita mulia sebagai oase dunia dengan
+                        mengalirkan kebaikan, keberkahan, dan kemudahan dalam
+                        setiap langkah kehidupan.
                     </p>
                 </div>
 
@@ -241,7 +243,8 @@ export default function Login({ status }: { status?: string; canResetPassword: b
                     </div>
 
                     <p className="relative text-xs text-white/40">
-                        © {new Date().getFullYear()} eKhidmah. All rights reserved.
+                        © {new Date().getFullYear()} eKhidmah. All rights
+                        reserved.
                     </p>
                 </div>
 

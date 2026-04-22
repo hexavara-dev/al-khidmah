@@ -43,10 +43,12 @@ export type PlnCustomer = {
 };
 
 export type PostpaidBill = {
-    ref_id: string;
+    ref_id: string | null;
     customer_name: string | null;
     period: string | null;
     nominal: number;
     admin: number;
     price: number;
+    already_paid?: boolean;
+    message?: string;
 };
