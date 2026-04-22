@@ -52,14 +52,14 @@ export default function DashboardCampaignsPage() {
     useEffect(() => { load(page, search, filterCat); }, [page, search, filterCat]);
     useEffect(() => { donationCategoryService.getAll().then(({ data }) => setCategories(data.data)); }, []);
 
-    const openCreate = () => { 
-        setEditing(null); 
-        setForm(EMPTY_FORM); 
+    const openCreate = () => {
+        setEditing(null);
+        setForm(EMPTY_FORM);
         setImageFile(null);
         setImagePreview(null);
-        setShowForm(true); 
+        setShowForm(true);
     };
-    
+
     const openEdit = (c: Campaign) => {
         setEditing(c);
         setForm({
@@ -210,7 +210,7 @@ export default function DashboardCampaignsPage() {
                                 ×
                             </button>
                         </div>
-                        
+
                         <form onSubmit={handleSubmit} className="p-6 space-y-5">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -272,7 +272,7 @@ export default function DashboardCampaignsPage() {
                                     />
                                 </div>
                             </div>
-                            
+
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Deskripsi <span className="text-red-500">*</span>
@@ -287,7 +287,7 @@ export default function DashboardCampaignsPage() {
                                     required
                                 />
                             </div>
-                            
+
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Gambar Campaign</label>
                                 <div className="flex items-center gap-4 flex-wrap">
@@ -313,7 +313,7 @@ export default function DashboardCampaignsPage() {
                                 </div>
                                 <p className="text-xs text-gray-400 mt-1">Format: JPG, PNG. Maksimal 2MB</p>
                             </div>
-                            
+
                             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
                                 <input
                                     type="checkbox"
@@ -326,7 +326,7 @@ export default function DashboardCampaignsPage() {
                                 <label htmlFor="is_active" className="text-sm font-medium text-gray-700">Aktifkan Campaign</label>
                                 <span className="text-xs text-gray-400">(Campaign aktif akan ditampilkan ke publik)</span>
                             </div>
-                            
+
                             <div className="flex gap-3 pt-4">
                                <button
                                     type="submit"
@@ -423,8 +423,8 @@ export default function DashboardCampaignsPage() {
                                                     Rp {Number(c.collected_amount).toLocaleString('id-ID')}
                                                 </span>
                                                 <div className="w-24 bg-gray-200 rounded-full h-1.5">
-                                                    <div 
-                                                        className="bg-blue-500 h-1.5 rounded-full" 
+                                                    <div
+                                                        className="bg-blue-500 h-1.5 rounded-full"
                                                         style={{ width: `${Math.min((c.collected_amount / c.target_amount) * 100, 100)}%` }}
                                                     ></div>
                                                 </div>
@@ -432,8 +432,8 @@ export default function DashboardCampaignsPage() {
                                         </td>
                                         <td className="px-4 py-3">
                                             <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                                                c.is_active 
-                                                    ? 'bg-blue-100 text-blue-800' 
+                                                c.is_active
+                                                    ? 'bg-blue-100 text-blue-800'
                                                     : 'bg-gray-100 text-gray-600'
                                             }`}>
                                                 <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${c.is_active ? 'bg-blue-500' : 'bg-gray-400'}`}></span>
@@ -463,7 +463,7 @@ export default function DashboardCampaignsPage() {
                     </table>
                 </div>
             </div>
-            
+
             {meta && campaigns.length > 0 && (
                 <div className="mt-6">
                     <Pagination meta={meta} onPageChange={setPage} />
