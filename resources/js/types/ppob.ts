@@ -15,6 +15,12 @@ export type PricelistItem = {
     product_nominal: string;
     product_details: string;
     product_price: number;
+    provider_code: string;
+    provider_name: string;
+    type: string;
+    category: string;
+    icon_url: string;
+    
 };
 
 export type Operator = {
