@@ -3,7 +3,7 @@ import type {
     Operator,
     Service,
     PlnCustomer,
-} from "@/types/ppob";
+} from "@/types/PPOB";
 import { useState } from "react";
 import {
     Info,
@@ -16,7 +16,7 @@ import {
     MessageSquare,
     Phone,
 } from "lucide-react";
-import { idr, getItemTitle, getItemSubtitle } from "@/lib/ppob";
+import { idr, getItemTitle, getItemSubtitle } from "@/lib/PPOB";
 
 type Props = {
     items: PricelistItem[];

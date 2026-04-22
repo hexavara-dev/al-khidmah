@@ -1,4 +1,4 @@
-import type { Operator } from '@/types/ppob';
+import type { Operator } from '@/types/PPOB';
 
 type Props = {
     phoneNumber: string;

@@ -1,9 +1,9 @@
-﻿import { Head, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import type { PageProps } from '@/types';
-import { services } from '@/lib/ppob';
+import { services } from '@/lib/PPOB';
 import Navbar from '@/components/ui/Navbar';
 import BottomNav from '@/components/ui/BottomNav';
-import ServiceCard from '@/components/ppob/ServiceCard';
+import ServiceCard from '@/components/PPOB/ServiceCard';
 
 type HomepageProps = PageProps<{ balance: number }>;
 

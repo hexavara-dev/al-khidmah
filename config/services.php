@@ -48,6 +48,13 @@ return [
         'redirect'      => env('GOOGLE_REDIRECT_URI', '/auth/google/callback'),
     ],
 
+    'mobile' => [
+        // Custom URL scheme deep link untuk Flutter app.
+        // Contoh: ekhidmah://callback
+        // Harus didaftarkan di AndroidManifest.xml / Info.plist Flutter.
+        'deep_link_callback' => env('MOBILE_DEEP_LINK_CALLBACK', 'ekhidmah://callback'),
+    ],
+
     'iak' => [
         'user_hp'              => env('IAK_USER_HP'),
         'api_key'              => env('IAK_API_KEY'),

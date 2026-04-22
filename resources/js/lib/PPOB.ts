@@ -1,5 +1,5 @@
 import { Smartphone, Wifi, Tv2, Zap, Wallet, FileText } from 'lucide-react';
-import type { Service, PricelistItem } from '@/types/ppob';
+import type { Service, PricelistItem } from '@/types/PPOB';
 
 export const idr = new Intl.NumberFormat('id-ID', {
     style: 'currency',

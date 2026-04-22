@@ -16,6 +16,7 @@ use App\Http\Controllers\PpobPageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PPOBController;
 use App\Http\Controllers\PPOBServiceController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -129,15 +130,42 @@ Route::post('/auth/jemaah/login', [JemaahController::class, 'loginWithPassword']
 
 Route::get('/mobile-auth/consume', [MobileAuthController::class, 'consume'])
     ->name('mobile.auth.consume');
-Route::get('/mobile-auth/consume', function (Request $request) {
-    $token = $request->token;
 
-    if (!$token) {
-        return response('Token tidak ada', 400);
-    }
+// ─── Debug OAuth (HANYA di non-production) ───────────────────────
+if (app()->environment(['local', 'staging'])) {
+    Route::get('/debug/google-oauth', function (Request $request) {
+        $logFile = storage_path('logs/laravel.log');
+        if (!file_exists($logFile)) {
+            return response()->json(['error' => 'Log file tidak ditemukan']);
+        }
 
-    // simulasi login
-    return redirect('/donasi');
-});
+        // Ambil 100 baris terakhir dan filter hanya baris [GoogleOAuth]
+        $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $filtered = array_filter($lines, fn($l) => str_contains($l, '[GoogleOAuth]') || str_contains($l, 'GoogleOAuth'));
+        $recent = array_slice(array_values($filtered), -50);
+
+        return response()->json([
+            'total_google_log_lines' => count($filtered),
+            'showing_last'           => count($recent),
+            'logs'                   => $recent,
+            'config_deep_link'       => config('services.mobile.deep_link_callback', '(tidak di-set, pakai default ekhidmah://callback)'),
+            'app_url'                => config('app.url'),
+            'google_redirect_uri'    => config('services.google.redirect'),
+        ]);
+    })->name('debug.google.oauth');
+
+    Route::get('/debug/mobile-auth-test', function (Request $request) {
+        $token = $request->query('token', 'TOKEN_KOSONG');
+        $deepLink = config('services.mobile.deep_link_callback', 'ekhidmah://callback')
+            . '?token=' . rawurlencode($token)
+            . '&return_url=' . rawurlencode(url('/donasi?mobile=1'));
+
+        return response()->json([
+            'deep_link'        => $deepLink,
+            'consume_url'      => route('mobile.auth.consume', ['token' => $token, 'return_url' => '/donasi?mobile=1']),
+            'config_deep_link' => config('services.mobile.deep_link_callback', '(tidak di-set)'),
+        ]);
+    })->name('debug.mobile.auth.test');
+}
 
 require __DIR__ . '/auth.php';

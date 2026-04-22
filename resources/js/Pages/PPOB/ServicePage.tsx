@@ -16,16 +16,16 @@ import type {
     PostpaidBill,
     PostpaidProvider,
     PlnCustomer,
-} from "@/types/ppob";
-import { services, idr } from "@/lib/ppob";
+} from "@/types/PPOB";
+import { services, idr } from "@/lib/PPOB";
 import phonePrefix from "@/lib/phonePrefix";
 import Navbar from "@/components/ui/Navbar";
 import BottomNav from "@/components/ui/BottomNav";
-import NumberInputBar from "@/components/ppob/NumberInputBar";
-import ProductList from "@/components/ppob/ProductList";
-import BillInquiryCard from "@/components/ppob/BillInquiryCard";
-import ConfirmModal from "@/components/ppob/ConfirmModal";
-import ProviderSelector from "@/components/ppob/ProviderSelector";
+import NumberInputBar from "@/components/PPOB/NumberInputBar";
+import ProductList from "@/components/PPOB/ProductList";
+import BillInquiryCard from "@/components/PPOB/BillInquiryCard";
+import ConfirmModal from "@/components/PPOB/ConfirmModal";
+import ProviderSelector from "@/components/PPOB/ProviderSelector";
 
 type RecentTx = {
     id: number;

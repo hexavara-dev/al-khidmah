@@ -1,5 +1,5 @@
-import type { PostpaidProvider } from "@/types/ppob";
-import { idr } from "@/lib/ppob";
+import type { PostpaidProvider } from "@/types/PPOB";
+import { idr } from "@/lib/PPOB";
 
 type Props = {
     providers: PostpaidProvider[];
