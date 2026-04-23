@@ -1,0 +1,210 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/geist";
+
+@plugin "@tailwindcss/forms";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: 'Geist Variable', sans-serif;
+  --font-heading: var(--font-sans);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* ── Material Design 3 surface tokens ── */
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+
+  /* ── Material Design 3 primary container tokens ── */
+  --color-primary-container: var(--primary-container);
+  --color-on-primary: var(--on-primary);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-primary-dim: var(--primary-dim);
+
+  /* ── Material Design 3 secondary container tokens ── */
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary: var(--on-secondary);
+
+  /* ── Material Design 3 outline tokens ── */
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+
+  /* ── Material Design 3 error tokens ── */
+  --color-error: var(--error);
+  --color-error-container: var(--error-container);
+  --color-on-error: var(--on-error);
+
+  /* ── Material Design 3 tertiary ── */
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-container: var(--tertiary-container);
+
+  /* ── Donation brand color #258d88 ── */
+  --color-donation:           #258d88;
+  --color-donation-dim:       #1d6e6a;
+  --color-donation-muted:     #e6f5f4;
+  --color-donation-subtle:    #f2fafa;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  :root {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.58 0.12 192);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.95 0.02 192);
+    --accent-foreground: oklch(0.35 0.10 192);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.58 0.12 192);
+    --chart-1: oklch(0.58 0.12 192);
+    --chart-2: oklch(0.65 0.11 185);
+    --chart-3: oklch(0.72 0.09 190);
+    --chart-4: oklch(0.50 0.13 195);
+    --chart-5: oklch(0.40 0.10 185);
+    --radius: 0.625rem;
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.58 0.12 192);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.95 0.02 192);
+    --sidebar-accent-foreground: oklch(0.35 0.10 192);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.58 0.12 192);
+
+    /* ── Material Design 3 tokens (tosca) ── */
+    --surface-bright: oklch(0.97 0.005 192);
+    --surface-container: oklch(0.94 0.01 192);
+    --surface-container-low: oklch(0.96 0.007 192);
+    --surface-container-lowest: oklch(1 0 0);
+    --surface-container-high: oklch(0.91 0.015 192);
+    --on-surface: oklch(0.14 0.01 192);
+    --on-surface-variant: oklch(0.36 0.02 192);
+    --primary-container: oklch(0.93 0.03 192);
+    --on-primary: oklch(1 0 0);
+    --on-primary-container: oklch(0.15 0.05 192);
+    --primary-dim: oklch(0.50 0.11 192);
+    --secondary-container: oklch(0.88 0.04 186);
+    --on-secondary: oklch(1 0 0);
+    --outline: oklch(0.55 0.02 192);
+    --outline-variant: oklch(0.82 0.02 192);
+    --error: oklch(0.5 0.22 27);
+    --error-container: oklch(0.93 0.05 25);
+    --on-error: oklch(1 0 0);
+    --tertiary: oklch(0.55 0.15 165);
+    --tertiary-container: oklch(0.91 0.05 165);
+  }
+  .dark {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.65 0.12 192);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.22 0.04 192);
+    --accent-foreground: oklch(0.85 0.08 192);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.65 0.12 192);
+    --chart-1: oklch(0.65 0.12 192);
+    --chart-2: oklch(0.72 0.09 190);
+    --chart-3: oklch(0.58 0.12 192);
+    --chart-4: oklch(0.50 0.13 195);
+    --chart-5: oklch(0.40 0.10 185);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.65 0.12 192);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.22 0.04 192);
+    --sidebar-accent-foreground: oklch(0.85 0.08 192);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.65 0.12 192);
+
+    /* ── Material Design 3 tokens (tosca dark) ── */
+    --surface-bright: oklch(0.25 0.01 192);
+    --surface-container: oklch(0.22 0.01 192);
+    --surface-container-low: oklch(0.19 0.008 192);
+    --surface-container-lowest: oklch(0.15 0.005 192);
+    --surface-container-high: oklch(0.28 0.015 192);
+    --on-surface: oklch(0.93 0.01 192);
+    --on-surface-variant: oklch(0.72 0.03 192);
+    --primary-container: oklch(0.32 0.10 192);
+    --on-primary: oklch(0.22 0.08 192);
+    --on-primary-container: oklch(0.88 0.07 192);
+    --primary-dim: oklch(0.55 0.12 192);
+    --secondary-container: oklch(0.28 0.04 186);
+    --on-secondary: oklch(0.22 0.05 186);
+    --outline: oklch(0.55 0.02 192);
+    --outline-variant: oklch(0.35 0.02 192);
+    --error: oklch(0.7 0.19 22);
+    --error-container: oklch(0.3 0.08 25);
+    --on-error: oklch(0.25 0.1 25);
+    --tertiary: oklch(0.7 0.12 165);
+    --tertiary-container: oklch(0.3 0.06 165);
+  }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
