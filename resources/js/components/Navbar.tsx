@@ -57,7 +57,7 @@ export default function Navbar() {
                         {navLink('/donasi', 'Beranda')}
                         {user ? (
                             <>
-                                {user.role === 'admin' && navLink('/admin/dashboard', 'Dashboard')}
+                                {/* {user.role === 'admin' && navLink('/admin/dashboard', 'Dashboard')} */}
                                 {navLink('/my-donations', 'Donasiku')}
                             </>
                         ) : (
