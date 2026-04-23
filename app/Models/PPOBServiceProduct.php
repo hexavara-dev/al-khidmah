@@ -14,6 +14,7 @@ class PPOBServiceProduct extends Model
 
     protected $fillable = [
         'ppob_service_id',
+        'category_id',
         'code',
         'label',
         'name',
@@ -36,5 +37,10 @@ class PPOBServiceProduct extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(PPOBService::class, 'ppob_service_id');
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(PPOBServiceCategory::class, 'category_id');
     }
 }

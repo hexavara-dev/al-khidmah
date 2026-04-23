@@ -12,7 +12,7 @@ import AdminLayout from '@/Layouts/AdminLayout'
 import { Head, router } from '@inertiajs/react'
 import { ColumnDef } from '@tanstack/react-table'
 import axios from 'axios'
-import { Check, Loader2, Minus, Pencil, PowerOff, RefreshCw, Save, Search } from 'lucide-react'
+import { Check, Folder, Loader2, Minus, Pencil, Plus, PowerOff, RefreshCw, Save, Search, Trash2 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -42,6 +42,21 @@ interface SavedProduct {
     period: string
     status: number
     fee: number | null
+}
+
+interface ServiceCategory {
+    id: string
+    name: string
+    products_count?: number
+}
+
+interface CategoryProduct {
+    id: string
+    code: string
+    name: string
+    label: string
+    price: number
+    status: number
 }
 
 interface Props {
@@ -153,7 +168,106 @@ function makeColumns(
 }
 
 export default function ServicePage({ service, supported, products }: Props) {
-    // ── Local products state (for optimistic updates) ───────────────
+    const serviceType = service.code
+
+    // ── Category management state ─────────────────────────────
+    const [catOpen, setCatOpen]                       = useState(false)
+    const [categories, setCategories]                 = useState<ServiceCategory[]>([])
+    const [catLoading, setCatLoading]                 = useState(false)
+    const [selectedCat, setSelectedCat]               = useState<ServiceCategory | null>(null)
+    const [catProducts, setCatProducts]               = useState<CategoryProduct[]>([])
+    const [catProductsLoading, setCatProductsLoading] = useState(false)
+    const [addingCat, setAddingCat]                   = useState(false)
+    const [newCatName, setNewCatName]                 = useState('')
+    const [newCatSaving, setNewCatSaving]             = useState(false)
+    const [editingCat, setEditingCat]                 = useState<ServiceCategory | null>(null)
+    const [editCatName, setEditCatName]               = useState('')
+    const [editCatSaving, setEditCatSaving]           = useState(false)
+    const [deletingCatId, setDeletingCatId]           = useState<string | null>(null)
+
+    const loadCategories = async () => {
+        setCatLoading(true)
+        try {
+            const { data } = await axios.get(`/admin/ppob/${service.code}/categories`)
+            setCategories(data)
+        } catch {
+            toast.error('Gagal memuat kategori.')
+        } finally {
+            setCatLoading(false)
+        }
+    }
+
+    const loadCatProducts = async (cat: ServiceCategory) => {
+        setSelectedCat(cat)
+        setCatProducts([])
+        setCatProductsLoading(true)
+        try {
+            const { data } = await axios.get(`/admin/ppob/${service.code}/categories/${cat.id}/products`)
+            setCatProducts(data)
+        } catch {
+            toast.error('Gagal memuat produk.')
+        } finally {
+            setCatProductsLoading(false)
+        }
+    }
+
+    const handleOpenCatDialog = () => {
+        setCatOpen(true)
+        setSelectedCat(null)
+        setCatProducts([])
+        setAddingCat(false)
+        setNewCatName('')
+        setEditingCat(null)
+        loadCategories()
+    }
+
+    const handleAddCategory = async () => {
+        if (!newCatName.trim()) return
+        setNewCatSaving(true)
+        try {
+            const { data } = await axios.post(`/admin/ppob/${service.code}/categories`, { name: newCatName.trim() })
+            setCategories(prev => [...prev, { ...data, products_count: 0 }].sort((a, b) => a.name.localeCompare(b.name)))
+            setNewCatName('')
+            setAddingCat(false)
+            toast.success('Kategori berhasil ditambahkan.')
+        } catch (err: any) {
+            const msg = err?.response?.data?.errors?.name?.[0] ?? 'Gagal menambah kategori.'
+            toast.error(msg)
+        } finally {
+            setNewCatSaving(false)
+        }
+    }
+
+    const handleUpdateCategory = async () => {
+        if (!editingCat || !editCatName.trim()) return
+        setEditCatSaving(true)
+        try {
+            const { data } = await axios.patch(`/admin/ppob/${service.code}/categories/${editingCat.id}`, { name: editCatName.trim() })
+            setCategories(prev => prev.map(c => c.id === data.id ? { ...c, name: data.name } : c).sort((a, b) => a.name.localeCompare(b.name)))
+            if (selectedCat?.id === data.id) setSelectedCat(s => s ? { ...s, name: data.name } : s)
+            setEditingCat(null)
+            toast.success('Kategori berhasil diperbarui.')
+        } catch (err: any) {
+            const msg = err?.response?.data?.errors?.name?.[0] ?? 'Gagal memperbarui kategori.'
+            toast.error(msg)
+        } finally {
+            setEditCatSaving(false)
+        }
+    }
+
+    const handleDeleteCategory = async (catId: string) => {
+        setDeletingCatId(catId)
+        try {
+            await axios.delete(`/admin/ppob/${service.code}/categories/${catId}`)
+            setCategories(prev => prev.filter(c => c.id !== catId))
+            if (selectedCat?.id === catId) { setSelectedCat(null); setCatProducts([]) }
+            toast.success('Kategori berhasil dihapus.')
+        } catch {
+            toast.error('Gagal menghapus kategori.')
+        } finally {
+            setDeletingCatId(null)
+        }
+    }
     const [localProducts, setLocalProducts] = useState<SavedProduct[]>(products)
     useEffect(() => { setLocalProducts(products) }, [products])
 
@@ -347,14 +461,22 @@ export default function ServicePage({ service, supported, products }: Props) {
                     </div>
 
                     {supported ? (
-                        <Button onClick={handleSync} disabled={loading} className="shrink-0">
-                            {loading ? (
-                                <Loader2 className="animate-spin" />
-                            ) : (
-                                <RefreshCw />
-                            )}
-                            Sinkronisasi Produk
-                        </Button>
+                        <>
+                            {serviceType === "pulsa" || serviceType === "paket" ? (
+                                <Button className="shrink-0" onClick={handleOpenCatDialog}>
+                                    <Folder className="size-4" />
+                                    Manajemen Kategori {serviceType}
+                                </Button>
+                            ) : null}
+                            <Button onClick={handleSync} disabled={loading} className="shrink-0">
+                                {loading ? (
+                                    <Loader2 className="animate-spin" />
+                                ) : (
+                                    <RefreshCw />
+                                )}
+                                Sinkronisasi Produk
+                            </Button>
+                        </>
                     ) : (
                         <Badge variant="outline" className="border-yellow-400 text-yellow-600">
                             Postpaid &mdash; sync belum didukung
@@ -627,6 +749,185 @@ export default function ServicePage({ service, supported, products }: Props) {
                             Simpan {selected.size > 0 ? `${selected.size} produk` : 'produk'}
                         </Button>
                     </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Manajemen Kategori modal */}
+            <Dialog open={catOpen} onOpenChange={setCatOpen}>
+                <DialogContent className="max-w-5xl" showCloseButton>
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Folder className="size-5" />
+                            Manajemen Kategori — {service.description}
+                        </DialogTitle>
+                    </DialogHeader>
+
+                    <div className="flex h-[65vh] gap-0 overflow-hidden rounded-lg border">
+                        {/* ── Left panel: category list ───────────────── */}
+                        <div className="flex w-72 shrink-0 flex-col border-r">
+                            {/* Header */}
+                            <div className="flex items-center justify-between border-b px-4 py-3">
+                                <span className="text-sm font-semibold">List Data Kategori</span>
+                                <button
+                                    type="button"
+                                    onClick={() => { setAddingCat(true); setEditingCat(null); setNewCatName('') }}
+                                    className="flex items-center gap-1 rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                                >
+                                    <Plus className="size-3" />
+                                    Tambah Data
+                                </button>
+                            </div>
+
+                            {/* Add form */}
+                            {addingCat && (
+                                <div className="flex flex-col gap-2 border-b px-3 py-3">
+                                    <input
+                                        autoFocus
+                                        type="text"
+                                        value={newCatName}
+                                        onChange={e => setNewCatName(e.target.value)}
+                                        onKeyDown={e => { if (e.key === 'Enter') handleAddCategory(); if (e.key === 'Escape') setAddingCat(false) }}
+                                        placeholder="Nama kategori..."
+                                        className="rounded-md border bg-background px-2.5 py-1.5 text-sm outline-none ring-inset focus:ring-2 focus:ring-primary/30"
+                                    />
+                                    <div className="flex gap-1.5">
+                                        <Button size="sm" onClick={handleAddCategory} disabled={newCatSaving || !newCatName.trim()} className="h-7 flex-1 text-xs">
+                                            {newCatSaving ? <Loader2 className="size-3 animate-spin" /> : 'Simpan'}
+                                        </Button>
+                                        <Button size="sm" variant="outline" onClick={() => setAddingCat(false)} className="h-7 flex-1 text-xs">
+                                            Batal
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Category list */}
+                            <div className="flex-1 overflow-y-auto">
+                                {catLoading ? (
+                                    <div className="flex items-center justify-center py-10">
+                                        <Loader2 className="size-5 animate-spin text-muted-foreground" />
+                                    </div>
+                                ) : categories.length === 0 ? (
+                                    <p className="px-4 py-6 text-center text-xs text-muted-foreground">
+                                        Belum ada kategori.
+                                    </p>
+                                ) : (
+                                    categories.map(cat => (
+                                        <div
+                                            key={cat.id}
+                                            className={[
+                                                'group flex cursor-pointer items-center justify-between px-4 py-3 text-sm transition-colors',
+                                                selectedCat?.id === cat.id
+                                                    ? 'bg-primary/10 font-medium text-primary'
+                                                    : 'hover:bg-muted/60',
+                                            ].join(' ')}
+                                            onClick={() => { setEditingCat(null); loadCatProducts(cat) }}
+                                        >
+                                            {editingCat?.id === cat.id ? (
+                                                <div className="flex w-full flex-col gap-1.5" onClick={e => e.stopPropagation()}>
+                                                    <input
+                                                        autoFocus
+                                                        type="text"
+                                                        value={editCatName}
+                                                        onChange={e => setEditCatName(e.target.value)}
+                                                        onKeyDown={e => { if (e.key === 'Enter') handleUpdateCategory(); if (e.key === 'Escape') setEditingCat(null) }}
+                                                        className="w-full rounded border bg-background px-2 py-1 text-xs outline-none ring-inset focus:ring-2 focus:ring-primary/30"
+                                                    />
+                                                    <div className="flex gap-1">
+                                                        <button
+                                                            onClick={handleUpdateCategory}
+                                                            disabled={editCatSaving || !editCatName.trim()}
+                                                            className="flex-1 rounded bg-primary py-0.5 text-xs font-medium text-primary-foreground disabled:opacity-50"
+                                                        >
+                                                            {editCatSaving ? <Loader2 className="mx-auto size-3 animate-spin" /> : 'OK'}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setEditingCat(null)}
+                                                            className="flex-1 rounded border py-0.5 text-xs"
+                                                        >
+                                                            Batal
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <span className="min-w-0 flex-1 truncate">{cat.name}</span>
+                                                    <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                                                        <button
+                                                            type="button"
+                                                            onClick={e => { e.stopPropagation(); setEditingCat(cat); setEditCatName(cat.name); setAddingCat(false) }}
+                                                            className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                            title="Edit"
+                                                        >
+                                                            <Pencil className="size-3.5" />
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={e => { e.stopPropagation(); handleDeleteCategory(cat.id) }}
+                                                            disabled={deletingCatId === cat.id}
+                                                            className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
+                                                            title="Hapus"
+                                                        >
+                                                            {deletingCatId === cat.id
+                                                                ? <Loader2 className="size-3.5 animate-spin" />
+                                                                : <Trash2 className="size-3.5" />
+                                                            }
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+
+                        {/* ── Right panel: products of selected category ── */}
+                        <div className="flex flex-1 flex-col">
+                            {/* Header */}
+                            <div className="flex items-center border-b px-5 py-3">
+                                <span className="text-sm font-semibold text-muted-foreground">
+                                    {selectedCat
+                                        ? <>Produk dalam kategori <span className="text-foreground">{selectedCat.name}</span></>
+                                        : 'Pilih kategori untuk melihat produk'}
+                                </span>
+                            </div>
+
+                            {/* Product list */}
+                            <div className="flex-1 overflow-y-auto px-5 py-3">
+                                {!selectedCat ? (
+                                    <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground">
+                                        <Folder className="size-10 opacity-25" />
+                                        <p className="text-sm">Belum ada kategori dipilih</p>
+                                    </div>
+                                ) : catProductsLoading ? (
+                                    <div className="flex h-full items-center justify-center">
+                                        <Loader2 className="size-5 animate-spin text-muted-foreground" />
+                                    </div>
+                                ) : catProducts.length === 0 ? (
+                                    <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground">
+                                        <Search className="size-8 opacity-25" />
+                                        <p className="text-sm">Tidak ada produk dalam kategori ini.</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                                        {catProducts.map(p => (
+                                            <div
+                                                key={p.id}
+                                                className="flex flex-col gap-0.5 rounded-lg border bg-background p-3 text-sm"
+                                            >
+                                                <span className="font-medium leading-snug">{p.name}</span>
+                                                <span className="text-xs text-muted-foreground">{p.label}</span>
+                                                <span className="mt-1 text-xs font-semibold">
+                                                    {formatRupiah(p.price)}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 </DialogContent>
             </Dialog>
         </AdminLayout>

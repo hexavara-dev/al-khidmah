@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PPOBServiceCategory extends Model
 {
@@ -22,5 +23,10 @@ class PPOBServiceCategory extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(PPOBService::class, 'ppob_id');
+    }
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(PPOBServiceProduct::class, 'category_id');
     }
 }

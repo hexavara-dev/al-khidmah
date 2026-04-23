@@ -16,6 +16,7 @@ use App\Http\Controllers\PpobPageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PPOBController;
 use App\Http\Controllers\PPOBServiceController;
+use App\Http\Controllers\PPOBServiceCategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -115,6 +116,13 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
         Route::post('/{code}/save',              [PPOBController::class, 'store'])->name('save');
         Route::patch('/products/{productId}',        [PPOBController::class, 'updateProduct'])->name('product.update');
         Route::patch('/products/{productId}/toggle', [PPOBController::class, 'toggleProductStatus'])->name('product.toggle');
+
+        // Category management
+        Route::get('/{code}/categories',                         [PPOBServiceCategoryController::class, 'index'])->name('categories.index');
+        Route::get('/{code}/categories/{categoryId}/products',   [PPOBServiceCategoryController::class, 'products'])->name('categories.products');
+        Route::post('/{code}/categories',                        [PPOBServiceCategoryController::class, 'store'])->name('categories.store');
+        Route::patch('/{code}/categories/{categoryId}',          [PPOBServiceCategoryController::class, 'update'])->name('categories.update');
+        Route::delete('/{code}/categories/{categoryId}',         [PPOBServiceCategoryController::class, 'destroy'])->name('categories.destroy');
     });
 });
 
