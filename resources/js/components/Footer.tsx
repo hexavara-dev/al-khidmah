@@ -8,7 +8,7 @@ export default function Footer() {
                     <div>
                         <div className="flex items-center gap-3 mb-4">
                             <div className="flex h-10 w-10 items-center justify-center">
-                                <img src="/images/assets/eKhidmah_logo.png" alt="eKhidmah" className="w-10 h-10 object-contain" />
+                                <img src="/images/assets/eKhidmah_logobaru.png" alt="eKhidmah" className="w-10 h-10 object-contain" />
                             </div>
                             <div>
                                 <p className="font-bold text-lg leading-none">eKhidmah</p>
