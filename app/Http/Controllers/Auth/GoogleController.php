@@ -17,12 +17,12 @@ class GoogleController extends Controller
         $stateValue = $isMobile ? 'mobile' : 'web';
 
         Log::channel('stack')->info('[GoogleOAuth] redirect() dipanggil', [
-            'ip'          => $request->ip(),
-            'user_agent'  => $request->userAgent(),
-            'mobile_param'=> $request->get('mobile'),
-            'is_mobile'   => $isMobile,
-            'state_sent'  => $stateValue,
-            'referer'     => $request->header('Referer'),
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'mobile_param' => $request->get('mobile'),
+            'is_mobile' => $isMobile,
+            'state_sent' => $stateValue,
+            'referer' => $request->header('Referer'),
         ]);
 
         return Socialite::driver('google')
@@ -78,15 +78,19 @@ class GoogleController extends Controller
                 $token = $user->createToken('mobile')->plainTextToken;
                 $returnUrl = '/donasi?mobile=1';
 
-                return redirect(
-                    url('/mobile-auth/consume')
-                    . '?token=' . rawurlencode($token)
-                    . '&return_url=' . rawurlencode($returnUrl)
-                );
+                Log::channel('stack')->info('[GoogleOAuth] Mobile flow — tampil halaman intent', [
+                    'user_id' => $user->id,
+                ]);
+
+                return response()->view('auth.mobile-callback', [
+                    'token' => $token,
+                    'returnUrl' => url($returnUrl),
+                    'packageName' => 'ekhidmah.com', // applicationId dari build.gradle
+                ]);
             }
 
             // =========================
-            // FLOW WEB
+            // FLOW WE
             // =========================
             Log::channel('stack')->info('[GoogleOAuth] Web flow — redirect ke home', [
                 'user_id' => $user->id,
@@ -96,7 +100,7 @@ class GoogleController extends Controller
 
         } catch (\Exception $e) {
             Log::channel('stack')->error('[GoogleOAuth] callback() GAGAL', [
-                'error'   => $e->getMessage(),
+                'error' => $e->getMessage(),
                 'state'   => $state,
                 'trace'   => $e->getTraceAsString(),
             ]);
