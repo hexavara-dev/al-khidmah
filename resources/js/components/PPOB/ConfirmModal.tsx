@@ -73,7 +73,11 @@ export default function ConfirmModal({
         setEmoneyError("");
         try {
             const csrfToken =
-                (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? "";
+                (
+                    document.querySelector(
+                        'meta[name="csrf-token"]',
+                    ) as HTMLMetaElement
+                )?.content ?? "";
             const res = await fetch("/ppob/inquiry-emoney", {
                 method: "POST",
                 credentials: "same-origin",
@@ -97,7 +101,7 @@ export default function ConfirmModal({
                 setEmoneyState("failed");
                 return;
             }
-            setEmoneyName(data.customer_name ?? "-");
+            setEmoneyName(data.customer_name?.trim() || "-");
             setEmoneyState("verified");
         } catch {
             setEmoneyError("Gagal memverifikasi. Cek koneksi internet.");
@@ -427,9 +431,13 @@ export default function ConfirmModal({
                                                         Memeriksa...
                                                     </span>
                                                 )}
-                                                {emoneyState === "verified" && emoneyName}
+                                                {emoneyState === "verified" &&
+                                                    (emoneyName ||
+                                                        "Nama tidak tersedia")}
                                                 {emoneyState === "failed" && (
-                                                    <span className="text-error text-xs">Gagal</span>
+                                                    <span className="text-error text-xs">
+                                                        Gagal
+                                                    </span>
                                                 )}
                                                 {emoneyState === "idle" && "—"}
                                             </span>
@@ -525,8 +533,10 @@ export default function ConfirmModal({
                                 onClick={handleBuy}
                                 disabled={
                                     status === "loading" ||
-                                    (needsInquiry && inquiryState !== "verified") ||
-                                    (needsEmoneyInquiry && emoneyState !== "verified")
+                                    (needsInquiry &&
+                                        inquiryState !== "verified") ||
+                                    (needsEmoneyInquiry &&
+                                        emoneyState !== "verified")
                                 }
                                 className="flex-1 rounded-xl bg-primary py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-dim disabled:opacity-50"
                             >

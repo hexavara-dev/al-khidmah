@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Donation;
 use App\Services\CampaignService;
 use App\Services\DonationService;
+use App\Services\MidtransService; 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -16,8 +17,8 @@ class DonasiController extends Controller
     public function __construct(
         private CampaignService $campaignService,
         private DonationService $donationService,
-    ) {
-    }
+        private MidtransService $midtransService,
+    ) {}
 
     public function index(Request $request): Response
     {
@@ -48,8 +49,8 @@ class DonasiController extends Controller
             'campaign' => $campaign,
             'donors' => $donors,
             'midtrans' => [
-                'snapJsUrl' => config('services.midtrans.snap_js_url', 'https://app.sandbox.midtrans.com/snap/snap.js'),
-                'clientKey' => config('services.midtrans.client_key', ''),
+                'snapJsUrl' => $this->midtransService->getSnapJsUrl(),
+                'clientKey' => $this->midtransService->getSnapClientKey(),
             ],
         ]);
     }
