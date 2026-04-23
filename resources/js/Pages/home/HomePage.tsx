@@ -81,7 +81,7 @@ export default function HomePage() {
             {/* ===== MOBILE HEADER ===== */}
             <div className="md:hidden bg-gradient-to-br from-[#00cacd] via-[#00b8bb] to-[#008f92] px-4 pt-10 pb-6">
                 <div className="flex items-center gap-3 mb-6">
-                    <span className="text-2xl">🕌</span>
+                    <img src="/images/assets/eKhidmah_logobaru.png" alt="eKhidmah" className="w-9 h-9 object-contain" />
                     <h1 className="text-white font-bold text-lg tracking-wide">Donasi Al Khidmah</h1>
                 </div>
 

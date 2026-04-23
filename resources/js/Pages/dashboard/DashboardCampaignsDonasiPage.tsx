@@ -34,6 +34,7 @@ export default function DashboardCampaignsPage() {
     const [submitting,  setSubmitting]  = useState(false);
     const [imageFile,   setImageFile]   = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [unlimitedTarget, setUnlimitedTarget] = useState(true);
     const [downloading, setDownloading] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
 
@@ -57,15 +58,18 @@ export default function DashboardCampaignsPage() {
         setForm(EMPTY_FORM);
         setImageFile(null);
         setImagePreview(null);
+        setUnlimitedTarget(true);
         setShowForm(true);
     };
 
     const openEdit = (c: Campaign) => {
+        const hasTarget = c.target_amount != null && Number(c.target_amount) > 0;
+        setUnlimitedTarget(!hasTarget);
         setEditing(c);
         setForm({
             title:         c.title,
             description:   c.description,
-            target_amount: String(c.target_amount),
+            target_amount: hasTarget ? String(c.target_amount) : '',
             category_id:   String(c.category_id),
             deadline:      c.deadline?.split('T')[0] ?? c.deadline,
             is_active:     c.is_active,
@@ -81,17 +85,41 @@ export default function DashboardCampaignsPage() {
         setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     };
 
+    const IMAGE_MAX_BYTES  = 2 * 1024 * 1024; // 2 MB
+    const IMAGE_MIN_W = 400;  const IMAGE_MIN_H = 200;
+    const IMAGE_MAX_W = 1920; const IMAGE_MAX_H = 1080;
+
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) {
+        if (!file) { setImageFile(null); setImagePreview(null); return; }
+
+        if (file.size > IMAGE_MAX_BYTES) {
+            toast.error('Ukuran gambar maksimal 2 MB');
+            if (fileRef.current) fileRef.current.value = '';
+            return;
+        }
+
+        const objectUrl = URL.createObjectURL(file);
+        const img = new window.Image();
+        img.onload = () => {
+            URL.revokeObjectURL(objectUrl);
+            if (img.width < IMAGE_MIN_W || img.height < IMAGE_MIN_H) {
+                toast.error(`Resolusi minimal ${IMAGE_MIN_W}×${IMAGE_MIN_H} px`);
+                if (fileRef.current) fileRef.current.value = '';
+                return;
+            }
+            if (img.width > IMAGE_MAX_W || img.height > IMAGE_MAX_H) {
+                toast.error(`Resolusi maksimal ${IMAGE_MAX_W}×${IMAGE_MAX_H} px`);
+                if (fileRef.current) fileRef.current.value = '';
+                return;
+            }
             setImageFile(file);
             const reader = new FileReader();
             reader.onloadend = () => setImagePreview(reader.result as string);
             reader.readAsDataURL(file);
-        } else {
-            setImageFile(null);
-            setImagePreview(null);
-        }
+        };
+        img.onerror = () => { URL.revokeObjectURL(objectUrl); toast.error('File gambar tidak valid.'); };
+        img.src = objectUrl;
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -102,6 +130,9 @@ export default function DashboardCampaignsPage() {
             Object.entries(form).forEach(([k, v]) => {
                 if (k === 'is_active') {
                     fd.append(k, v ? '1' : '0');
+                } else if (k === 'target_amount') {
+                    // Only append when not unlimited and value is set
+                    if (!unlimitedTarget && (v as string)) fd.append(k, v as string);
                 } else {
                     fd.append(k, v as string);
                 }
@@ -246,17 +277,32 @@ export default function DashboardCampaignsPage() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Target Donasi (Rp) <span className="text-red-500">*</span>
+                                        Target Donasi (Rp)
                                     </label>
-                                    <input
-                                        type="number"
-                                        name="target_amount"
-                                        value={form.target_amount}
-                                        onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="1000000"
-                                        required
-                                    />
+                                    <label className="inline-flex items-center gap-2 mb-2 cursor-pointer select-none">
+                                        <input
+                                            type="checkbox"
+                                            checked={unlimitedTarget}
+                                            onChange={(e) => {
+                                                setUnlimitedTarget(e.target.checked);
+                                                if (e.target.checked) setForm(prev => ({ ...prev, target_amount: '' }));
+                                            }}
+                                            className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                                        />
+                                        <span className="text-sm text-gray-600">Tidak terbatas</span>
+                                    </label>
+                                    {!unlimitedTarget && (
+                                        <input
+                                            type="number"
+                                            name="target_amount"
+                                            value={form.target_amount}
+                                            onChange={handleChange}
+                                            className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            placeholder="Contoh: 5000000"
+                                            min={1}
+                                            required
+                                        />
+                                    )}
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -311,7 +357,7 @@ export default function DashboardCampaignsPage() {
                                         </div>
                                     )}
                                 </div>
-                                <p className="text-xs text-gray-400 mt-1">Format: JPG, PNG. Maksimal 2MB</p>
+                                <p className="text-xs text-gray-400 mt-1">Format: JPG, PNG, WebP · Maks. 2 MB · Resolusi 400×200 s/d 1920×1080 px</p>
                             </div>
 
                             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
