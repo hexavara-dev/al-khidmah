@@ -74,25 +74,15 @@ class GoogleController extends Controller
             // =========================
             // FLOW MOBILE
             // =========================
-            if ($state === 'mobile') {
-                $token        = $user->createToken('mobile')->plainTextToken;
-                $returnUrl    = url('/mobile-auth/consume?return_url=' . urlencode('/donasi?mobile=1'));
-                $callbackBase = config('services.mobile.deep_link_callback', 'ekhidmah://callback');
-                $deepLink     = $callbackBase . '?token=' . rawurlencode($token) . '&return_url=' . rawurlencode(url('/donasi?mobile=1'));
+      if ($state === 'mobile') {
+                $token = $user->createToken('mobile')->plainTextToken;
+                $returnUrl = '/donasi?mobile=1';
 
-                Log::channel('stack')->info('[GoogleOAuth] Mobile flow — deep link dibuat', [
-                    'user_id'       => $user->id,
-                    'deep_link'     => $deepLink,
-                    'return_url'    => $returnUrl,
-                    'callback_base' => $callbackBase,
-                    'config_set'    => config('services.mobile.deep_link_callback') !== null,
-                ]);
-
-                return response()->view('auth.mobile-callback', [
-                    'deepLink'  => $deepLink,
-                    'returnUrl' => $returnUrl,
-                    'token'     => $token,
-                ]);
+                return redirect(
+                    url('/mobile-auth/consume')
+                    . '?token=' . rawurlencode($token)
+                    . '&return_url=' . rawurlencode($returnUrl)
+                );
             }
 
             // =========================
