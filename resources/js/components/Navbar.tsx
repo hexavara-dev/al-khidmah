@@ -44,7 +44,7 @@ export default function Navbar() {
                     {/* Logo */}
                     <Link href="/donasi" className="flex items-center gap-2.5 group">
                         <div className="flex h-9 w-9 items-center justify-center transition">
-                            <img src="/images/assets/eKhidmah_logo.png" alt="eKhidmah" className="w-9 h-9 object-contain" />
+                            <img src="/images/assets/eKhidmah_logobaru.png" alt="eKhidmah" className="w-9 h-9 object-contain" />
                         </div>
                         <div className="leading-none">
                             <span className="font-bold text-base tracking-wide block">eKhidmah</span>
