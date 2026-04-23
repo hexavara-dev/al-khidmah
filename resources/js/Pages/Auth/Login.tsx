@@ -192,9 +192,7 @@ export default function Login({ status }: { status?: string; canResetPassword: b
                         eKhidmah
                     </h1>
                     <p className="mt-1 max-w-xs text-sm text-muted-foreground">
-                        Membawa cita-cita mulia sebagai oase dunia dengan
-                        mengalirkan kebaikan, keberkahan, dan kemudahan dalam
-                        setiap langkah kehidupan.
+                        Mengalirkan kebaikan, keberkahan, dan kemudahan.
                     </p>
                 </div>
 

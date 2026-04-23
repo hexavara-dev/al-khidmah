@@ -22,6 +22,7 @@ class PPOBServiceProduct extends Model
         'type',
         'status',
         'fee',
+        'icon_url',
     ];
 
     protected function casts(): array

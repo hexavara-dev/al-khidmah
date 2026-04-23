@@ -48,7 +48,8 @@ class PPOBController extends Controller
         ]);
     }
 
-    public function checkBalance() {
+    public function checkBalance()
+    {
         $result = $this->iakService->checkBalance();
         return response()->json($result);
     }
@@ -68,7 +69,7 @@ class PPOBController extends Controller
             ->where('status', true)
             ->orderBy('price')
             ->get()
-            ->map(fn ($p) => [
+            ->map(fn($p) => [
                 'product_code'        => $p->code,
                 'product_description' => $p->label,
                 'product_nominal'     => $p->name,
@@ -84,13 +85,15 @@ class PPOBController extends Controller
         return response()->json(['data' => ['pricelist' => $products]]);
     }
 
-    public function priceListPasca(PostpaidPriceListRequest $request) {
+    public function priceListPasca(PostpaidPriceListRequest $request)
+    {
         $type   = (string) $request->validated('type');
         $result = $this->iakService->priceListPasca($type);
         return response()->json($result);
     }
 
-    public function inquiryOvo(Request $request) {
+    public function inquiryOvo(Request $request)
+    {
         $request->validate([
             'customer_id' => 'required|string|regex:/^08\d{8,11}$/',
         ]);
@@ -111,12 +114,13 @@ class PPOBController extends Controller
         ]);
     }
 
-    public function checkout(TopUpRequest $request) {
+    public function checkout(TopUpRequest $request)
+    {
         $data = $this->transactionService->createCheckout(
-            customerId:  (string) $request->validated('customer_id'),
+            customerId: (string) $request->validated('customer_id'),
             productCode: (string) $request->validated('product_code'),
-            type:        (string) $request->validated('type'),
-            price:       (int)    $request->validated('price'),
+            type: (string) $request->validated('type'),
+            price: (int)    $request->validated('price'),
         );
 
         return response()->json($data);
@@ -126,9 +130,9 @@ class PPOBController extends Controller
     {
         try {
             $data = $this->transactionService->createPostpaidInquiry(
-                customerId:  (string) $request->validated('customer_id'),
+                customerId: (string) $request->validated('customer_id'),
                 productCode: (string) $request->validated('product_code'),
-                type:        (string) $request->validated('type'),
+                type: (string) $request->validated('type'),
             );
             return response()->json($data);
         } catch (\RuntimeException $e) {
@@ -138,6 +142,7 @@ class PPOBController extends Controller
 
     public function inquiryEmoney(Request $request): JsonResponse
     {
+        
         $request->validate([
             'product_code' => 'required|string',
             'hp'           => 'required|string',
@@ -160,8 +165,15 @@ class PPOBController extends Controller
             return response()->json(['message' => $msg], 422);
         }
 
+        $rawName = $payload['tr_name'] ?? null;
+
+        if ($rawName && str_contains($rawName, '/')) {
+            $parts = explode('/', $rawName);
+            $rawName = trim($parts[0]); 
+        }
+
         return response()->json([
-            'customer_name' => $payload['tr_name'] ?? null,
+            'customer_name' => $rawName ?: null,
             'nominal'       => (int) ($payload['nominal'] ?? 0),
             'admin'         => (int) ($payload['admin']   ?? 0),
             'price'         => (int) ($payload['price']   ?? 0),
@@ -214,9 +226,9 @@ class PPOBController extends Controller
         $rawList  = $response['data']['pricelist'] ?? [];
 
         $items = collect($rawList)
-            ->filter(fn ($item) => is_array($item) && ($item['status'] ?? '') === 'active')
+            ->filter(fn($item) => is_array($item) && ($item['status'] ?? '') === 'active')
             ->values()
-            ->map(fn ($item) => $this->transform($item, $code, $config['name_from']))
+            ->map(fn($item) => $this->transform($item, $code, $config['name_from']))
             ->values();
 
         return response()->json(['data' => $items]);
@@ -232,9 +244,10 @@ class PPOBController extends Controller
             'items.*.label'  => ['required', 'string', 'max:255'],
             'items.*.name'   => ['required', 'string'],
             'items.*.price'  => ['required', 'integer', 'min:0'],
-            'items.*.period' => ['required', 'string', 'max:50'],
+            'items.*.period' => ['required', 'string', 'max:255'],
             'items.*.type'   => ['required', 'string', 'max:50'],
             'items.*.fee'    => ['nullable', 'integer', 'min:0'],
+            'items.*.icon_url'  => ['nullable', 'string', 'max:500'],
         ]);
 
         $saved = $this->upsert($service, $validated['items']);
@@ -250,7 +263,7 @@ class PPOBController extends Controller
         $now   = now();
         $codes = collect($items)->pluck('code')->all();
 
-        $rows = collect($items)->map(fn ($item) => [
+        $rows = collect($items)->map(fn($item) => [
             'id'              => (string) Str::uuid(),
             'ppob_service_id' => $service->id,
             'code'            => $item['code'],
@@ -325,6 +338,31 @@ class PPOBController extends Controller
         ]);
     }
 
+    private const EMONEY_ICONS = [
+        'ovo'       => 'https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg',
+        'gopay'     => 'https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg',
+        'dana'      => 'https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg',
+        'shopeepay' => '"https://cdn.mobilepulsa.net/img/product/operator_list/021219030403-shopeepay.jpg"',
+        'linkaja'   => 'https://upload.wikimedia.org/wikipedia/commons/8/86/LinkAja.svg',
+    ];
+
+    private function resolveIconUrl(array $item): ?string
+    {
+        $url = $item['icon_url'] ?? null;
+
+        if (!empty($url) && $url !== '-') return $url;
+
+        $haystack = strtolower(
+            ($item['product_code'] ?? '') . ' ' . ($item['product_description'] ?? '')
+        );
+
+        foreach (self::EMONEY_ICONS as $key => $fallbackUrl) {
+            if (str_contains($haystack, $key)) return $fallbackUrl;
+        }
+
+        return null;
+    }
+
     private function transform(array $item, string $code, string $nameFrom): array
     {
         if ($nameFrom === 'details_or_nominal') {
@@ -337,15 +375,14 @@ class PPOBController extends Controller
         }
 
         return [
-            'code'     => $item['product_code']        ?? '',
-            'label'    => $item['product_description'] ?? '',
+            'code'     => $item['product_code']                                     ?? '',
+            'label'    => $item['product_description']                              ?? '',
             'name'     => $name,
-            'price'    => (int) ($item['product_price']  ?? 0),
-            'period'   => (string) ($item['active_period'] ?? '0'),
-            'type'     => $item['product_type']        ?? '',
+            'price'    => (int) ($item['product_price']                             ?? 0),
+            'period'   => Str::limit((string) ($item['active_period']               ?? '0'), 50, ''),
+            'type'     => $item['product_type']                                     ?? '',
             'fee'      => null,
-            'icon_url' => $item['icon_url']            ?? null,
+            'icon_url' => $this->resolveIconUrl($item),
         ];
     }
 }
-

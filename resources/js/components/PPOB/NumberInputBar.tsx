@@ -58,7 +58,8 @@ type Props = {
     type?: string;
     emoneyProvider?: string;
     onEmoneyChange?: (value: string) => void;
-    emoneyItems?: PricelistItem[]; // ← tambah prop ini
+    emoneyItems?: PricelistItem[]; 
+    errorMessage?: string | null;
 };
 
 export default function NumberInputBar({
@@ -73,6 +74,7 @@ export default function NumberInputBar({
     emoneyProvider,
     onEmoneyChange,
     emoneyItems = [],
+    errorMessage,
 }: Props) {
     const isEmoney = type === "etoll";
     const label = inputLabels[type ?? ""] ?? "Nomor / ID Pelanggan";
@@ -94,7 +96,7 @@ export default function NumberInputBar({
                                 <button
                                     key={opt.value}
                                     onClick={() => onEmoneyChange?.(opt.value)}
-                                    className="flex shrink-0 flex-col items-center gap-1.5"
+                                    className="flex shrink-0 flex-col items-center gap-1.5 pt-4"
                                 >
                                     <div
                                         className={`flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-surface-container transition-all ${
@@ -171,6 +173,15 @@ export default function NumberInputBar({
                     </div>
                 )}
             </div>
+
+            {errorMessage && (
+                <div className="flex items-center gap-2 rounded-xl border border-error/30 bg-error/5 px-3 py-2.5">
+                    <XCircle className="size-4 shrink-0 text-error" />
+                    <p className="text-xs font-semibold text-error">
+                        {errorMessage}
+                    </p>
+                </div>
+            )}
 
             {/* CTA */}
             <button

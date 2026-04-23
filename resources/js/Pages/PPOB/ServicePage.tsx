@@ -108,10 +108,10 @@ function DesktopPaymentSidebar({
     onConfirmItem: (item: PricelistItem) => void;
     onConfirmBill: (bill: PostpaidBill) => void;
 }) {
-    const hasPayment = selectedItem !== null || (billData !== null && !billData.already_paid);
+    const hasPayment =
+        selectedItem !== null || (billData !== null && !billData.already_paid);
     const price = selectedItem?.product_price ?? billData?.price ?? 0;
-    const productLabel =
-        selectedItem?.product_description  ?? "-";
+    const productLabel = selectedItem?.product_description ?? "-";
 
     return (
         <div className="sticky top-32 flex flex-col gap-3 self-start max-h-[calc(100vh-8rem)] overflow-y-auto">
@@ -274,6 +274,8 @@ export default function ServicePage({
     const [selectedItem, setSelectedItem] = useState<PricelistItem | null>(
         null,
     );
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
     const [emoneyItems, setEmoneyItems] = useState<PricelistItem[]>([]);
 
     useEffect(() => {
@@ -316,6 +318,7 @@ export default function ServicePage({
         setPrepaidService(null);
         setBillData(null);
         setSelectedItem(null);
+        setErrorMessage(null);
 
         try {
             if (service.type === "pln_pasca" || service.type === "tv") {
@@ -349,7 +352,14 @@ export default function ServicePage({
                         type: iakType,
                     }),
                 });
-                if (!res.ok) return;
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => null);
+                    setErrorMessage(
+                        errData?.message ??
+                            "ID Pelanggan yang anda masukkan tidak ditemukan. Periksa kembali.",
+                    );
+                    return;
+                }
                 const data = res.headers
                     .get("content-type")
                     ?.includes("application/json")
@@ -366,14 +376,18 @@ export default function ServicePage({
                     isEmoney ? emoneyProvider : (operator?.apiName ?? "")
                 ).toLowerCase();
 
-                if (key && (service.type === "pulsa" || service.type === "data" || service.type === "etoll")) {
+                if (
+                    key &&
+                    (service.type === "pulsa" ||
+                        service.type === "data" ||
+                        service.type === "etoll")
+                ) {
                     // Filter by operator/provider name — DB products have provider in label/code
-                    const filtered = all
-                        .filter((item) => {
-                            const d = item.product_description.toLowerCase();
-                            const c = item.product_code.toLowerCase();
-                            return d.includes(key) || c.includes(key);
-                        });
+                    const filtered = all.filter((item) => {
+                        const d = item.product_description.toLowerCase();
+                        const c = item.product_code.toLowerCase();
+                        return d.includes(key) || c.includes(key);
+                    });
                     setPrepaidService(filtered);
                 } else if (
                     service.type === "pln" &&
@@ -386,9 +400,33 @@ export default function ServicePage({
                             const r = await fetch(
                                 `/ppob/inquiry-pln/${encodeURIComponent(phoneNumber)}`,
                             );
-                            if (r.ok) setPlnCustomer(await r.json());
+                            if (r.ok) {
+                                setPlnCustomer(await r.json());
+                                setPrepaidService(all);
+                            } else {
+                                setPlnCustomer(null);
+                                setPrepaidService(null);
+                                const errData = await r
+                                    .json()
+                                    .catch(() => null);
+                                const rawMsg: string = errData?.message ?? "";
+                                setErrorMessage(
+                                    rawMsg
+                                        .toUpperCase()
+                                        .includes(
+                                            "INCORRECT DESTINATION NUMBER",
+                                        )
+                                        ? "ID Pelanggan yang anda masukkan tidak ditemukan. Periksa kembali."
+                                        : rawMsg ||
+                                              "ID Pelanggan yang anda masukkan tidak ditemukan. Periksa kembali.",
+                                );
+                            }
                         } catch {
-                            /* fallback */
+                            setPlnCustomer(null);
+                            setPrepaidService(null);
+                            setErrorMessage(
+                                "Gagal menghubungi server. Coba lagi.",
+                            );
                         }
                     }
                 } else {
@@ -495,27 +533,13 @@ export default function ServicePage({
 
                 {/* ── Content wrapper ── */}
                 <div className="mx-auto w-full max-w-screen-xl px-4 py-6 pb-64 sm:pb-40 sm:px-6 lg:px-8">
-
                     {isTv ? (
-                        <div className="sm:grid sm:grid-cols-[1fr_1.2fr] sm:gap-6 sm:items-start">
-                            <div className="mb-5 sm:mb-0">
-                                {tvLoading ? (
-                                    <div className="flex items-center gap-3 rounded-2xl border border-outline-variant/20 bg-surface-container-lowest p-4 text-sm text-primary">
-                                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-outline-variant border-t-primary" />
-                                        Memuat penyedia layanan...
-                                    </div>
-                                ) : (
-                                    <ProviderSelector
-                                        providers={tvProviders ?? []}
-                                        selected={
-                                            selectedProvider?.code ?? null
-                                        }
-                                        onSelect={setSelectedProvider}
-                                    />
-                                )}
-                            </div>
+                        <div className="sm:grid sm:grid-cols-[1fr_280px] md:grid-cols-[1fr_300px] lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_340px] sm:gap-6 sm:items-start">
+                            {/* Kiri: provider + input + bill */}
+                            <div className="min-w-0">
+                                {/* Provider selector */}
 
-                            <div>
+                                {/* Input card */}
                                 {selectedProvider !== null && (
                                     <div className="mb-5 scroll-mt-32 rounded-2xl border border-outline-variant/20 bg-surface-container-lowest p-4 shadow-sm">
                                         <NumberInputBar
@@ -529,10 +553,29 @@ export default function ServicePage({
                                             emoneyProvider={emoneyProvider}
                                             emoneyItems={emoneyItems}
                                             onEmoneyChange={setEmoneyProvider}
+                                            errorMessage={errorMessage}
                                         />
                                     </div>
                                 )}
 
+                                <div className="mb-5">
+                                    {tvLoading ? (
+                                        <div className="flex items-center gap-3 rounded-2xl border border-outline-variant/20 bg-surface-container-lowest p-4 text-sm text-primary">
+                                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-outline-variant border-t-primary" />
+                                            Memuat penyedia layanan...
+                                        </div>
+                                    ) : (
+                                        <ProviderSelector
+                                            providers={tvProviders ?? []}
+                                            selected={
+                                                selectedProvider?.code ?? null
+                                            }
+                                            onSelect={setSelectedProvider}
+                                        />
+                                    )}
+                                </div>
+
+                                {/* Empty state */}
                                 {!hasResult && (
                                     <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-outline-variant/30 py-16 text-center">
                                         <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container">
@@ -543,12 +586,13 @@ export default function ServicePage({
                                         </p>
                                         <p className="mt-1 max-w-xs text-xs text-on-surface-variant">
                                             {!selectedProvider
-                                                ? "Pilih penyedia layanan di sebelah kiri terlebih dahulu."
+                                                ? "Pilih penyedia layanan di atas terlebih dahulu."
                                                 : "Masukkan nomor di atas lalu klik tombol cek."}
                                         </p>
                                     </div>
                                 )}
 
+                                {/* Bill inquiry card */}
                                 {billData && (
                                     <BillInquiryCard
                                         bill={billData}
@@ -560,13 +604,21 @@ export default function ServicePage({
                                 )}
                             </div>
 
+                            {/* Kanan: sticky sidebar — DESKTOP ONLY */}
+                            <div className="hidden sm:block">
+                                <DesktopPaymentSidebar
+                                    service={service}
+                                    phoneNumber={phoneNumber}
+                                    operator={operator}
+                                    plnCustomer={plnCustomer}
+                                    selectedItem={selectedItem}
+                                    billData={billData}
+                                    onConfirmItem={setConfirmItem}
+                                    onConfirmBill={setConfirmBill}
+                                />
+                            </div>
                         </div>
                     ) : (
-                        /* ══════════════════════════════════════════════════
-                            NON-TV
-                            Desktop  → col-9 (input + pricelist) | col-3 (sticky sidebar)
-                            Mobile   → single column + floating CTA bar
-                        ══════════════════════════════════════════════════ */
                         <div className="sm:grid sm:grid-cols-[1fr_280px] md:grid-cols-[1fr_300px] lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_340px] sm:gap-6 sm:items-start">
                             {/* ── Kiri: input + product results ── */}
                             <div className="min-w-0">
@@ -589,6 +641,7 @@ export default function ServicePage({
                                         emoneyProvider={emoneyProvider}
                                         emoneyItems={emoneyItems}
                                         onEmoneyChange={setEmoneyProvider}
+                                        errorMessage={errorMessage}
                                     />
                                 </div>
 
@@ -623,9 +676,18 @@ export default function ServicePage({
                                 {plnCustomer?.name && (
                                     <div className="mb-5 flex items-center gap-4 overflow-hidden rounded-2xl bg-primary px-5 py-4 shadow-md shadow-primary/20">
                                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15">
-                                            <svg className="size-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                            <svg
+                                                className="size-6 text-white"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="1.8"
+                                            >
                                                 <circle cx="12" cy="8" r="4" />
-                                                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" strokeLinecap="round" />
+                                                <path
+                                                    d="M4 20c0-4 3.6-7 8-7s8 3 8 7"
+                                                    strokeLinecap="round"
+                                                />
                                             </svg>
                                         </div>
                                         <div className="min-w-0 flex-1">
@@ -637,7 +699,8 @@ export default function ServicePage({
                                             </p>
                                             {plnCustomer.segment_power && (
                                                 <p className="mt-0.5 text-xs text-white/70">
-                                                    Tarif/Daya: {plnCustomer.segment_power}
+                                                    Tarif/Daya:{" "}
+                                                    {plnCustomer.segment_power}
                                                 </p>
                                             )}
                                         </div>
@@ -727,10 +790,6 @@ export default function ServicePage({
                     )}
                 </div>
 
-                {/* ══════════════════════════════════════════════════
-                    MOBILE ONLY floating CTA bar  (hidden sm:hidden)
-                ══════════════════════════════════════════════════ */}
-
                 {/* Bill CTA */}
                 {billData && !selectedItem && !billData.already_paid && (
                     <div className="fixed bottom-24 left-0 right-0 z-40 border-t border-outline-variant/10 bg-surface-bright/95 px-4 py-3 backdrop-blur-md md:hidden">
@@ -810,7 +869,9 @@ export default function ServicePage({
                 phoneNumber={phoneNumber}
                 operator={operator}
                 service={service}
-                emoneyProvider={service.type === "etoll" ? emoneyProvider : undefined}
+                emoneyProvider={
+                    service.type === "etoll" ? emoneyProvider : undefined
+                }
                 onClose={() => setConfirmItem(null)}
             />
             <ConfirmModal

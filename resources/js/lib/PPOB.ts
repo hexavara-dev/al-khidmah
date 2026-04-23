@@ -1,6 +1,5 @@
 import { Smartphone, Wifi, Tv2, Zap, Wallet, FileText } from 'lucide-react';
 import type { Service, PricelistItem } from '@/types/PPOB';
-
 export const idr = new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
@@ -16,13 +15,6 @@ export const services: Service[] = [
     { label: 'PLN Pascabayar',            sub: 'Tagihan listrik bulanan',  type: 'pln_pasca', endpoint: 'postpaid', icon: FileText, placeholder: 'Masukkan nomor meter'        },
 ];
 
-/** Parse nominal string IAK menjadi { nominal, admin }.
- *  Format yang dikenal:
- *  - "LinkAja Rp 80.000. - Admin Rp 1.000"   (separator " - ")
- *  - "ShopeePay Rp 10.000 Admin Rp 1.000"    (kata "Admin" tanpa dash)
- *  - "DANA 100.000 Admin 500"                 (tanpa "Rp")
- *  - "GO-PAY Rp 10.000"                       (tanpa admin)
- */
 function parseEtollNominal(nominal: string): { nominalNum: number; adminNum: number } | null {
     const adminMatch = nominal.match(/Admin(?:\s+Rp)?\s*([\d.]+)/i);
     const nominalMatch = nominal.match(/(?:Rp\s*)?([\d.]+)/i);
