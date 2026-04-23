@@ -24,15 +24,18 @@ import {
 } from 'lucide-react'
 
 const navMain = [
+    { title: 'Dashboard', url: '/admin/dashboard', icon: <LayoutDashboard /> },
     {
         title: 'PPOB',
-        url: '/admin/ppob',
+        url: '/admin/ppob/pulsa',
         icon: <Zap />,
         isActive: true,
         items: [
-            { title: 'Pulsa & Data', url: '/admin/ppob/pulsa' },
-            { title: 'Token PLN', url: '/admin/ppob/pln' },
-            { title: 'Air & Internet', url: '/admin/ppob/air' },
+            { title: 'Pulsa', url: '/admin/ppob/pulsa' },
+            { title: 'Paket Data', url: '/admin/ppob/data' },
+            { title: 'Token Listrik', url: '/admin/ppob/pln' },
+            { title: 'Top Up E-Money', url: '/admin/ppob/emoney' },
+            { title: 'TV Kabel', url: '/admin/ppob/tv' },
         ],
     },
     {
@@ -58,7 +61,6 @@ const navMain = [
 ]
 
 const navAdmin = [
-    { name: 'Dashboard', url: '/admin/dashboard', icon: <LayoutDashboard /> },
     { name: 'Transaksi', url: '/admin/transactions', icon: <ShoppingCart /> },
     { name: 'Pengguna', url: '/admin/users', icon: <Users /> },
     { name: 'Laporan', url: '/admin/reports', icon: <BarChart3 /> },
@@ -99,14 +101,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarFooter>
                 <NavUser
                     user={{
-                        name: user?.name ?? 'Admin',
-                        email: user?.email ?? '',
-                        initials: user ? getInitials(user.name) : 'A',
+                        name: user?.name ?? "Admin",
+                        email: user?.email ?? "",
+                        initials: user ? getInitials(user.name) : "A",
                     }}
                 />
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>
-    )
+    );
 }
 

@@ -192,9 +192,34 @@ class TransactionService
 
         $payload = $result['data'] ?? $result;
 
-        $rc = $payload['response_code'] ?? null;
+        $rc  = $payload['response_code'] ?? null;
+        $msg = $payload['message'] ?? '';
+
         if ($rc !== '00') {
-            $msg = $payload['message'] ?? null;
+            if (str_contains(strtoupper($msg), 'LUNAS')) {
+                // IAK tidak mengembalikan data pelanggan saat sudah lunas.
+                // Untuk PLN pasca, fallback ke inquiry_pln untuk ambil nama pelanggan.
+                $customerName = $payload['tr_name'] ?? null;
+                if ($customerName === null && $type === 'pln_pasca') {
+                    try {
+                        $plnData = $this->iakService->inquiryPln($customerId);
+                        $customerName = ($plnData['data'] ?? $plnData)['name'] ?? null;
+                    } catch (\Throwable) {
+                        // fallback graceful — biarkan null
+                    }
+                }
+
+                return [
+                    'already_paid'  => true,
+                    'ref_id'        => null,
+                    'customer_name' => $customerName,
+                    'period'        => $payload['period']  ?? null,
+                    'nominal'       => (float) ($payload['nominal'] ?? 0),
+                    'admin'         => (float) ($payload['admin']   ?? 0),
+                    'price'         => (float) ($payload['price']   ?? 0),
+                    'message'       => $msg,
+                ];
+            }
             throw new \RuntimeException($msg ?: "Inquiry gagal (rc={$rc}). Periksa nomor pelanggan dan coba lagi.");
         }
 

@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('transactions', function (Blueprint $table) {
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete()->after('id');
+            $table->foreignUuid('user_id')->nullable()->constrained()->nullOnDelete()->after('id');
         });
     }
 
     public function down(): void
     {
         Schema::table('transactions', function (Blueprint $table) {
-            $table->dropForeignIdFor(\App\Models\User::class);
+            $table->dropForeignIdFor(\App\Models\User::class, 'user_id');
         });
     }
 };

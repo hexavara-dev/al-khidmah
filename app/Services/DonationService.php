@@ -43,7 +43,7 @@ class DonationService
         return $query->paginate($perPage);
     }
 
-    public function myDonations(int $userId): array
+    public function myDonations(string $userId): array
     {
         $donations = Donation::with('campaign')
             ->where('user_id', $userId)

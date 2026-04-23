@@ -1,16 +1,21 @@
-import { useState, useRef, useEffect } from 'react';
-import { Bell, Search, CircleDollarSign, LogOut, User, ChevronDown } from 'lucide-react';
-import { usePage, router, Link } from '@inertiajs/react';
-import type { PageProps } from '@/types';
+import { useState, useRef, useEffect } from "react";
+import { Bell, Search, LogOut, User, ChevronDown } from "lucide-react";
+import { usePage, router, Link } from "@inertiajs/react";
+import type { PageProps } from "@/types";
+import AppLogo from "@/components/ui/AppLogo";
 
-const idr = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
+const idr = new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+});
 
 type Props = {
     balance: number;
     appName?: string;
 };
 
-export default function Navbar({ balance, appName = 'eKhidmah' }: Props) {
+export default function Navbar({ balance, appName = "eKhidmah" }: Props) {
     const page = usePage<PageProps<{ balance: number }>>();
     const { auth } = page.props as any;
     const user = auth?.user;
@@ -21,39 +26,52 @@ export default function Navbar({ balance, appName = 'eKhidmah' }: Props) {
 
     useEffect(() => {
         function handleClickOutside(e: MouseEvent) {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(e.target as Node)
+            ) {
                 setDropdownOpen(false);
             }
         }
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        document.addEventListener("mousedown", handleClickOutside);
+        return () =>
+            document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
     const handleLogout = () => {
-        router.post('/logout');
+        router.post("/logout");
     };
 
     const initials = user?.name
-        ? user.name.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()
-        : 'AK';
+        ? user.name
+              .split(" ")
+              .map((w: string) => w[0])
+              .slice(0, 2)
+              .join("")
+              .toUpperCase()
+        : "AK";
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 border-b border-outline-variant/10 bg-surface-bright/85 px-8 py-4 backdrop-blur-2xl">
             <div className="mx-auto flex max-w-7xl items-center justify-between gap-8">
-
                 {/* Logo */}
-                <div className="flex flex-shrink-0 items-center gap-2.5">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary shadow-md shadow-primary/30">
-                        <CircleDollarSign className="size-5 text-on-primary" />
-                    </div>
+                <Link href="/" className="flex shrink-0 items-center gap-2.5">
+                    <AppLogo size={36} />
                     <div>
-                        <p className="font-headline text-base font-bold leading-tight text-primary">{appName}</p>
-                        <p className="text-[10px] leading-tight text-on-surface-variant">Payment Point</p>
+                        <p className="font-headline text-base font-bold leading-tight text-primary">
+                            {appName}
+                        </p>
+                        <p className="text-[10px] leading-tight text-on-surface-variant">
+                            Mudah dan berkah
+                        </p>
                     </div>
-                </div>
+                </Link>
 
                 {/* Search Bar */}
-                <div className="hidden flex-1 md:block" style={{ maxWidth: '28rem' }}>
+                <div
+                    className="hidden flex-1 md:block"
+                    style={{ maxWidth: "28rem" }}
+                >
                     <div className="group relative">
                         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-on-surface-variant transition-colors group-focus-within:text-primary" />
                         <input
@@ -64,36 +82,15 @@ export default function Navbar({ balance, appName = 'eKhidmah' }: Props) {
                     </div>
                 </div>
 
-                {/* Nav Links */}
-                <div className="hidden items-center gap-1 lg:flex">
-                    <Link
-                        href="/"
-                        className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all ${currentPath === '/' ? 'bg-primary-container text-primary' : 'text-on-surface-variant hover:bg-surface-container-low'}`}
-                    >
-                        Beranda
-                    </Link>
-                    <Link
-                        href="/history"
-                        className={`rounded-xl px-4 py-2 text-sm font-medium transition-all ${currentPath === '/history' ? 'bg-primary-container text-primary' : 'text-on-surface-variant hover:bg-surface-container-low'}`}
-                    >
-                        Riwayat
-                    </Link>
-                    <a href="#" className="rounded-xl px-4 py-2 text-sm font-medium text-on-surface-variant transition-all hover:bg-surface-container-low">
-                        Tagihan
-                    </a>
-                    <a href="#" className="rounded-xl px-4 py-2 text-sm font-medium text-on-surface-variant transition-all hover:bg-surface-container-low">
-                        Profil
-                    </a>
-                </div>
-
+       
                 {/* Right Actions */}
                 <div className="flex items-center gap-3">
                     {/* Balance */}
-                    <div className="hidden items-center gap-2 rounded-full border border-outline-variant/30 bg-surface-container-low px-4 py-1.5 sm:flex">
+                    {/* <div className="hidden items-center gap-2 rounded-full border border-outline-variant/30 bg-surface-container-low px-4 py-1.5 sm:flex">
                         <div className="h-2 w-2 rounded-full bg-secondary" />
                         <span className="text-xs font-medium text-on-surface-variant">Saldo</span>
                         <span className="text-sm font-bold text-on-surface">{idr.format(balance ?? 0)}</span>
-                    </div>
+                    </div> */}
 
                     {/* Notification Bell */}
                     <button className="relative rounded-full bg-surface-container-low p-2.5 text-on-surface transition-colors hover:bg-surface-container">
@@ -110,17 +107,25 @@ export default function Navbar({ balance, appName = 'eKhidmah' }: Props) {
                             {/* Avatar */}
                             <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full border-2 border-primary-container">
                                 {user?.avatar ? (
-                                    <img src={user.avatar} alt={user.name} className="h-full w-full object-cover" />
+                                    <img
+                                        src={user.avatar}
+                                        alt={user.name}
+                                        className="h-full w-full object-cover"
+                                    />
                                 ) : (
                                     <div className="flex h-full w-full items-center justify-center rounded-full bg-primary-container">
-                                        <span className="font-headline text-xs font-bold text-primary">{initials}</span>
+                                        <span className="font-headline text-xs font-bold text-primary">
+                                            {initials}
+                                        </span>
                                     </div>
                                 )}
                             </div>
                             <span className="hidden max-w-[100px] truncate text-xs font-semibold text-on-surface lg:block">
-                                {user?.name ?? 'Pengguna'}
+                                {user?.name ?? "Pengguna"}
                             </span>
-                            <ChevronDown className={`size-3.5 text-on-surface-variant transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                            <ChevronDown
+                                className={`size-3.5 text-on-surface-variant transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
+                            />
                         </button>
 
                         {/* Dropdown */}
@@ -130,16 +135,26 @@ export default function Navbar({ balance, appName = 'eKhidmah' }: Props) {
                                 <div className="flex items-center gap-3 border-b border-outline-variant/10 px-4 py-4">
                                     <div className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-full border-2 border-primary-container">
                                         {user?.avatar ? (
-                                            <img src={user.avatar} alt={user.name} className="h-full w-full object-cover" />
+                                            <img
+                                                src={user.avatar}
+                                                alt={user.name}
+                                                className="h-full w-full object-cover"
+                                            />
                                         ) : (
                                             <div className="flex h-full w-full items-center justify-center rounded-full bg-primary-container">
-                                                <span className="font-headline text-sm font-bold text-primary">{initials}</span>
+                                                <span className="font-headline text-sm font-bold text-primary">
+                                                    {initials}
+                                                </span>
                                             </div>
                                         )}
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="truncate text-sm font-bold text-on-surface">{user?.name ?? 'Pengguna'}</p>
-                                        <p className="truncate text-xs text-on-surface-variant">{user?.email ?? ''}</p>
+                                        <p className="truncate text-sm font-bold text-on-surface">
+                                            {user?.name ?? "Pengguna"}
+                                        </p>
+                                        <p className="truncate text-xs text-on-surface-variant">
+                                            {user?.email ?? ""}
+                                        </p>
                                     </div>
                                 </div>
 
@@ -161,7 +176,6 @@ export default function Navbar({ balance, appName = 'eKhidmah' }: Props) {
                         )}
                     </div>
                 </div>
-
             </div>
         </nav>
     );

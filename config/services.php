@@ -37,7 +37,8 @@ return [
 
     'jemaah' => [
         'auth_server_url' => env('JEMAAH_AUTH_SERVER_URL', 'https://jamaah.alkhidmah.or.id'),
-        'client_id'       => env('JEMAAH_CLIENT_ID'),
+        'client_id'       => env('JEMAAH_CLIENT_ID', '019dab4d-798e-71d1-a147-3be52fbc317a'),
+        'client_secret'   => env('JEMAAH_CLIENT_SECRET', 'HrYtLve7reKH3DrTWtVDvtBjOrsoBGcuwtftmWqh'),
         'redirect_uri'    => env('JEMAAH_REDIRECT_URI', 'http://localhost:8000/auth/jemaah/callback'),
     ],
 
@@ -45,6 +46,13 @@ return [
         'client_id'     => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect'      => env('GOOGLE_REDIRECT_URI', '/auth/google/callback'),
+    ],
+
+    'mobile' => [
+        // Custom URL scheme deep link untuk Flutter app.
+        // Contoh: ekhidmah://callback
+        // Harus didaftarkan di AndroidManifest.xml / Info.plist Flutter.
+        'deep_link_callback' => env('MOBILE_DEEP_LINK_CALLBACK', 'ekhidmah://callback'),
     ],
 
     'iak' => [

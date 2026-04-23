@@ -72,12 +72,23 @@ class IAKService {
         ])->json();
     }
 
-    public function inquiryPln(string $hp): array {
-        $response = Http::post($this->prepaidUrl . '/inquiry-pln', [
-            'commands' => 'inquiry_pln',
+    public function inquiryEmoney(string $refId, string $productCode, string $hp, int $amount): array {
+        return Http::post($this->postpaidUrl . '/emoney', [
+            'commands' => 'inq-pasca',
             'username' => $this->userHp,
+            'code'     => $productCode,
             'hp'       => $hp,
-            'sign'     => md5($this->userHp . $this->apiKey . $hp),
+            'ref_id'   => $refId,
+            'sign'     => $this->sign($refId),
+            'desc'     => ['amount' => $amount],
+        ])->json() ?? [];
+    }
+
+    public function inquiryPln(string $customerId): array {
+        $response = Http::post($this->prepaidUrl . '/inquiry-pln', [
+            'username'    => $this->userHp,
+            'customer_id' => $customerId,
+            'sign'        => md5($this->userHp . $this->apiKey . $customerId),
         ])->json();
         return $response ?? [];
     }

@@ -3,17 +3,31 @@
 namespace App\Http\Controllers;
 
 use App\Models\PPOBService;
+use App\Models\PPOBServiceProduct;
 use App\Http\Requests\StorePPOBServiceRequest;
 use App\Http\Requests\UpdatePPOBServiceRequest;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PPOBServiceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    private const IAK_SUPPORTED = ['pulsa', 'data', 'pln', 'emoney'];
+
+    public function show(string $code, Request $request)
     {
-        //
+        $service   = PPOBService::where('code', $code)->firstOrFail();
+        $supported = in_array($code, self::IAK_SUPPORTED);
+
+        $products = PPOBServiceProduct::where('ppob_service_id', $service->id)
+            ->select(['id', 'code', 'name', 'label', 'price', 'base_price', 'period', 'status', 'fee'])
+            ->orderBy('name')
+            ->get();
+
+        return Inertia::render('Admin/PPOB/ServicePage', [
+            'service'   => $service,
+            'supported' => $supported,
+            'products'  => $products,
+        ]);
     }
 
     /**
@@ -29,38 +43,22 @@ class PPOBServiceController extends Controller
      */
     public function store(StorePPOBServiceRequest $request)
     {
-        //
+        PPOBService::create($request->validated());
+
+        return back()->with('success', 'Layanan berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(PPOBService $pPOBService)
+    public function update(UpdatePPOBServiceRequest $request, PPOBService $ppobService)
     {
-        //
+        $ppobService->update($request->validated());
+
+        return back()->with('success', 'Layanan berhasil diperbarui.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(PPOBService $pPOBService)
+    public function destroy(PPOBService $ppobService)
     {
-        //
-    }
+        $ppobService->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatePPOBServiceRequest $request, PPOBService $pPOBService)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(PPOBService $pPOBService)
-    {
-        //
+        return back()->with('success', 'Layanan berhasil dihapus.');
     }
 }
