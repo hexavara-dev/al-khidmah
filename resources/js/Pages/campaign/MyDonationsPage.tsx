@@ -65,7 +65,7 @@ function DonationStruktModal({ donation, onClose }: { donation: Donation | null;
     const handleShare = async () => {
         const text = `Alhamdulillah, saya baru berdonasi Rp ${fmt(donation.amount)} untuk "${donation.campaign?.title}" melalui Al Khidmah. 🤲`;
         if (navigator.share) {
-            try { await navigator.share({ title: 'Struk Donasi Al Khidmah', text }); } catch { /* cancelled */ }
+            try { await navigator.share({ title: 'Struk Donasi eKhidmah', text }); } catch { /* cancelled */ }
         } else {
             await navigator.clipboard.writeText(text);
             toast.success('Teks donasi disalin!');
@@ -103,7 +103,7 @@ function DonationStruktModal({ donation, onClose }: { donation: Donation | null;
                                 <path d="M5 17.25H19C19 17.25 19.75 17.75 19.75 18.5C19.75 19.25 19 19.75 19 19.75H5C5 19.75 4.25 19.25 4.25 18.5C4.25 17.75 5 17.25 5 17.25Z"/>
                             </svg>
                         </div>
-                        <h2 className="font-bold text-gray-800 text-lg">Struk Donasi Al Khidmah</h2>
+                        <h2 className="font-bold text-gray-800 text-lg">Struk Donasi eKhidmah</h2>
                         <p className="text-gray-400 text-sm mt-1">Terima kasih atas kebaikan Anda</p>
                     </div>
 
