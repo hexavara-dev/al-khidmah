@@ -69,7 +69,7 @@ export default function DashboardOverviewPage() {
                 <div className="absolute top-4 right-32 w-8 h-8 bg-white/10 rounded-full animate-pulse" />
                 <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <p className="text-white/80 text-xs font-semibold uppercase tracking-widest mb-1">Panel Admin · Al Khidmah</p>
+                        <p className="text-white/80 text-xs font-semibold uppercase tracking-widest mb-1">Panel Admin · eKhidmah</p>
                         <h2 className="text-3xl font-bold">Selamat Datang! 👋</h2>
                         <p className="text-white/70 text-sm mt-1.5 max-w-sm">Pantau dan kelola semua aktivitas platform donasi dari sini.</p>
                     </div>

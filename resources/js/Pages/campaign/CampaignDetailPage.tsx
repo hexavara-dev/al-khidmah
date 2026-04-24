@@ -152,9 +152,9 @@ export default function CampaignDetailPage() {
                 setTimeout(() => window.print(), 300);
             };
             const handleShare = async () => {
-                const text = `Alhamdulillah, saya baru berdonasi Rp ${fmt(finalAmount)} untuk "${campaign.title}" melalui Al Khidmah. Mari bersama berbuat kebaikan! 🤲`;
+                const text = `Alhamdulillah, saya baru berdonasi Rp ${fmt(finalAmount)} untuk "${campaign.title}" melalui eKhidmah. Mari bersama berbuat kebaikan! 🤲`;
                 if (navigator.share) {
-                    try { await navigator.share({ title: 'Struk Donasi Al Khidmah', text }); } catch { /* cancelled */ }
+                    try { await navigator.share({ title: 'Struk Donasi eKhidmah', text }); } catch { /* cancelled */ }
                 } else {
                     await navigator.clipboard.writeText(text);
                     toast.success('Teks donasi disalin!');
@@ -170,7 +170,7 @@ export default function CampaignDetailPage() {
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                                 </svg>
                             </button>
-                            <h1 className="text-base font-bold text-[#00cacd]">Al Khidmah</h1>
+                            <h1 className="text-base font-bold text-[#00cacd]">eKhidmah</h1>
                             <div className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-gray-400">
                                     <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
@@ -193,7 +193,7 @@ export default function CampaignDetailPage() {
                                             <path d="M5 17.25H19C19 17.25 19.75 17.75 19.75 18.5C19.75 19.25 19 19.75 19 19.75H5C5 19.75 4.25 19.25 4.25 18.5C4.25 17.75 5 17.25 5 17.25Z"/>
                                         </svg>
                                     </div>
-                                    <h2 className="font-bold text-gray-800 text-lg">Struk Donasi Al Khidmah</h2>
+                                    <h2 className="font-bold text-gray-800 text-lg">Struk Donasi eKhidmah</h2>
                                     <p className="text-gray-400 text-sm mt-1">Terima kasih atas kebaikan Anda</p>
                                 </div>
 
@@ -245,7 +245,7 @@ export default function CampaignDetailPage() {
                             </div>
 
                             <p className="text-center text-xs text-gray-400 mt-4 px-2 leading-relaxed">
-                                Bukti transaksi ini diterbitkan secara sah oleh Al Khidmah Foundation sebagai tanda terima donasi Anda.
+                                Bukti transaksi ini diterbitkan secara sah oleh eKhidmah Foundation sebagai tanda terima donasi Anda.
                             </p>
                         </div>
                     </div>
