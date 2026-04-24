@@ -30,6 +30,7 @@ interface ProductItem {
     period: string
     type: string
     fee: number | null
+    komisi?: number
 }
 
 interface SavedProduct {
@@ -42,6 +43,7 @@ interface SavedProduct {
     period: string
     status: number
     fee: number | null
+    komisi?: number | null
 }
 
 interface Props {
@@ -75,6 +77,7 @@ const KNOWN_PROVIDERS = [
 
 function makeColumns(
     supported: boolean,
+    isPostpaid: boolean,
     onEdit: (product: SavedProduct) => void,
     onToggle: (product: SavedProduct) => void,
 ): ColumnDef<SavedProduct>[] {
@@ -97,16 +100,61 @@ function makeColumns(
         },
         {
             accessorKey: 'price',
-            header: 'Harga',
-            cell: ({ getValue }) => (
-                <span className="font-medium">{formatRupiah(getValue() as number)}</span>
-            ),
+            header: isPostpaid ? 'Biaya Layanan' : 'Harga',
+            cell: ({ row, getValue }) => {
+                if (isPostpaid) {
+                    const fee = row.original.fee ?? 0
+                    const komisi = (row.original.komisi ?? 0) as number
+                    return (
+                        <div className="space-y-0.5">
+                            <div className="text-xs">
+                                <span className="text-muted-foreground">Biaya provider:&nbsp;</span>
+                                <span className="font-medium">{formatRupiah(fee)}</span>
+                            </div>
+                            <div className="text-xs">
+                                <span className="text-muted-foreground">Komisi balik:&nbsp;</span>
+                                <span className="font-medium text-emerald-600">{komisi ? `+ ${formatRupiah(komisi)}` : '—'}</span>
+                            </div>
+                        </div>
+                    )
+                }
+                const v = getValue() as number
+                return (
+                    <span className="font-medium">
+                        {v > 0 ? formatRupiah(v) : <span className="text-muted-foreground italic">Sesuai tagihan</span>}
+                    </span>
+                )
+            },
         },
-        {
-            accessorKey: 'period',
+        ...(isPostpaid ? [{
+            accessorKey: 'price' as const,
+            id: 'margin_col',
+            header: 'Biaya Admin Anda',
+            cell: ({ row }: { row: any }) => {
+                const rawPrice = row.original.price as number
+                const fee = (row.original.fee ?? 0) as number
+                const komisi = (row.original.komisi ?? 0) as number
+                const effectivePrice = rawPrice > 0 ? rawPrice : komisi
+                const margin = effectivePrice - fee + komisi
+                const isDefault = rawPrice === 0 || rawPrice == null
+                return (
+                    <div>
+                        <span className="font-medium">
+                            {formatRupiah(effectivePrice)}
+                            {isDefault && <span className="ml-1 text-xs text-muted-foreground">(default)</span>}
+                        </span>
+                        <div className={`text-xs font-medium ${margin >= 0 ? 'text-emerald-600' : 'text-destructive'}`}>
+                            {margin >= 0 ? `untung ${formatRupiah(margin)}` : `rugi ${formatRupiah(Math.abs(margin))}`}
+                        </div>
+                    </div>
+                )
+            },
+        }] : []),
+        ...(!isPostpaid ? [{
+            accessorKey: 'period' as const,
             header: 'Masa Aktif',
-            cell: ({ getValue }) => formatPeriod(getValue() as string),
-        },
+            cell: ({ getValue }: { getValue: () => unknown }) => formatPeriod(getValue() as string),
+        }] : []),
         {
             accessorKey: 'status',
             header: 'Status',
@@ -157,6 +205,8 @@ export default function ServicePage({ service, supported, products }: Props) {
     const [localProducts, setLocalProducts] = useState<SavedProduct[]>(products)
     useEffect(() => { setLocalProducts(products) }, [products])
 
+    const isPostpaid = supported && !['pulsa', 'data', 'pln', 'emoney'].includes(service.code)
+
     // ── Edit dialog state ───────────────────────────────────────────
     const [editOpen, setEditOpen]       = useState(false)
     const [editProduct, setEditProduct] = useState<SavedProduct | null>(null)
@@ -165,7 +215,11 @@ export default function ServicePage({ service, supported, products }: Props) {
 
     const handleEdit = useCallback((product: SavedProduct) => {
         setEditProduct(product)
-        setEditForm({ label: product.label, name: product.name, price: product.price })
+        setEditForm({
+            label: product.label,
+            name: product.name,
+            price: product.price > 0 ? product.price : (product.komisi ?? 0),
+        })
         setEditOpen(true)
     }, [])
 
@@ -174,6 +228,13 @@ export default function ServicePage({ service, supported, products }: Props) {
         setEditSaving(true)
         try {
             await axios.patch(`/admin/ppob/products/${editProduct.id}`, editForm)
+            // Optimistic update — langsung update datatable tanpa tunggu reload
+            setLocalProducts(prev =>
+                prev.map(p => p.id === editProduct!.id
+                    ? { ...p, label: editForm.label, name: editForm.name, price: editForm.price }
+                    : p
+                )
+            )
             toast.success('Produk berhasil diperbarui.')
             setEditOpen(false)
             router.reload({ only: ['products'] })
@@ -207,8 +268,8 @@ export default function ServicePage({ service, supported, products }: Props) {
     }, [])
 
     const columns = useMemo(
-        () => makeColumns(supported, handleEdit, handleToggle),
-        [supported, handleEdit, handleToggle],
+        () => makeColumns(supported, isPostpaid, handleEdit, handleToggle),
+        [supported, isPostpaid, handleEdit, handleToggle],
     )
 
     // ── Sync dialog state ───────────────────────────────────────────
@@ -265,6 +326,10 @@ export default function ServicePage({ service, supported, products }: Props) {
             const activeCodes = new Set(
                 products.filter(p => p.status === 1).map(p => p.code)
             )
+            // Jika belum ada produk tersimpan sama sekali, pilih semua otomatis
+            if (products.length === 0) {
+                newItems.forEach(i => activeCodes.add(i.code))
+            }
             setSelected(activeCodes)
             // Auto-select first detected provider
             for (const p of KNOWN_PROVIDERS) {
@@ -404,7 +469,7 @@ export default function ServicePage({ service, supported, products }: Props) {
                             />
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <label className="text-sm font-medium">Harga</label>
+                            <label className="text-sm font-medium">{isPostpaid ? 'Biaya Admin (ditagihkan ke user)' : 'Harga Jual'}</label>
                             <div
                                 className={[
                                     'flex overflow-hidden rounded-lg border bg-background text-sm transition-colors',
@@ -433,12 +498,53 @@ export default function ServicePage({ service, supported, products }: Props) {
                                 <p className="text-xs text-destructive">
                                     Harga tidak boleh di bawah harga dasar {formatRupiah(editProduct.base_price)}
                                 </p>
+                            ) : isPostpaid && editProduct ? (
+                                <>
+                                    {editProduct.base_price > 0 && (
+                                        <p className="text-xs text-muted-foreground">
+                                            Harga dasar: {formatRupiah(editProduct.base_price)}
+                                        </p>
+                                    )}
+                                    {(() => {
+                                        const fee = editProduct.fee ?? 0
+                                        const komisi = editProduct.komisi ?? 0
+                                        const margin = editForm.price - fee + komisi
+                                        const breakeven = fee - komisi
+                                        return (
+                                            <div className={`rounded-md border p-2.5 text-xs space-y-1.5 ${
+                                                margin < 0
+                                                    ? 'border-destructive/30 bg-destructive/5 text-destructive'
+                                                    : 'border-emerald-200 bg-emerald-50'
+                                            }`}>
+                                                <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-muted-foreground">
+                                                    <span>Biaya provider:</span>
+                                                    <span className="text-right font-medium text-foreground">− {formatRupiah(fee)}</span>
+                                                    <span>Komisi balik ke saldo:</span>
+                                                    <span className="text-right font-medium text-emerald-600">+ {formatRupiah(komisi)}</span>
+                                                    <span className="font-semibold text-foreground">Biaya admin kamu:</span>
+                                                    <span className="text-right font-semibold text-foreground">+ {formatRupiah(editForm.price)}</span>
+                                                </div>
+                                                <div className="border-t pt-1.5">
+                                                    {margin < 0 ? (
+                                                        <>
+                                                            <p className="font-semibold">⚠️ Terlalu rendah, kamu akan rugi {formatRupiah(Math.abs(margin))} per transaksi!</p>
+                                                            <p>Naikkan minimal ke <span className="font-semibold">{formatRupiah(breakeven)}</span> agar tidak rugi.</p>
+                                                        </>
+                                                    ) : (
+                                                        <p className="font-semibold text-emerald-700">✓ Estimasi untung {formatRupiah(margin)} per transaksi</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )
+                                    })()}
+                                </>
                             ) : editProduct && editProduct.base_price > 0 ? (
                                 <p className="text-xs text-muted-foreground">
                                     Harga dasar: {formatRupiah(editProduct.base_price)}
                                 </p>
                             ) : null}
                         </div>
+
                     </div>
 
                     <DialogFooter>
@@ -451,7 +557,8 @@ export default function ServicePage({ service, supported, products }: Props) {
                                 editSaving ||
                                 !editForm.label.trim() ||
                                 !editForm.name.trim() ||
-                                (editProduct !== null && editForm.price < editProduct.base_price)
+                                (editProduct !== null && editForm.price < editProduct.base_price) ||
+                                (isPostpaid && editProduct !== null && editForm.price <= (editProduct.fee ?? 0) - (editProduct.komisi ?? 0))
                             }
                         >
                             {editSaving ? <Loader2 className="animate-spin" /> : <Save />}
@@ -595,10 +702,26 @@ export default function ServicePage({ service, supported, products }: Props) {
                                         <span className="text-xs text-muted-foreground">{item.label}</span>
                                         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                                             <span className="font-semibold text-foreground">
-                                                {formatRupiah(item.price)}
+                                                {item.price > 0 ? formatRupiah(item.price) : 'Sesuai tagihan'}
                                             </span>
-                                            <span>&middot;</span>
-                                            <span>{formatPeriod(item.period)}</span>
+                                            {item.fee != null && item.fee > 0 && (
+                                                <>
+                                                    <span>&middot;</span>
+                                                    <span>Biaya admin {formatRupiah(item.fee)}</span>
+                                                </>
+                                            )}
+                                            {item.komisi != null && item.komisi > 0 && (
+                                                <>
+                                                    <span>&middot;</span>
+                                                    <span className="text-green-600 font-medium">Komisi {formatRupiah(item.komisi)}</span>
+                                                </>
+                                            )}
+                                            {item.price > 0 && (
+                                                <>
+                                                    <span>&middot;</span>
+                                                    <span>{formatPeriod(item.period)}</span>
+                                                </>
+                                            )}
                                         </div>
                                     </label>
                                 )

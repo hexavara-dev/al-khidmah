@@ -1,0 +1,118 @@
+====================================================================
+MEKANISME BIAYA POSTPAID - RINGKASAN
+AL-KHIDMAH PLATFORM | April 2026
+====================================================================
+
+KONTEKS
+-------
+Platform ini menggunakan IAK (iakpay.com) sebagai penyedia layanan
+PPOB postpaid (PLN Pascabayar, TV Kabel, Internet, dsb.).
+Platform berperan sebagai RESELLER IAK.
+
+--------------------------------------------------------------------
+ISTILAH & DEFINISI
+--------------------------------------------------------------------
+
+BIAYA PROVIDER (fee dari IAK)
+  - Biaya yang dipotong otomatis dari saldo IAK platform setiap kali
+    satu transaksi postpaid berhasil diproses.
+  - Ini adalah BIAYA MODAL platform, bukan yang dibayar user.
+  - Contoh BIZNET HOME: Rp 5.000 per transaksi
+  - Contoh PLN POSTPAID: Rp 2.750 per transaksi
+
+KOMISI BALIK (komisi dari IAK)
+  - Komisi yang dikreditkan kembali ke saldo IAK platform setelah
+    transaksi sukses. Ini semacam "cashback" dari IAK ke reseller.
+  - Mengurangi biaya pokok yang ditanggung platform.
+  - Contoh BIZNET HOME: Rp 1.500 per transaksi
+  - Contoh PLN POSTPAID: Rp 1.800 per transaksi
+
+BIAYA ADMIN PLATFORM (price / diatur oleh admin)
+  - Biaya tambahan yang ditagihkan platform ke END USER di atas
+    tagihan aslinya. Ini adalah sumber keuntungan platform.
+  - Nilainya bebas diatur oleh admin di halaman Service.
+  - Default value: diisi otomatis = nilai komisi balik (agar langsung
+    untung kecil tanpa harus diatur manual)
+
+--------------------------------------------------------------------
+ALUR UANG PER TRANSAKSI
+--------------------------------------------------------------------
+
+  1. User membayar ke platform:
+       Tagihan asli (misal listrik Rp 200.000)
+     + Biaya Admin Platform (misal Rp 1.800)
+     = Total dibayar user: Rp 201.800
+
+  2. Platform memproses ke IAK → saldo IAK platform berkurang:
+     - Biaya provider: - Rp 2.750
+
+  3. Setelah transaksi sukses, komisi masuk ke saldo IAK platform:
+     + Komisi balik: + Rp 1.800
+
+  4. Net dari saldo IAK platform per transaksi:
+     - Rp 2.750 + Rp 1.800 = - Rp 950
+
+  5. Pemasukan dari biaya admin user:
+     + Rp 1.800
+
+  MARGIN = Biaya Admin - (Biaya Provider - Komisi Balik)
+         = 1.800 - (2.750 - 1.800)
+         = 1.800 - 950
+         = + Rp 850 (UNTUNG)
+
+--------------------------------------------------------------------
+RUMUS MARGIN
+--------------------------------------------------------------------
+
+  Margin = Biaya Admin + Komisi Balik - Biaya Provider
+         = price + komisi - fee
+
+  Impas (breakeven) = fee - komisi
+  → Biaya Admin minimal = Rp 950 (untuk PLN POSTPAID)
+
+  Jika Biaya Admin < (fee - komisi) → RUGI
+  Jika Biaya Admin > (fee - komisi) → UNTUNG
+
+--------------------------------------------------------------------
+CONTOH PRODUK NYATA
+--------------------------------------------------------------------
+
+PLN POSTPAID (PLNPOSTPAID):
+  Biaya provider : Rp 2.750
+  Komisi balik   : Rp 1.800
+  Biaya bersih   : Rp 950
+  Default admin  : Rp 1.800 → margin + Rp 850
+
+PLN NON-TAGLIS (PLNNONTAG):
+  Biaya provider : Rp 5.000
+  Komisi balik   : Rp 1.750
+  Biaya bersih   : Rp 3.250
+  Default admin  : Rp 1.750 → margin - Rp 1.500 (RUGI jika tidak diubah)
+
+BIZNET HOME:
+  Biaya provider : Rp 5.000
+  Komisi balik   : Rp 1.500
+  Biaya bersih   : Rp 3.500
+  Default admin  : Rp 1.500 → margin - Rp 2.000 (RUGI jika tidak diubah)
+
+--------------------------------------------------------------------
+IMPLEMENTASI DI KODE (ServicePage.tsx)
+--------------------------------------------------------------------
+
+Kolom datatable "Biaya Layanan":
+  Tampil: Biaya provider + Komisi balik (info modal per transaksi)
+
+Kolom datatable "Biaya Admin Anda":
+  Tampil: nilai price (atau komisi jika belum diatur = "(default)")
+  + label untung/rugi otomatis di bawahnya
+
+Form edit - helper box:
+  Rincian: Biaya provider (−), Komisi balik (+), Biaya admin kamu (+)
+  Jika margin < 0 → kotak merah + pesan rugi + angka minimal agar impas
+  Jika margin >= 0 → kotak hijau + estimasi untung
+
+Validasi tombol Simpan:
+  Disabled jika Biaya Admin <= (fee - komisi) → admin tidak bisa save
+  jika akan rugi atau impas, harus untung minimal Rp 1
+
+====================================================================

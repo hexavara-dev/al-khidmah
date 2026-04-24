@@ -22,6 +22,7 @@ class PPOBServiceProduct extends Model
         'type',
         'status',
         'fee',
+        'komisi',
         'icon_url',
     ];
 
@@ -30,6 +31,7 @@ class PPOBServiceProduct extends Model
         return [
             'price'  => 'integer',
             'fee'    => 'integer',
+            'komisi' => 'integer',
             'status' => 'integer',
         ];
     }
