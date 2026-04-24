@@ -11,19 +11,23 @@
     <p>Login berhasil. Membuka aplikasi...</p>
 
     <script>
-        var token = @json(new URL(@json($deepLink)) . searchParams . get('token'));
+        // ✅ $token dikirim langsung dari controller — tidak perlu parse URL
+        var token = @json($token);
         var returnUrl = @json($returnUrl);
+        var deepLink = @json($deepLink);
         var isAndroid = /android/i.test(navigator.userAgent);
 
         if (isAndroid) {
+            // Intent URL: langsung buka app tanpa dialog di Android
             window.location.href = 'intent://auth/callback'
                 + '?token=' + encodeURIComponent(token)
                 + '#Intent;scheme=ekhidmah;package=ekhidmah.com;end';
         } else {
-            window.location.href = @json($deepLink);
+            // iOS: pakai custom scheme
+            window.location.href = deepLink;
         }
 
-        // Fallback jika app tidak terbuka
+        // Fallback jika app tidak terbuka dalam 2.5 detik
         setTimeout(function () {
             if (!document.hidden) {
                 window.location.href = returnUrl;

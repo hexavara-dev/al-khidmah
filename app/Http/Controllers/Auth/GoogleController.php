@@ -84,7 +84,9 @@ class GoogleController extends Controller
                     'return_url' => $returnUrl,
                 ]);
 
-                return view('auth.mobile-callback', compact('deepLink', 'returnUrl'));
+                // ✅ Kirim $token langsung ke blade
+                // supaya blade tidak perlu parse URL
+                return view('auth.mobile-callback', compact('deepLink', 'returnUrl', 'token'));
             }
 
             // ── FLOW WEB ──────────────────────────────────────────────
