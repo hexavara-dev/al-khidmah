@@ -26,6 +26,11 @@ class PPOBController extends Controller
         'emoney' => ['iak_type' => 'etoll', 'name_from' => 'nominal'],
     ];
 
+    private const IAK_POSTPAID_CONFIG = [
+        'tv'      => ['iak_type' => 'tv'],
+        'listrik' => ['iak_type' => 'pln'],
+    ];
+
     public function __construct(
         private IAKService $iakService,
         private TransactionService $transactionService,
@@ -142,7 +147,7 @@ class PPOBController extends Controller
 
     public function inquiryEmoney(Request $request): JsonResponse
     {
-        
+
         $request->validate([
             'product_code' => 'required|string',
             'hp'           => 'required|string',
@@ -169,7 +174,7 @@ class PPOBController extends Controller
 
         if ($rawName && str_contains($rawName, '/')) {
             $parts = explode('/', $rawName);
-            $rawName = trim($parts[0]); 
+            $rawName = trim($parts[0]);
         }
 
         return response()->json([
@@ -216,22 +221,37 @@ class PPOBController extends Controller
 
     public function sync(string $code): JsonResponse
     {
+        // ── Prepaid ─────────────────────────────────────────────────────
         $config = self::IAK_CONFIG[$code] ?? null;
+        if ($config) {
+            $response = $this->iakService->priceList($config['iak_type']);
+            $rawList  = $response['data']['pricelist'] ?? [];
 
-        if (! $config) {
-            return response()->json(['error' => 'Layanan ini tidak mendukung sinkronisasi produk.'], 422);
+            $items = collect($rawList)
+                ->filter(fn($item) => is_array($item) && ($item['status'] ?? '') === 'active')
+                ->values()
+                ->map(fn($item) => $this->transform($item, $code, $config['name_from']))
+                ->values();
+
+            return response()->json(['data' => $items]);
         }
 
-        $response = $this->iakService->priceList($config['iak_type']);
-        $rawList  = $response['data']['pricelist'] ?? [];
+        // ── Postpaid ────────────────────────────────────────────────────
+        $postpaidConfig = self::IAK_POSTPAID_CONFIG[$code] ?? null;
+        if ($postpaidConfig) {
+            $response = $this->iakService->priceListPasca($postpaidConfig['iak_type']);
+            $rawList  = $response['data']['pasca'] ?? [];
 
-        $items = collect($rawList)
-            ->filter(fn($item) => is_array($item) && ($item['status'] ?? '') === 'active')
-            ->values()
-            ->map(fn($item) => $this->transform($item, $code, $config['name_from']))
-            ->values();
+            $items = collect($rawList)
+                ->filter(fn($item) => is_array($item) && ((int) ($item['status'] ?? 0)) === 1)
+                ->values()
+                ->map(fn($item) => $this->transformPostpaid($item, $code))
+                ->values();
 
-        return response()->json(['data' => $items]);
+            return response()->json(['data' => $items]);
+        }
+
+        return response()->json(['error' => 'Layanan ini tidak mendukung sinkronisasi produk.'], 422);
     }
 
     public function store(Request $request, string $code): JsonResponse
@@ -239,14 +259,15 @@ class PPOBController extends Controller
         $service = PPOBService::where('code', $code)->firstOrFail();
 
         $validated = $request->validate([
-            'items'          => ['required', 'array', 'min:1'],
-            'items.*.code'   => ['required', 'string', 'max:100'],
-            'items.*.label'  => ['required', 'string', 'max:255'],
-            'items.*.name'   => ['required', 'string'],
-            'items.*.price'  => ['required', 'integer', 'min:0'],
-            'items.*.period' => ['required', 'string', 'max:255'],
-            'items.*.type'   => ['required', 'string', 'max:50'],
-            'items.*.fee'    => ['nullable', 'integer', 'min:0'],
+            'items'             => ['required', 'array', 'min:1'],
+            'items.*.code'      => ['required', 'string', 'max:100'],
+            'items.*.label'     => ['required', 'string', 'max:255'],
+            'items.*.name'      => ['required', 'string'],
+            'items.*.price'     => ['required', 'integer', 'min:0'],
+            'items.*.period'    => ['required', 'string', 'max:255'],
+            'items.*.type'      => ['required', 'string', 'max:50'],
+            'items.*.fee'       => ['nullable', 'integer', 'min:0'],
+            'items.*.komisi'    => ['nullable', 'integer', 'min:0'],
             'items.*.icon_url'  => ['nullable', 'string', 'max:500'],
         ]);
 
@@ -275,6 +296,7 @@ class PPOBController extends Controller
             'type'            => $item['type'],
             'status'          => 1,
             'fee'             => $item['fee'] ?? null,
+            'komisi'          => $item['komisi'] ?? 0,
             'icon_url'        => $item['icon_url'] ?? null,
             'created_at'      => $now,
             'updated_at'      => $now,
@@ -283,7 +305,7 @@ class PPOBController extends Controller
         PPOBServiceProduct::upsert(
             $rows,
             ['code'],
-            ['label', 'name', 'price', 'period', 'type', 'fee', 'icon_url', 'status', 'updated_at']
+            ['label', 'name', 'price', 'period', 'type', 'fee', 'komisi', 'icon_url', 'status', 'updated_at']
         );
 
         // Set base_price only for rows being inserted for the first time (base_price still 0)
@@ -309,9 +331,9 @@ class PPOBController extends Controller
         $product = PPOBServiceProduct::findOrFail($productId);
 
         $validated = $request->validate([
-            'label' => ['required', 'string', 'max:255'],
-            'name'  => ['required', 'string'],
-            'price' => ['required', 'integer', 'min:0'],
+            'label'  => ['required', 'string', 'max:255'],
+            'name'   => ['required', 'string'],
+            'price'  => ['required', 'integer', 'min:0'],
         ]);
 
         if ((int) $validated['price'] < (int) $product->base_price) {
@@ -345,6 +367,21 @@ class PPOBController extends Controller
         'shopeepay' => '"https://cdn.mobilepulsa.net/img/product/operator_list/021219030403-shopeepay.jpg"',
         'linkaja'   => 'https://upload.wikimedia.org/wikipedia/commons/8/86/LinkAja.svg',
     ];
+
+    private function transformPostpaid(array $item, string $code): array
+    {
+        return [
+            'code'     => $item['code']           ?? '',
+            'label'    => $item['name']           ?? '',
+            'name'     => $item['name']           ?? '',
+            'price'    => 0,
+            'period'   => '0',
+            'type'     => $item['type']           ?? $code,
+            'fee'      => (int) ($item['fee']     ?? 0),
+            'komisi'   => (int) ($item['komisi']  ?? 0),
+            'icon_url' => null,
+        ];
+    }
 
     private function resolveIconUrl(array $item): ?string
     {

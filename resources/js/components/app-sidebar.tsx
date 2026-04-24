@@ -34,6 +34,7 @@ const navMain = [
             { title: 'Pulsa', url: '/admin/ppob/pulsa' },
             { title: 'Paket Data', url: '/admin/ppob/data' },
             { title: 'Token Listrik', url: '/admin/ppob/pln' },
+            { title: 'PLN Pascabayar', url: '/admin/ppob/listrik' },
             { title: 'Top Up E-Money', url: '/admin/ppob/emoney' },
             { title: 'TV Kabel', url: '/admin/ppob/tv' },
         ],

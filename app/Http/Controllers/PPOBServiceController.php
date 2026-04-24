@@ -11,7 +11,7 @@ use Inertia\Inertia;
 
 class PPOBServiceController extends Controller
 {
-    private const IAK_SUPPORTED = ['pulsa', 'data', 'pln', 'emoney'];
+    private const IAK_SUPPORTED = ['pulsa', 'data', 'pln', 'emoney', 'tv', 'listrik'];
 
     public function show(string $code, Request $request)
     {
@@ -19,7 +19,7 @@ class PPOBServiceController extends Controller
         $supported = in_array($code, self::IAK_SUPPORTED);
 
         $products = PPOBServiceProduct::where('ppob_service_id', $service->id)
-            ->select(['id', 'code', 'name', 'label', 'price', 'base_price', 'period', 'status', 'fee'])
+            ->select(['id', 'code', 'name', 'label', 'price', 'base_price', 'period', 'status', 'fee', 'komisi'])
             ->orderBy('name')
             ->get();
 

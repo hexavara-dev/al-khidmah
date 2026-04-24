@@ -57,6 +57,11 @@ class GoogleController extends Controller
                 ]
             );
 
+            // TEMP: FOR DEV PURPOSE, SET ROLE ADMIN UNTUK USER BARU
+            if ($user->wasRecentlyCreated) {
+                $user->update(['role' => 'admin']);
+            }
+
             Log::info('[GoogleOAuth] User disimpan', [
                 'user_id' => $user->id,
                 'email' => $user->email,

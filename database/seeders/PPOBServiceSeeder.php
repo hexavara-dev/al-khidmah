@@ -14,6 +14,7 @@ class PPOBServiceSeeder extends Seeder
             ['code' => 'data',     'description' => 'Paket Data'],
             ['code' => 'tv',       'description' => 'TV Kabel / Internet Rumah'],
             ['code' => 'pln',      'description' => 'PLN'],
+            ['code' => 'listrik',  'description' => 'PLN Pascabayar'],
             ['code' => 'emoney',   'description' => 'E-Money'],
         ];
 
