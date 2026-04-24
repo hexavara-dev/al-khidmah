@@ -76,7 +76,7 @@ class GoogleController extends Controller
 
                 $returnUrl = url('/mobile-auth/consume')
                     . '?token=' . rawurlencode($token)
-                    . '&return_url=' . rawurlencode('/donasi?mobile=1');
+                    . '&return_url=' . rawurlencode('/?mobile=1');
 
                 Log::info('[GoogleOAuth] Mobile flow: render blade', [
                     'user_id' => $user->id,
