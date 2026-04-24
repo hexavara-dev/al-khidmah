@@ -12,7 +12,7 @@ class MobileAuthController extends Controller
     public function consume(Request $request)
     {
         $plainToken = (string) $request->query('token', '');
-        $returnUrl = (string) $request->query('return_url', '/donasi');
+        $returnUrl = (string) $request->query('return_url', '/');
 
         if ($plainToken === '') {
             return response('Token tidak ada', 400);
@@ -32,7 +32,7 @@ class MobileAuthController extends Controller
         $accessToken->delete();
 
         if (!str_starts_with($returnUrl, '/')) {
-            $returnUrl = '/donasi';
+            $returnUrl = '/';
         }
 
         return redirect($returnUrl);
