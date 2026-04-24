@@ -92,29 +92,29 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::prefix('/donations')->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Admin/Donations');
-    })->name('donations');
+        Route::get('/', function () {
+            return Inertia::render('Admin/Donations');
+        })->name('donations');
 
-    Route::get('/overview', function () {
-        return Inertia::render('dashboard/DashboardOverviewDonationPage');
-    })->name('donations.overview');
+        Route::get('/overview', function () {
+            return Inertia::render('dashboard/DashboardOverviewDonationPage');
+        })->name('donations.overview');
 
-    Route::get('/campaigns', function () {
-        return Inertia::render('dashboard/DashboardCampaignsDonasiPage');
-    })->name('donations.campaigns');
+        Route::get('/campaigns', function () {
+            return Inertia::render('dashboard/DashboardCampaignsDonasiPage');
+        })->name('donations.campaigns');
 
-    Route::get('/categories', function () {
-        return Inertia::render('dashboard/DashboardDonationCategoriesPage');
-    })->name('donations.categories');
+        Route::get('/categories', function () {
+            return Inertia::render('dashboard/DashboardDonationCategoriesPage');
+        })->name('donations.categories');
     });
 
     // -- PPOB product sync (prepaid only) -------------------------
     Route::prefix('ppob')->name('ppob.')->group(function () {
-        Route::get('/{code}',                    [PPOBServiceController::class, 'show'])->name('page');
-        Route::get('/{code}/sync',               [PPOBController::class, 'sync'])->name('sync');
-        Route::post('/{code}/save',              [PPOBController::class, 'store'])->name('save');
-        Route::patch('/products/{productId}',        [PPOBController::class, 'updateProduct'])->name('product.update');
+        Route::get('/{code}', [PPOBServiceController::class, 'show'])->name('page');
+        Route::get('/{code}/sync', [PPOBController::class, 'sync'])->name('sync');
+        Route::post('/{code}/save', [PPOBController::class, 'store'])->name('save');
+        Route::patch('/products/{productId}', [PPOBController::class, 'updateProduct'])->name('product.update');
         Route::patch('/products/{productId}/toggle', [PPOBController::class, 'toggleProductStatus'])->name('product.toggle');
     });
 });
@@ -149,11 +149,11 @@ if (app()->environment(['local', 'staging'])) {
 
         return response()->json([
             'total_google_log_lines' => count($filtered),
-            'showing_last'           => count($recent),
-            'logs'                   => $recent,
-            'config_deep_link'       => config('services.mobile.deep_link_callback', '(tidak di-set, pakai default ekhidmah://callback)'),
-            'app_url'                => config('app.url'),
-            'google_redirect_uri'    => config('services.google.redirect'),
+            'showing_last' => count($recent),
+            'logs' => $recent,
+            'config_deep_link' => config('services.mobile.deep_link_callback', '(tidak di-set, pakai default ekhidmah://callback)'),
+            'app_url' => config('app.url'),
+            'google_redirect_uri' => config('services.google.redirect'),
         ]);
     })->name('debug.google.oauth');
 
@@ -161,11 +161,11 @@ if (app()->environment(['local', 'staging'])) {
         $token = $request->query('token', 'TOKEN_KOSONG');
         $deepLink = config('services.mobile.deep_link_callback', 'ekhidmah://callback')
             . '?token=' . rawurlencode($token)
-            . '&return_url=' . rawurlencode(url('/donasi?mobile=1'));
+            . '&return_url=' . rawurlencode(url('/?mobile=1'));
 
         return response()->json([
-            'deep_link'        => $deepLink,
-            'consume_url'      => route('mobile.auth.consume', ['token' => $token, 'return_url' => '/donasi?mobile=1']),
+            'deep_link' => $deepLink,
+            'consume_url' => route('mobile.auth.consume', ['token' => $token, 'return_url' => '/?mobile=1']),
             'config_deep_link' => config('services.mobile.deep_link_callback', '(tidak di-set)'),
         ]);
     })->name('debug.mobile.auth.test');
