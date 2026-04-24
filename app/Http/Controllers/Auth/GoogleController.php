@@ -84,7 +84,7 @@ class GoogleController extends Controller
                     'return_url' => $returnUrl,
                 ]);
 
-                return view('auth.membuka-aplikasi', compact('deepLink', 'returnUrl'));
+                return view('auth.mobile-callback', compact('deepLink', 'returnUrl'));
             }
 
             // ── FLOW WEB ──────────────────────────────────────────────
